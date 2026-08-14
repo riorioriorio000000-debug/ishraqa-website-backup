@@ -110,7 +110,7 @@ export async function getSiteVisitCount() {
 export async function submitVisitorFeedback(input: { rating: number; comment: string }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
-  await db.insert(visitorFeedback).values({ rating: input.rating, comment: input.comment.trim(), status: "pending" });
+  await db.insert(visitorFeedback).values({ rating: input.rating, comment: input.comment.trim(), status: "published" });
   return { accepted: true as const };
 }
 
@@ -144,7 +144,7 @@ export async function submitSiteComment(input: { pageKey: string; displayName: s
     displayName: input.displayName.trim(),
     body: input.body.trim(),
     avatarKind: input.avatarKind,
-    status: "pending",
+    status: "published",
   });
   return { accepted: true as const };
 }

@@ -333,3 +333,80 @@ img { -webkit-user-drag: none; user-drag: none; }
 @keyframes heart-rotate { 0% { transform: perspective(120px) rotateY(0deg) scale(1); } 50% { transform: perspective(120px) rotateY(180deg) scale(1.28); } 100% { transform: perspective(120px) rotateY(360deg) scale(1); } }
 @keyframes broken-heart { 0%,100% { transform: rotate(0) translateY(0); } 20% { transform: rotate(-9deg) translateY(1px); } 42% { transform: rotate(8deg) translateY(3px); } 64% { transform: rotate(-5deg) translateY(2px); } 82% { transform: rotate(3deg) translateY(1px); } }
 @media (prefers-reduced-motion: reduce) { .comment-reactions .heart.active, .comment-reactions .broken.active { animation: none; } }
+
+/* مكتبة المقالات: تدرجات هادئة من لون الهوية، بلا إطارات ثقيلة أو تباين لوني مشتت. */
+.article-index-section { background: linear-gradient(180deg, #f8fbfa 0%, #eef6f4 100%); }
+.featured-article-grid { gap: 1.15rem; }
+.featured-article-card { border: 0; box-shadow: none; color: #f8f8f1; }
+.featured-article-card:hover { box-shadow: 0 18px 34px rgba(15, 86, 88, .15); }
+.featured-article-card::after { display: none; }
+.featured-article-card-1 { background: #0f5c63; }
+.featured-article-card-2 { background: #17686d; color: #f8f8f1; }
+.featured-article-card-2::before { border-color: rgba(245, 250, 248, .18); }
+.featured-article-card-3 { background: #24747a; color: #f8f8f1; }
+.featured-article-card-4 { background: #2d7f80; color: #f8f8f1; }
+.featured-article-card-5 { background: #3a8987; color: #f8f8f1; }
+.featured-article-card-3::before, .featured-article-card-4::before, .featured-article-card-5::before { opacity: .14; }
+.article-read-button { background: #f8f8f1; color: #15585c; }
+.more-article-wrap { padding: 1.1rem 0 0; border: 0; border-radius: 0; background: transparent; }
+.secondary-article-grid { gap: .65rem; }
+.secondary-article-grid article { border: 0; border-radius: 14px; background: rgba(255, 255, 255, .54); transition: transform .16s var(--ease-out), background-color .16s ease; }
+.secondary-article-grid article:hover { transform: translateX(-3px); background: #fff; }
+.article-reading-section { background: #f9fcfb; }
+.article-prose > aside { border: 0; background: #eaf5f2; }
+.article-scroll-top { position: fixed; z-index: 20; left: 1.3rem; bottom: 5.5rem; display: inline-flex; align-items: center; gap: .42rem; padding: .7rem .9rem; border: 0; border-radius: 999px; background: #155e62; color: #fff; box-shadow: 0 12px 24px rgba(8, 72, 74, .18); font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; transition: transform .16s var(--ease-out), background-color .16s ease; }
+.article-scroll-top:hover { transform: translateY(-3px); background: #0e4d51; }
+.article-scroll-top:active { transform: scale(.97); }
+@media (max-width: 720px) { .article-scroll-top { left: 1rem; bottom: 5rem; padding: .65rem .75rem; } .featured-article-card { min-height: 250px; } }
+
+/* ترويسة مقروءة فوق جميع الخلفيات، مع الحفاظ على هدوء الهوية العربية. */
+.site-header { transition: color .18s var(--ease-out), background .18s var(--ease-out); }
+.site-header-on-dark .header-inner { margin-top: 10px; padding: 11px 16px; border: 1px solid rgba(255,255,255,.18); border-radius: 1.3rem; background: rgba(5,57,60,.28); box-shadow: 0 14px 32px rgba(0,0,0,.12); backdrop-filter: blur(12px); }
+.site-header-on-dark .brand-copy strong, .site-header-on-dark .brand-copy small, .site-header-on-dark .desktop-nav a, .site-header-on-dark .header-phone { color: #fff; text-shadow: 0 1px 12px rgba(0,0,0,.24); }
+.site-header-on-dark .header-phone { color: rgba(255,255,255,.92); }
+.site-header-on-dark .menu-toggle { border-color: rgba(255,255,255,.28); background: rgba(255,255,255,.12); color: #fff; }
+.header-actions { flex-direction: row-reverse; gap: 10px; }
+.header-booking-button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 15px; border-radius: 999px; background: #d9e9e4; color: #174e4e; font-size: .74rem; font-weight: 800; box-shadow: none; transition: transform .18s var(--ease-out), background .18s var(--ease-out), color .18s var(--ease-out); }
+.header-booking-button:hover { background: #c5ddd6; color: #0e484a; transform: translateY(-1px); }
+.site-header-on-dark .header-booking-button { background: rgba(255,255,255,.93); color: #135258; }
+.brand-lockup .brand-copy { text-align: right; }
+.brand-copy strong { white-space: nowrap; }
+
+/* لسان واتساب هادئ على اليمين؛ يظل واضحًا وهو مطوي ثم ينفتح إلى الداخل. */
+.whatsapp-float { right: 0 !important; left: auto !important; width: 58px !important; min-height: 54px; padding: 0 !important; border: 1px solid rgba(21,113,79,.18); border-radius: 1.1rem 0 0 1.1rem !important; background: rgba(255,253,248,.9) !important; color: #155d45 !important; box-shadow: 0 12px 30px rgba(15,92,99,.13); }
+.whatsapp-float-icon { min-width: 56px; height: 52px; color: #177a57; }
+.whatsapp-float-label { color: #fff; }
+.whatsapp-float:hover, .whatsapp-float:focus-visible { width: 184px !important; background: #197557 !important; color: #fff !important; box-shadow: 0 15px 34px rgba(16,100,72,.24); }
+.whatsapp-float:hover .whatsapp-float-icon, .whatsapp-float:focus-visible .whatsapp-float-icon { color: #fff; }
+
+@media (max-width: 720px) {
+  .header-inner { gap: 10px; }
+  .header-inner .brand-mark { width: 54px !important; height: 54px !important; max-width: 54px; }
+  .brand-copy { gap: 3px; }
+  .brand-copy strong { font-size: .82rem; }
+  .brand-copy small { max-width: 14.5rem; overflow: hidden; text-overflow: ellipsis; font-size: .48rem; }
+  .header-booking-button { display: none; }
+  .site-header-on-dark .header-inner { margin-top: 6px; padding: 8px 10px; }
+  .whatsapp-float { bottom: 20vh !important; }
+  .whatsapp-float .whatsapp-float-icon { display: inline-flex !important; align-items: center; justify-content: center; }
+  .whatsapp-float .whatsapp-float-label { display: none !important; }
+  .whatsapp-float:hover .whatsapp-float-label, .whatsapp-float:focus-visible .whatsapp-float-label { display: inline !important; }
+}
+/* Compressed, low-contrast interaction details added after the base style rules. */
+.article-comments { padding: clamp(1.2rem, 3vw, 2rem); margin-top: 2.5rem; }
+.article-comments-head h2 { margin: .35rem 0; font-size: clamp(1.35rem, 3vw, 1.9rem); }
+.article-comments-head p { margin: 0; max-width: 58ch; }
+.comment-form { gap: .7rem; padding: 1rem; }
+.comment-form textarea { min-height: 88px; }
+.comment-list { gap: .7rem; margin-top: 1rem; }
+.comment-card { padding: .85rem 1rem; gap: .7rem; }
+.comment-copy p { margin: .25rem 0 .45rem; }
+.comment-reactions { gap: .45rem; }
+.comment-reactions button { padding: .35rem .55rem; }
+.hero-dust-title { position: relative; isolation: isolate; }
+.hero-dust-title::after { content: "· · · · · · · · ·"; display: block; color: color-mix(in srgb, var(--sand) 80%, transparent); font: 700 .48rem/1 var(--font-kufi); letter-spacing: .35em; margin-top: .25rem; transition: transform 180ms var(--ease-out), letter-spacing 180ms var(--ease-out); }
+.hero-copy:hover .hero-dust-title::after { letter-spacing: .55em; transform: translateX(-.35rem); }
+.ai-thinking span { background: linear-gradient(105deg, var(--teal) 15%, var(--sand) 46%, var(--teal) 70%); background-size: 220% auto; background-clip: text; -webkit-background-clip: text; color: transparent; animation: ishrqa-think-shine 1.7s linear infinite; }
+@keyframes ishrqa-think-shine { to { background-position: -220% center; } }
+@media (prefers-reduced-motion: no-preference) { .service-card, .article-card, .hero-art img, .map-panel img { transition: transform 180ms var(--ease-out), filter 180ms var(--ease-out); } .service-card:hover, .article-card:hover { transform: translateY(-4px); } .hero-art:hover img, .map-panel:hover img { transform: translateY(-3px) scale(1.015); } }
+@media (prefers-reduced-motion: reduce) { .ai-thinking span { animation: none; } }

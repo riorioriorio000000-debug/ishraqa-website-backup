@@ -317,7 +317,7 @@ export function AIChatBox({
                   <div className="size-8 shrink-0 mt-1 rounded-full bg-primary/10 flex items-center justify-center">
                     <Sparkles className="size-4 text-primary" />
                   </div>
-                  <div className="flex items-center gap-2 px-1 py-2 text-sm text-muted-foreground" role="status" aria-live="polite">
+                  <div className="ai-thinking flex items-center gap-2 px-1 py-2 text-sm text-muted-foreground" role="status" aria-live="polite">
                     <img src="/manus-storage/ai-loading_4a219f05.gif" alt="" aria-hidden="true" className="size-8 object-contain" />
                     <span>يتحقق المساعد من التفاصيل…</span>
                   </div>

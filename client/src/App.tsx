@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import { AboutPage, ArticlesPage, BookingPage, CoveragePage, FaqPage, ServicesPage } from "./pages/StaticPage";
 import ArticleDetailPage from "./pages/ArticleDetail";
 import ServiceCalculator from "./pages/ServiceCalculator";
+import RouteScrollTop from "./components/RouteScrollTop";
 
 function Router() { return <Switch><Route path="/" component={Home} /><Route path="/services" component={ServicesPage} /><Route path="/booking" component={BookingPage} /><Route path="/calculator" component={ServiceCalculator} /><Route path="/articles" component={ArticlesPage} /><Route path="/articles/:slug" component={ArticleDetailPage} /><Route path="/where-we-work" component={CoveragePage} /><Route path="/about" component={AboutPage} /><Route path="/faq" component={FaqPage} /><Route path="/customer-service" component={CustomerService} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>; }
 
@@ -28,6 +29,7 @@ function App() {
       >
         <TooltipProvider>
           <ContentGuard />
+          <RouteScrollTop />
           <Router />
           <SelectionExplainer />
           <Toaster />
