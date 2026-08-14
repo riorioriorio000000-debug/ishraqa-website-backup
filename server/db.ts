@@ -1,9 +1,8 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commentReactions, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
-import { and, inArray } from "drizzle-orm";
 import { makeReactionId } from "../shared/interactionHelpers";
-import { directCommentStatus, isDuplicateComment, normalizeCommentSubmission } from "./commentSubmissionPolicy";
+import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -108,10 +107,10 @@ export async function getSiteVisitCount() {
   return result[0]?.value ?? 0;
 }
 
-export async function submitVisitorFeedback(input: { rating: number; comment: string }) {
+export async function submitVisitorFeedback(input: { rating: number; comment?: string }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
-  await db.insert(visitorFeedback).values({ rating: input.rating, comment: input.comment.trim(), status: "published" });
+  await db.insert(visitorFeedback).values({ rating: input.rating, comment: input.comment?.trim() || null, status: "published" });
   return { accepted: true as const };
 }
 
@@ -137,29 +136,81 @@ export async function getUniqueVisitorCount() {
   return Number(result[0]?.count ?? 0);
 }
 
-export async function submitSiteComment(input: { pageKey: string; displayName: string; body: string; avatarKind: string }) {
+type VisitorOwnedCommentInput = {
+  pageKey: string;
+  visitorId: string;
+  displayName: string;
+  body: string;
+  avatarKind: string;
+  avatarUrl?: string | null;
+};
+
+export async function submitSiteComment(input: VisitorOwnedCommentInput) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
-  const normalized = normalizeCommentSubmission(input);
-  const existing = await db.select({ pageKey: siteComments.pageKey, displayName: siteComments.displayName, body: siteComments.body })
+  const normalized = {
+    ...normalizeCommentSubmission(input),
+    visitorId: input.visitorId,
+    avatarUrl: input.avatarUrl?.trim() || null,
+  };
+  if (!passesAutomaticCommentScreening(normalized)) return { accepted: false as const, reason: "content-not-allowed" as const };
+  const existing = await db.select({ id: siteComments.id })
     .from(siteComments)
-    .where(and(eq(siteComments.pageKey, normalized.pageKey), eq(siteComments.displayName, normalized.displayName), eq(siteComments.body, normalized.body)))
+    .where(and(eq(siteComments.pageKey, normalized.pageKey), eq(siteComments.visitorId, normalized.visitorId), isNull(siteComments.deletedAt)))
     .limit(1);
-  if (isDuplicateComment(existing[0], normalized)) return { accepted: true as const, duplicate: true as const };
+  if (existing[0]) return { accepted: false as const, reason: "active-comment-exists" as const, existingCommentId: existing[0].id };
   await db.insert(siteComments).values({
     pageKey: normalized.pageKey,
+    visitorId: normalized.visitorId,
     displayName: normalized.displayName,
     body: normalized.body,
     avatarKind: normalized.avatarKind,
+    avatarUrl: normalized.avatarUrl,
     status: directCommentStatus,
   });
-  return { accepted: true as const, duplicate: false as const };
+  return { accepted: true as const };
+}
+
+export async function updateVisitorComment(input: VisitorOwnedCommentInput & { commentId: number }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const normalized = {
+    ...normalizeCommentSubmission(input),
+    avatarUrl: input.avatarUrl?.trim() || null,
+  };
+  if (!passesAutomaticCommentScreening(normalized)) return { updated: false as const, reason: "content-not-allowed" as const };
+  const existing = await db.select({ id: siteComments.id })
+    .from(siteComments)
+    .where(and(eq(siteComments.id, input.commentId), eq(siteComments.visitorId, input.visitorId), isNull(siteComments.deletedAt)))
+    .limit(1);
+  if (!existing[0]) return { updated: false as const };
+  await db.update(siteComments).set({
+    displayName: normalized.displayName,
+    body: normalized.body,
+    avatarKind: normalized.avatarKind,
+    avatarUrl: normalized.avatarUrl,
+    status: directCommentStatus,
+    updatedAt: new Date(),
+  }).where(eq(siteComments.id, input.commentId));
+  return { updated: true as const };
+}
+
+export async function deleteVisitorComment(commentId: number, visitorId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const existing = await db.select({ id: siteComments.id })
+    .from(siteComments)
+    .where(and(eq(siteComments.id, commentId), eq(siteComments.visitorId, visitorId), isNull(siteComments.deletedAt)))
+    .limit(1);
+  if (!existing[0]) return { deleted: false as const };
+  await db.update(siteComments).set({ deletedAt: new Date(), updatedAt: new Date() }).where(eq(siteComments.id, commentId));
+  return { deleted: true as const };
 }
 
 export async function getPublishedComments(pageKey: string, visitorId?: string) {
   const db = await getDb();
   if (!db) return [];
-  const comments = await db.select().from(siteComments).where(and(eq(siteComments.pageKey, pageKey), eq(siteComments.status, "published"))).orderBy(desc(siteComments.createdAt)).limit(30);
+  const comments = await db.select().from(siteComments).where(and(eq(siteComments.pageKey, pageKey), eq(siteComments.status, "published"), isNull(siteComments.deletedAt))).orderBy(desc(siteComments.createdAt)).limit(30);
   if (!comments.length) return [];
   const ids = comments.map((comment) => comment.id);
   const reactions = await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction, count: sql<number>`count(*)` })
@@ -167,8 +218,9 @@ export async function getPublishedComments(pageKey: string, visitorId?: string) 
   const ownReactions = visitorId
     ? await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction }).from(commentReactions).where(and(inArray(commentReactions.commentId, ids), eq(commentReactions.visitorId, visitorId)))
     : [];
-  return comments.map((comment) => ({
+  return comments.map(({ visitorId: commentVisitorId, ...comment }) => ({
     ...comment,
+    isOwner: Boolean(visitorId && commentVisitorId === visitorId),
     hearts: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "heart")?.count ?? 0),
     broken: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "broken")?.count ?? 0),
     viewerReaction: ownReactions.find((item) => item.commentId === comment.id)?.reaction ?? null,

@@ -11,7 +11,6 @@ export default function WhatsAppFloat() {
       title="تواصل عبر واتساب"
     >
       <span className="whatsapp-float-icon"><MessageCircle size={23} aria-hidden="true" /></span>
-      <span className="whatsapp-float-label">تواصل عبر واتساب</span>
     </a>
   );
 }

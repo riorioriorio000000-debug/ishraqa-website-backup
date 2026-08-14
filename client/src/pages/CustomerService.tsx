@@ -1,21 +1,23 @@
-import { AIChatBox, type Message } from "@/components/AIChatBox";
+import { AIChatBox, type ChatAttachmentUpload, type Message } from "@/components/AIChatBox";
 import SiteShell from "@/components/SiteShell";
 import PageMeta from "@/components/PageMeta";
 import { browseFailureMessage } from "@/lib/chatMessages";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, BookOpen, CalendarCheck, MapPin, ShieldCheck, Sparkles } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "wouter";
 
 const prompts = [
   "ما الخدمة الأنسب لتنظيف شقة؟",
   "هل تصلون إلى مدينتي؟",
   "كيف أرتب طلب نقل العفش؟",
-  "لخّص لي مقالة تنظيف الرياض",
+  "أحتاج رابط دليل صيانة منزلية",
 ];
 
 type ChatMessage = Omit<Message, "role"> & { role: "user" | "assistant" };
 const publicUrlPattern = /https?:\/\/[^\s<>"'`\])}]+/i;
+const chatHistoryKey = "ishraqa-customer-service-chat-v1";
+const pageContext = { title: "خدمة العملاء الذكية", url: "/customer-service" };
 
 function extractPublicUrl(content: string) {
   const match = content.match(publicUrlPattern);
@@ -23,18 +25,32 @@ function extractPublicUrl(content: string) {
 }
 
 export default function CustomerService() {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(chatHistoryKey) || "[]");
+      return Array.isArray(stored)
+        ? stored.filter((message): message is ChatMessage => message && (message.role === "user" || message.role === "assistant") && typeof message.content === "string")
+        : [];
+    } catch {
+      return [];
+    }
+  });
   const [activeRequest, setActiveRequest] = useState<"chat" | "browse" | null>(null);
   const chat = trpc.ai.chat.useMutation({
-    onSuccess: ({ reply, contentCards }) => {
-      setMessages((current) => [...current, { role: "assistant", content: reply, contentCards }]);
+    onSuccess: ({ reply, workSummary, navigation, contentCards }) => {
+      setMessages((current) => [...current, { role: "assistant", content: reply, workSummary, navigation, contentCards }]);
       setActiveRequest(null);
     },
     onError: () => setActiveRequest(null),
   });
   const browse = trpc.ai.browseAndSummarize.useMutation({
     onSuccess: ({ summary, title, sourceUrl }) => {
-      setMessages((current) => [...current, { role: "assistant", content: `### ملخص صفحة عامة: ${title}\n\n${summary}\n\n[فتح المصدر](${sourceUrl})` }]);
+      setMessages((current) => [...current, {
+        role: "assistant",
+        content: `### ملخص صفحة عامة: ${title}\n\n${summary}\n\n[فتح المصدر](${sourceUrl})`,
+        workSummary: ["تحققت من أن الرابط عام ويمكن قراءته.", "لخصت النص المتاح في الصفحة فقط.", "أدرجت رابط المصدر للمراجعة."],
+      }]);
       setActiveRequest(null);
     },
     onError: (error) => {
@@ -49,18 +65,37 @@ export default function CustomerService() {
     },
   });
 
-  function sendMessage(content: string) {
-    const next: ChatMessage[] = [...messages, { role: "user", content }];
+  useEffect(() => {
+    window.localStorage.setItem(chatHistoryKey, JSON.stringify(messages.slice(-24)));
+  }, [messages]);
+
+  function sendMessage(content: string, attachment?: ChatAttachmentUpload) {
+    const next: ChatMessage[] = [...messages, {
+      role: "user",
+      content,
+      ...(attachment ? { attachment: { name: attachment.name, mimeType: attachment.mimeType, size: attachment.size } } : {}),
+    }];
     setMessages(next);
     const url = extractPublicUrl(content);
-    if (url) {
+    if (url && !attachment) {
       const question = content.replace(url, "").replace(/^\s*(?:لخ[ّصص]|اختصر|اقرأ)\s*(?:هذه\s*)?(?:الصفحة)?\s*[:：-]?\s*/i, "").trim();
       setActiveRequest("browse");
       browse.mutate({ url, question: question || undefined });
       return;
     }
     setActiveRequest("chat");
-    chat.mutate({ messages: next });
+    chat.mutate({ messages: next, pageContext, ...(attachment ? { attachment } : {}) });
+  }
+
+  function editMessage(messageIndex: number, content: string) {
+    const revisedHistory = [...messages.slice(0, messageIndex), { role: "user" as const, content }];
+    setMessages(revisedHistory);
+    setActiveRequest("chat");
+    chat.mutate({ messages: revisedHistory, pageContext });
+  }
+
+  function shareCurrentPage() {
+    sendMessage("أريد مساعدتك بخصوص الصفحة الحالية: خدمة العملاء الذكية. أعطني أفضل خطوة مناسبة من معلومات موقع الإشراقة.");
   }
 
   return (
@@ -92,13 +127,13 @@ export default function CustomerService() {
                 placeholder="اسأل عن الخدمات أو ألصق رابط صفحة عامة لتلخيصها…"
                 emptyStateMessage="اسأل عن الخدمة، المدن، التحضير للحجز أو المقالات. يمكنك أيضًا لصق رابط صفحة عامة لتلخيصه هنا."
                 suggestedPrompts={prompts}
-                quickActions={[
-                  { label: "ابحث داخل الموقع", prompt: "ابحث في الموقع عن " },
-                  { label: "لخّص صفحة ويب", prompt: "لخّص هذه الصفحة: " },
-                ]}
+                quickActions={[{ label: "ابحث داخل الموقع", prompt: "ابحث في الموقع عن " }]}
+                onEditMessage={editMessage}
+                onClearConversation={() => setMessages([])}
+                onShareCurrentPage={shareCurrentPage}
                 className="assistant-chatbox"
               />
-              <p className="assistant-privacy-note"><ShieldCheck size={17} /> <strong>خصوصيتك مهمة:</strong> يُرسل نص السؤال الذي تكتبه فقط لمعالجة الرد. عند لصق رابط عام، تُقرأ الصفحة المتاحة فقط لتلخيصها. لا يُرسل نموذج الحجز أو رقم هاتفك تلقائيًا؛ لذا تجنّب إدخال أي بيانات حساسة في المحادثة.</p>
+              <p className="assistant-privacy-note"><ShieldCheck size={17} /> <strong>خصوصيتك مهمة:</strong> يُرسل نص السؤال الذي تكتبه فقط لمعالجة الرد. إذا أرفقت ملفًا، يُرسل هذا الملف وحده مع السؤال لتحليله. عند لصق رابط عام، تُقرأ الصفحة المتاحة فقط لتلخيصها. لا يُرسل نموذج الحجز أو رقم هاتفك تلقائيًا؛ لذا تجنّب إدخال أي بيانات حساسة في المحادثة.</p>
               {chat.error && <p className="assistant-error">تعذر الرد الآن. يمكنك التواصل عبر واتساب مباشرة.</p>}
             </div>
           </div>

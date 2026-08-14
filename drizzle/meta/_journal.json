@@ -15,6 +15,13 @@
       "when": 1786716729466,
       "tag": "0001_sudden_human_fly",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1786740304530,
+      "tag": "0002_nebulous_speed",
+      "breakpoints": true
     }
   ]
 }

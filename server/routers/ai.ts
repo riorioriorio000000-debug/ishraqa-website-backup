@@ -4,11 +4,20 @@ import { invokeLLM } from "../_core/llm";
 import { publicProcedure, router } from "../_core/trpc";
 import { internalNavigation, recommendSiteContent, siteKnowledge } from "../siteKnowledge";
 import { fetchPublicPageText } from "../webPage";
+import { storageGetSignedUrl, storagePut } from "../storage";
 
 const messageSchema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.string().trim().min(1).max(4_000),
 });
+
+const attachmentSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  mimeType: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf", "audio/mpeg", "audio/wav", "audio/mp4", "video/mp4"]),
+  dataUrl: z.string().min(32).max(7_000_000),
+});
+
+const MAX_ATTACHMENT_BYTES = 5_000_000;
 
 const requestLedger = new Map<string, { startedAt: number; count: number }>();
 const REQUEST_WINDOW_MS = 10 * 60 * 1_000;
@@ -39,6 +48,35 @@ function readReply(response: Awaited<ReturnType<typeof invokeLLM>>) {
 
 function identityFor(request: { ip?: string }) {
   return request.ip || 'public-visitor';
+}
+
+function visibleWorkSummary(question: string, pageTitle?: string, hasAttachment = false) {
+  const topic = question.trim().slice(0, 88) || "طلبك";
+  const source = pageTitle ? `ضمن سياق صفحة «${pageTitle}»` : "ضمن معلومات موقع الإشراقة";
+  return [
+    `فهمت ${topic}.`,
+    hasAttachment ? "راجعت المرفق المسموح الذي أرسلته مع السؤال." : `راجعت المعلومات المتاحة ${source}.`,
+    "جهزت إجابة مختصرة وروابط أو بطاقات مناسبة عند توفرها.",
+  ];
+}
+
+function attachmentError(message: string): never {
+  throw new TRPCError({ code: "BAD_REQUEST", message });
+}
+
+function decodeAttachment(attachment: z.infer<typeof attachmentSchema>) {
+  const prefix = `data:${attachment.mimeType};base64,`;
+  if (!attachment.dataUrl.startsWith(prefix)) attachmentError("صيغة المرفق غير مطابقة لنوع الملف المحدد.");
+  const encoded = attachment.dataUrl.slice(prefix.length);
+  if (!encoded || !/^[A-Za-z0-9+/]+={0,2}$/.test(encoded)) attachmentError("تعذر قراءة بيانات المرفق.");
+  const data = Buffer.from(encoded, "base64");
+  if (!data.length || data.length > MAX_ATTACHMENT_BYTES) attachmentError("حجم المرفق يجب ألا يتجاوز 5 ميغابايت.");
+  return data;
+}
+
+function safeAttachmentName(name: string) {
+  const cleaned = name.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+  return cleaned || "attachment";
 }
 
 const buildRequestPattern = /(?:اصنع|أنشئ|انشئ|اكتب|طو[ّرل]|طور|ابن[ِى]|سو[ّي]|اعمل|عل[ّم]|اشرح|أبغى|ابغى|أريد|اريد|احتاج).{0,80}(?:كود|أكواد|شفرة|برمج|تطبيق|تطبيقات|موقع|مواقع|برنامج|code|app|website)|(?:كود|أكواد|شفرة|برمج|تطبيق|تطبيقات|موقع|مواقع|برنامج|code|app|website).{0,80}(?:اصنع|أنشئ|انشئ|اكتب|طو[ّرل]|طور|ابن[ِى]|سو[ّي]|اعمل|عل[ّم]|اشرح)/i;
@@ -74,22 +112,52 @@ ${siteKnowledge}
 
 export const aiRouter = router({
   chat: publicProcedure
-    .input(z.object({ messages: z.array(messageSchema).min(1).max(12) }))
+    .input(z.object({
+      messages: z.array(messageSchema).min(1).max(12),
+      attachment: attachmentSchema.optional(),
+      pageContext: z.object({
+        title: z.string().trim().min(1).max(160),
+        url: z.string().max(2_048),
+      }).optional(),
+    }))
     .mutation(async ({ input, ctx }) => {
       const latestUserMessage = [...input.messages].reverse().find((message) => message.role === 'user');
+      const workSummary = visibleWorkSummary(latestUserMessage?.content || "الطلب", input.pageContext?.title, Boolean(input.attachment));
       if (latestUserMessage && isUnsupportedBuildRequest(latestUserMessage.content)) {
-        return { reply: buildRequestRefusal, navigation: internalNavigation, contentCards: recommendSiteContent(latestUserMessage.content) };
+        return {
+          reply: buildRequestRefusal,
+          workSummary,
+          navigation: internalNavigation,
+          contentCards: recommendSiteContent(latestUserMessage.content),
+        };
       }
       protectBudget(identityFor(ctx.req));
+      const attachmentContent = input.attachment
+        ? await (async () => {
+          const data = decodeAttachment(input.attachment!);
+          const stored = await storagePut(`assistant-attachments/${Date.now()}-${safeAttachmentName(input.attachment!.name)}`, data, input.attachment!.mimeType);
+          const signedUrl = await storageGetSignedUrl(stored.key);
+          return input.attachment!.mimeType.startsWith("image/")
+            ? { type: "image_url" as const, image_url: { url: signedUrl, detail: "auto" as const } }
+            : { type: "file_url" as const, file_url: { url: signedUrl, mime_type: input.attachment!.mimeType as "application/pdf" | "audio/mpeg" | "audio/wav" | "audio/mp4" | "video/mp4" } };
+        })()
+        : null;
       const response = await invokeLLM({
         messages: [
           { role: 'system', content: assistantRules },
-          ...input.messages.map(message => ({ role: message.role, content: message.content })),
+          ...(input.pageContext ? [{ role: 'system' as const, content: `سياق الصفحة الحالية (للاسترشاد فقط): ${input.pageContext.title} — ${input.pageContext.url}` }] : []),
+          ...input.messages.map((message, index) => ({
+            role: message.role,
+            content: attachmentContent && index === input.messages.length - 1 && message.role === "user"
+              ? [{ type: "text" as const, text: message.content }, attachmentContent]
+              : message.content,
+          })),
         ],
         maxTokens: 900,
       });
       return {
         reply: readReply(response),
+        workSummary,
         navigation: internalNavigation,
         contentCards: recommendSiteContent(latestUserMessage?.content || ""),
       };

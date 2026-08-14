@@ -34,7 +34,7 @@ export const siteMetrics = mysqlTable("site_metrics", {
 export const visitorFeedback = mysqlTable("visitor_feedback", {
   id: int("id").autoincrement().primaryKey(),
   rating: int("rating").notNull(),
-  comment: text("comment").notNull(),
+  comment: text("comment"),
   status: mysqlEnum("status", ["pending", "published", "rejected"]).default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
@@ -53,6 +53,8 @@ export const siteVisitors = mysqlTable("site_visitors", {
 export const siteComments = mysqlTable("site_comments", {
   id: int("id").autoincrement().primaryKey(),
   pageKey: varchar("pageKey", { length: 160 }).notNull(),
+  /** Anonymous browser-generated ID used only to control comment ownership. */
+  visitorId: varchar("visitorId", { length: 64 }),
   displayName: varchar("displayName", { length: 64 }).notNull(),
   avatarKind: varchar("avatarKind", { length: 32 }).notNull().default("wave"),
   avatarUrl: varchar("avatarUrl", { length: 1024 }),
@@ -60,6 +62,7 @@ export const siteComments = mysqlTable("site_comments", {
   status: mysqlEnum("status", ["pending", "published", "rejected"]).default("pending").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  deletedAt: timestamp("deletedAt"),
 });
 
 /** The composite identifier guarantees one selectable reaction per anonymous visitor and comment. */
