@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 
 const VISITOR_STORAGE_KEY = "ishraqa-anonymous-visitor";

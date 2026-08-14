@@ -27,6 +27,13 @@ export default function PageMeta({ title, description, keywords, path }: PageMet
     setMeta("property", "og:title", fullTitle);
     setMeta("property", "og:description", description);
     setMeta("property", "og:url", canonicalUrl);
+    setMeta("property", "og:type", "website");
+    setMeta("property", "og:locale", "ar_SA");
+    setMeta("property", "og:image", "https://al-eshraqa.co/manus-storage/ishraqa-blue-mark_51e1bd1d.png");
+    setMeta("name", "twitter:card", "summary");
+    setMeta("name", "twitter:title", fullTitle);
+    setMeta("name", "twitter:description", description);
+    setMeta("name", "robots", "index, follow, max-image-preview:large");
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement("link");

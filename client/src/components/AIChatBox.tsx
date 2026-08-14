@@ -3,7 +3,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, BookOpen, CalendarCheck, Loader2, Play, Send, User, Wrench, Sparkles } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { Streamdown } from "streamdown";
 
 /**

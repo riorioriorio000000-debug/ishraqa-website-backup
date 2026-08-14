@@ -53,4 +53,14 @@ describe("نموذج الحجز", () => {
     expect(screen.getByAltText("رسم شفاف لصندوق أدوات تنظيف الإشراقة")).toBeTruthy();
     expect(screen.getByAltText("خريطة مدن تغطية شركة الإشراقة في السعودية")).toBeTruthy();
   });
+
+  it("يفصل عنوان الترويسة إلى سطرين واضحين بدل تداخل النص", () => {
+    render(<Home />);
+
+    const title = screen.getByRole("heading", { level: 1, name: /بيتك أنظف.*يومك أخف/ });
+    expect(title.className).toContain("hero-dust-title");
+    expect(title.querySelectorAll("span, em")).toHaveLength(2);
+    expect(title.querySelector("span")?.textContent).toBe("بيتك أنظف.");
+    expect(title.querySelector("em")?.textContent).toBe("يومك أخف.");
+  });
 });

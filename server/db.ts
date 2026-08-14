@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import { InsertUser, commentReactions, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
 import { and, inArray } from "drizzle-orm";
 import { makeReactionId } from "../shared/interactionHelpers";
+import { directCommentStatus, isDuplicateComment, normalizeCommentSubmission } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -139,14 +140,20 @@ export async function getUniqueVisitorCount() {
 export async function submitSiteComment(input: { pageKey: string; displayName: string; body: string; avatarKind: string }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const normalized = normalizeCommentSubmission(input);
+  const existing = await db.select({ pageKey: siteComments.pageKey, displayName: siteComments.displayName, body: siteComments.body })
+    .from(siteComments)
+    .where(and(eq(siteComments.pageKey, normalized.pageKey), eq(siteComments.displayName, normalized.displayName), eq(siteComments.body, normalized.body)))
+    .limit(1);
+  if (isDuplicateComment(existing[0], normalized)) return { accepted: true as const, duplicate: true as const };
   await db.insert(siteComments).values({
-    pageKey: input.pageKey,
-    displayName: input.displayName.trim(),
-    body: input.body.trim(),
-    avatarKind: input.avatarKind,
-    status: "published",
+    pageKey: normalized.pageKey,
+    displayName: normalized.displayName,
+    body: normalized.body,
+    avatarKind: normalized.avatarKind,
+    status: directCommentStatus,
   });
-  return { accepted: true as const };
+  return { accepted: true as const, duplicate: false as const };
 }
 
 export async function getPublishedComments(pageKey: string, visitorId?: string) {

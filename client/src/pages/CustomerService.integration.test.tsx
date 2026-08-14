@@ -77,4 +77,15 @@ describe("CustomerService", () => {
     expect(screen.getByRole("link", { name: "دليل تنظيف المنزل" }).getAttribute("href")).toBe("/articles/home-cleaning-guide");
     expect(screen.getByRole("link", { name: "مرئي خدمة التنظيف" }).getAttribute("href")).toBe("/");
   });
+
+  it("يوفر روابط وصول سريعة ذات مسارات داخلية وتلميحًا واضحًا لتلخيص الروابط", () => {
+    render(<CustomerService />);
+
+    const navigation = screen.getByRole("navigation", { name: "روابط وصول سريعة" });
+    expect(navigation.querySelector('a[href="/services"]')).toBeTruthy();
+    expect(navigation.querySelector('a[href="/articles"]')).toBeTruthy();
+    expect(navigation.querySelector('a[href="/where-we-work"]')).toBeTruthy();
+    expect(navigation.querySelector('a[href="/booking"]')).toBeTruthy();
+    expect(screen.getByText(/عند لصق رابط عام، تُقرأ الصفحة المتاحة فقط لتلخيصها/)).toBeTruthy();
+  });
 });

@@ -167,6 +167,8 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    // يخفف استهلاك الذاكرة في بيئة البناء؛ لا يغير الملفات المنتجة أو ضغط الاستضافة.
+    reportCompressedSize: false,
   },
   server: {
     host: true,
