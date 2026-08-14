@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
 import { publicProcedure, router } from "../_core/trpc";
-import { internalNavigation, siteKnowledge } from "../siteKnowledge";
+import { internalNavigation, recommendSiteContent, siteKnowledge } from "../siteKnowledge";
 import { fetchPublicPageText } from "../webPage";
 
 const messageSchema = z.object({
@@ -78,7 +78,7 @@ export const aiRouter = router({
     .mutation(async ({ input, ctx }) => {
       const latestUserMessage = [...input.messages].reverse().find((message) => message.role === 'user');
       if (latestUserMessage && isUnsupportedBuildRequest(latestUserMessage.content)) {
-        return { reply: buildRequestRefusal, navigation: internalNavigation };
+        return { reply: buildRequestRefusal, navigation: internalNavigation, contentCards: recommendSiteContent(latestUserMessage.content) };
       }
       protectBudget(identityFor(ctx.req));
       const response = await invokeLLM({
@@ -88,7 +88,11 @@ export const aiRouter = router({
         ],
         maxTokens: 900,
       });
-      return { reply: readReply(response), navigation: internalNavigation };
+      return {
+        reply: readReply(response),
+        navigation: internalNavigation,
+        contentCards: recommendSiteContent(latestUserMessage?.content || ""),
+      };
     }),
   summarizeSelection: publicProcedure
     .input(z.object({ text: z.string().trim().min(1).max(6_000) }))

@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import Home from "./Home";
@@ -16,7 +16,10 @@ vi.mock("wouter", () => ({
 }));
 
 describe("نموذج الحجز", () => {
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   it("يفتح رسالة واتساب جاهزة إلى رقم الإشراقة المعتمد", async () => {
     const user = userEvent.setup();
@@ -37,5 +40,15 @@ describe("نموذج الحجز", () => {
       "noopener,noreferrer",
     );
     expect(openSpy.mock.calls[0]?.[0]).toContain("0509614797");
+  });
+
+  it("يعرض كل صور الصفحة الرئيسية بنص بديل وصفي بعد التصيير", () => {
+    render(<Home />);
+
+    const images = screen.getAllByRole("img");
+    expect(images).toHaveLength(6);
+    images.forEach((image) => expect(image.getAttribute("alt")?.trim()).not.toBe(""));
+    expect(screen.getByAltText("رسم شفاف لصندوق أدوات تنظيف الإشراقة")).toBeTruthy();
+    expect(screen.getByAltText("خريطة مدن تغطية شركة الإشراقة في السعودية")).toBeTruthy();
   });
 });

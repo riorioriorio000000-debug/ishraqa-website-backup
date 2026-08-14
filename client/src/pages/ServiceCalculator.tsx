@@ -1,6 +1,7 @@
 import { ArrowLeft, Calculator, CheckCircle2, MessageCircle, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import SiteShell from "@/components/SiteShell";
+import PageMeta from "@/components/PageMeta";
 import { calculateServicePlan, propertyLabels, serviceLabels, sizeLabels, type PropertyKey, type ServiceKey, type SizeKey } from "@shared/serviceCalculator";
 
 export default function ServiceCalculator() {
@@ -14,6 +15,7 @@ export default function ServiceCalculator() {
 
   return (
     <SiteShell>
+      <PageMeta title="حاسبة ترتيب طلب الخدمة" description="رتّب تفاصيل طلب التنظيف أو الصيانة أو نقل العفش قبل التواصل، دون إظهار أسعار ثابتة أو التزام بحجز." keywords={["حاسبة تنظيف", "تنظيم طلب صيانة", "طلب نقل عفش", "واتساب الإشراقة"]} path="/calculator" />
       <main className="calculator-page" dir="rtl">
         <section className="calculator-hero" style={{ backgroundImage: "linear-gradient(90deg, rgba(11,64,70,.94), rgba(11,64,70,.78)), url('/manus-storage/ishraqa-calculator-background_0832e013.webp')" }}>
           <div className="shell calculator-hero-inner">

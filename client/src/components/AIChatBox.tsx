@@ -2,17 +2,35 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { Loader2, Send, User, Sparkles } from "lucide-react";
+import { ArrowLeft, BookOpen, CalendarCheck, Loader2, Play, Send, User, Wrench, Sparkles } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Streamdown } from "streamdown";
 
 /**
  * Message type matching server-side LLM Message interface
  */
+export type SiteContentCard = {
+  id: string;
+  kind: "service" | "article" | "video" | "booking";
+  title: string;
+  description: string;
+  href: string;
+  image?: string;
+  video?: string;
+};
+
 export type Message = {
   role: "system" | "user" | "assistant";
   content: string;
+  contentCards?: SiteContentCard[];
 };
+
+function ContentCardIcon({ kind }: { kind: SiteContentCard["kind"] }) {
+  if (kind === "article") return <BookOpen aria-hidden="true" className="size-4" />;
+  if (kind === "video") return <Play aria-hidden="true" className="size-4" />;
+  if (kind === "booking") return <CalendarCheck aria-hidden="true" className="size-4" />;
+  return <Wrench aria-hidden="true" className="size-4" />;
+}
 
 export type AIChatBoxProps = {
   /**
@@ -286,9 +304,36 @@ export function AIChatBox({
                       )}
                     >
                       {message.role === "assistant" ? (
-                        <div className="prose prose-sm dark:prose-invert max-w-none">
-                          <Streamdown>{message.content}</Streamdown>
-                        </div>
+                        <>
+                          <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <Streamdown>{message.content}</Streamdown>
+                          </div>
+                          {message.contentCards && message.contentCards.length > 0 && (
+                            <div className="mt-4 grid gap-2" aria-label="روابط مقترحة من موقع الإشراقة">
+                              {message.contentCards.map((card) => (
+                                <a
+                                  key={card.id}
+                                  href={card.href}
+                                  className="group flex min-w-0 items-center gap-3 rounded-xl border border-teal-900/10 bg-white/80 p-2.5 text-right no-underline transition hover:-translate-y-0.5 hover:border-teal-800/25 hover:bg-white"
+                                >
+                                  {card.video ? (
+                                    <video className="size-14 shrink-0 rounded-lg bg-teal-50 object-cover" src={card.video} muted loop autoPlay playsInline aria-label={card.title} />
+                                  ) : card.image ? (
+                                    <img className="size-14 shrink-0 rounded-lg bg-teal-50 object-contain p-1" src={card.image} alt="" aria-hidden="true" />
+                                  ) : (
+                                    <span className="flex size-14 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-800"><ContentCardIcon kind={card.kind} /></span>
+                                  )}
+                                  <span className="min-w-0 flex-1">
+                                    <span className="mb-0.5 flex items-center gap-1 text-xs font-semibold text-teal-800"><ContentCardIcon kind={card.kind} /> {card.kind === "article" ? "مقالة" : card.kind === "video" ? "مرئي" : card.kind === "booking" ? "الحجز" : "خدمة"}</span>
+                                    <strong className="block truncate text-sm text-slate-900">{card.title}</strong>
+                                    <span className="block line-clamp-2 text-xs leading-5 text-slate-600">{card.description}</span>
+                                  </span>
+                                  <ArrowLeft aria-hidden="true" className="size-4 shrink-0 text-teal-800 transition group-hover:-translate-x-0.5" />
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </>
                       ) : (
                         <p className="whitespace-pre-wrap text-sm">
                           {message.content}

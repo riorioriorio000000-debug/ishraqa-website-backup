@@ -1,5 +1,6 @@
 import { AIChatBox, type Message } from "@/components/AIChatBox";
 import SiteShell from "@/components/SiteShell";
+import PageMeta from "@/components/PageMeta";
 import { browseFailureMessage } from "@/lib/chatMessages";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, BookOpen, CalendarCheck, MapPin, ShieldCheck, Sparkles } from "lucide-react";
@@ -13,7 +14,7 @@ const prompts = [
   "لخّص لي مقالة تنظيف الرياض",
 ];
 
-type ChatMessage = { role: "user" | "assistant"; content: string };
+type ChatMessage = Omit<Message, "role"> & { role: "user" | "assistant" };
 const publicUrlPattern = /https?:\/\/[^\s<>"'`\])}]+/i;
 
 function extractPublicUrl(content: string) {
@@ -25,8 +26,8 @@ export default function CustomerService() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [activeRequest, setActiveRequest] = useState<"chat" | "browse" | null>(null);
   const chat = trpc.ai.chat.useMutation({
-    onSuccess: ({ reply }) => {
-      setMessages((current) => [...current, { role: "assistant", content: reply }]);
+    onSuccess: ({ reply, contentCards }) => {
+      setMessages((current) => [...current, { role: "assistant", content: reply, contentCards }]);
       setActiveRequest(null);
     },
     onError: () => setActiveRequest(null),
@@ -64,6 +65,7 @@ export default function CustomerService() {
 
   return (
     <SiteShell>
+      <PageMeta title="خدمة العملاء الذكية" description="اسأل مساعد الإشراقة عن خدمات التنظيف والصيانة ونقل العفش ومقالات الموقع، واحصل على روابط موثوقة للخطوة التالية." keywords={["خدمة العملاء", "مساعد شركة تنظيف", "تنظيف وصيانة", "نقل عفش", "مقالات الإشراقة"]} path="/customer-service" />
       <main className="assistant-page" dir="rtl">
         <section className="assistant-hero">
           <div className="shell assistant-hero-grid">
