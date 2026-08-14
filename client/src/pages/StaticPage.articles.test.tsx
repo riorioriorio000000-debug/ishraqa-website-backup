@@ -2,6 +2,7 @@
 import React from "react";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { articleEntries } from "./ArticleDetail";
 import { ArticlesPage } from "./StaticPage";
 
 vi.mock("@/components/SiteShell", () => ({ default: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
@@ -27,5 +28,14 @@ describe("بحث مكتبة المقالات", () => {
     expect(container.querySelectorAll(".featured-article-card")).toHaveLength(4);
     expect(container.querySelectorAll(".featured-article-media img")).toHaveLength(4);
     expect(container.querySelectorAll(".secondary-article-grid article")).toHaveLength(58);
+  });
+
+  it("يضم صورًا وملاحظات تحريرية مواءمة داخل الأدلة الرئيسية من دون الاسم السابق", () => {
+    const mainArticles = articleEntries.filter((article) => article.category === "دليل رئيسي");
+
+    expect(mainArticles).toHaveLength(4);
+    expect(mainArticles.every((article) => article.image && article.imageAlt)).toBe(true);
+    expect(mainArticles.flatMap((article) => article.sections).map(([, body]) => body).join(" ")).not.toContain("الخيال كلين");
+    expect(mainArticles.find((article) => article.slug === "kitchen-care-guide")?.sections.map(([heading]) => heading)).toContain("الدهون المتراكمة تحتاج تدرجًا");
   });
 });
