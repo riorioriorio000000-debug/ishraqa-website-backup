@@ -12,5 +12,7 @@ describe("SEO للصفحة الرئيسية", () => {
     expect(homeSource).toContain('alt={`رسم توضيحي لخدمة ${title} من شركة الإشراقة`}');
     expect(homeSource).toContain('alt="رسم أدوات الصيانة المنزلية المستخدمة في خدمات الإشراقة"');
     expect(homeSource).toContain('alt="خريطة مدن تغطية شركة الإشراقة في السعودية"');
+    expect(homeSource.match(/loading="lazy" decoding="async"/g)).toHaveLength(3);
+    expect(homeSource).toContain('decoding="async" fetchPriority="high"');
   });
 });
