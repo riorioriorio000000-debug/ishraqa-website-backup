@@ -1,8 +1,9 @@
 import { AIChatBox, type Message } from "@/components/AIChatBox";
 import SiteShell from "@/components/SiteShell";
+import { browseFailureMessage } from "@/lib/chatMessages";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, BookOpen, CalendarCheck, MapPin, ShieldCheck, Sparkles } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
 
 const prompts = [
@@ -35,7 +36,16 @@ export default function CustomerService() {
       setMessages((current) => [...current, { role: "assistant", content: `### ملخص صفحة عامة: ${title}\n\n${summary}\n\n[فتح المصدر](${sourceUrl})` }]);
       setActiveRequest(null);
     },
-    onError: () => setActiveRequest(null),
+    onError: (error) => {
+      setMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          content: browseFailureMessage(error.message),
+        },
+      ]);
+      setActiveRequest(null);
+    },
   });
 
   function sendMessage(content: string) {
@@ -87,7 +97,7 @@ export default function CustomerService() {
                 className="assistant-chatbox"
               />
               <p className="assistant-privacy-note"><ShieldCheck size={17} /> <strong>خصوصيتك مهمة:</strong> يُرسل نص السؤال الذي تكتبه فقط لمعالجة الرد. عند لصق رابط عام، تُقرأ الصفحة المتاحة فقط لتلخيصها. لا يُرسل نموذج الحجز أو رقم هاتفك تلقائيًا؛ لذا تجنّب إدخال أي بيانات حساسة في المحادثة.</p>
-              {(chat.error || browse.error) && <p className="assistant-error">{browse.error ? "تعذر قراءة الصفحة. تأكد أن الرابط عام ويشير إلى صفحة HTML." : "تعذر الرد الآن. يمكنك التواصل عبر واتساب مباشرة."}</p>}
+              {chat.error && <p className="assistant-error">تعذر الرد الآن. يمكنك التواصل عبر واتساب مباشرة.</p>}
             </div>
           </div>
         </section>
