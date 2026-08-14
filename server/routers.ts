@@ -28,6 +28,13 @@ export const appRouter = router({
     listPublished: publicProcedure.query(() => db.getPublishedFeedback()),
     submit: publicProcedure.input(z.object({ rating: z.number().int().min(1).max(5), comment: z.string().trim().min(10).max(800) })).mutation(({ input }) => db.submitVisitorFeedback(input)),
   }),
+  interactions: router({
+    visitorCount: publicProcedure.query(() => db.getUniqueVisitorCount()),
+    recordVisitor: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).mutation(({ input }) => db.recordAnonymousVisitor(input.visitorId)),
+    listComments: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getPublishedComments(input.pageKey, input.visitorId)),
+    submitComment: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), displayName: z.string().trim().min(2).max(64), body: z.string().trim().min(4).max(800), avatarKind: z.enum(["wave", "spark", "leaf", "star"]).default("wave") })).mutation(({ input }) => db.submitSiteComment(input)),
+    react: publicProcedure.input(z.object({ commentId: z.number().int().positive(), visitorId: z.string().uuid(), reaction: z.enum(["heart", "broken"]).nullable() })).mutation(({ input }) => db.setCommentReaction(input)),
+  }),
 
   // TODO: add feature routers here, e.g.
   // todo: router({

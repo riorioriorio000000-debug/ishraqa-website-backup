@@ -1,9 +1,8 @@
 import { AIChatBox, type Message } from "@/components/AIChatBox";
 import SiteShell from "@/components/SiteShell";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, BookOpen, CalendarCheck, Globe2, Loader2, MapPin, ShieldCheck, Sparkles } from "lucide-react";
-import { FormEvent, useState } from "react";
-import { Streamdown } from "streamdown";
+import { ArrowLeft, BookOpen, CalendarCheck, MapPin, ShieldCheck, Sparkles } from "lucide-react";
+import { useState } from "react";
 import { Link } from "wouter";
 
 const prompts = [
@@ -14,30 +13,43 @@ const prompts = [
 ];
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
+const publicUrlPattern = /https?:\/\/[^\s<>"'`\])}]+/i;
+
+function extractPublicUrl(content: string) {
+  const match = content.match(publicUrlPattern);
+  return match?.[0]?.replace(/[.,،؛!?]+$/, "") || null;
+}
 
 export default function CustomerService() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [url, setUrl] = useState("");
-  const [question, setQuestion] = useState("");
-  const [webSummary, setWebSummary] = useState<{ title: string; summary: string; sourceUrl: string } | null>(null);
+  const [activeRequest, setActiveRequest] = useState<"chat" | "browse" | null>(null);
   const chat = trpc.ai.chat.useMutation({
-    onSuccess: ({ reply }) => setMessages((current) => [...current, { role: "assistant" as const, content: reply }]),
+    onSuccess: ({ reply }) => {
+      setMessages((current) => [...current, { role: "assistant", content: reply }]);
+      setActiveRequest(null);
+    },
+    onError: () => setActiveRequest(null),
   });
   const browse = trpc.ai.browseAndSummarize.useMutation({
-    onSuccess: (result) => setWebSummary(result),
+    onSuccess: ({ summary, title, sourceUrl }) => {
+      setMessages((current) => [...current, { role: "assistant", content: `### ملخص صفحة عامة: ${title}\n\n${summary}\n\n[فتح المصدر](${sourceUrl})` }]);
+      setActiveRequest(null);
+    },
+    onError: () => setActiveRequest(null),
   });
 
   function sendMessage(content: string) {
     const next: ChatMessage[] = [...messages, { role: "user", content }];
     setMessages(next);
+    const url = extractPublicUrl(content);
+    if (url) {
+      const question = content.replace(url, "").replace(/^\s*(?:لخ[ّصص]|اختصر|اقرأ)\s*(?:هذه\s*)?(?:الصفحة)?\s*[:：-]?\s*/i, "").trim();
+      setActiveRequest("browse");
+      browse.mutate({ url, question: question || undefined });
+      return;
+    }
+    setActiveRequest("chat");
     chat.mutate({ messages: next });
-  }
-
-  function submitBrowse(event: FormEvent) {
-    event.preventDefault();
-    if (!url.trim() || browse.isPending) return;
-    setWebSummary(null);
-    browse.mutate({ url: url.trim(), question: question.trim() || undefined });
   }
 
   return (
@@ -63,32 +75,20 @@ export default function CustomerService() {
               <AIChatBox
                 messages={messages}
                 onSendMessage={sendMessage}
-                isLoading={chat.isPending}
+                isLoading={activeRequest !== null}
                 height="610px"
-                placeholder="اكتب سؤالك عن الخدمات أو المقالات…"
-                emptyStateMessage="اسأل عن الخدمة، المدن، التحضير للحجز أو المقالات."
+                placeholder="اسأل عن الخدمات أو ألصق رابط صفحة عامة لتلخيصها…"
+                emptyStateMessage="اسأل عن الخدمة، المدن، التحضير للحجز أو المقالات. يمكنك أيضًا لصق رابط صفحة عامة لتلخيصه هنا."
                 suggestedPrompts={prompts}
+                quickActions={[
+                  { label: "ابحث داخل الموقع", prompt: "ابحث في الموقع عن " },
+                  { label: "لخّص صفحة ويب", prompt: "لخّص هذه الصفحة: " },
+                ]}
                 className="assistant-chatbox"
               />
-              <p className="assistant-privacy-note"><ShieldCheck size={17} /> <strong>خصوصيتك مهمة:</strong> يُرسل نص السؤال الذي تكتبه فقط لمعالجة الرد. لا يُرسل نموذج الحجز أو رقم هاتفك تلقائيًا إلى المساعد، لذا تجنّب إدخال أي بيانات حساسة في المحادثة.</p>
-              {chat.error && <p className="assistant-error">تعذر الرد الآن. يمكنك التواصل عبر واتساب مباشرة.</p>}
+              <p className="assistant-privacy-note"><ShieldCheck size={17} /> <strong>خصوصيتك مهمة:</strong> يُرسل نص السؤال الذي تكتبه فقط لمعالجة الرد. عند لصق رابط عام، تُقرأ الصفحة المتاحة فقط لتلخيصها. لا يُرسل نموذج الحجز أو رقم هاتفك تلقائيًا؛ لذا تجنّب إدخال أي بيانات حساسة في المحادثة.</p>
+              {(chat.error || browse.error) && <p className="assistant-error">{browse.error ? "تعذر قراءة الصفحة. تأكد أن الرابط عام ويشير إلى صفحة HTML." : "تعذر الرد الآن. يمكنك التواصل عبر واتساب مباشرة."}</p>}
             </div>
-
-            <aside className="assistant-side-panel">
-              <div className="assistant-side-icon"><Globe2 size={24} /></div>
-              <span className="eyebrow">تلخيص صفحة عامة</span>
-              <h2>اقرأ صفحة ثم لخّصها.</h2>
-              <p>ألصق رابط صفحة عامة، وسيقرأ المساعد النص المتاح فيها ويلخصه لك. لا يمكنه فتح حسابات أو صفحات خاصة أو تنفيذ إجراءات نيابةً عنك. أرسل روابط لا تحتوي على بيانات خاصة.</p>
-              <form className="assistant-browse-form" onSubmit={submitBrowse}>
-                <label htmlFor="public-url">رابط الصفحة العامة</label>
-                <input id="public-url" type="url" dir="ltr" value={url} onChange={(event) => setUrl(event.target.value)} placeholder="https://example.com/article" required />
-                <label htmlFor="browse-question">ماذا تريد أن تعرف؟ <small>اختياري</small></label>
-                <textarea id="browse-question" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="لخّص أهم النقاط" maxLength={800} />
-                <button className="button" type="submit" disabled={browse.isPending}>{browse.isPending ? <><Loader2 size={16} className="spin" /> جارٍ القراءة…</> : <><Globe2 size={16} /> لخّص الصفحة</>}</button>
-              </form>
-              {browse.error && <p className="assistant-error">تعذر قراءة الصفحة. تأكد أن الرابط عام ويشير إلى صفحة HTML.</p>}
-              {webSummary && <article className="web-summary"><span>ملخص عام</span><h3>{webSummary.title}</h3><div><Streamdown>{webSummary.summary}</Streamdown></div><a href={webSummary.sourceUrl} target="_blank" rel="noreferrer">فتح المصدر</a></article>}
-            </aside>
           </div>
         </section>
       </main>

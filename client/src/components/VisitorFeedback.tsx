@@ -2,11 +2,20 @@ import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 
+function getVisitorId() {
+  const key = "ishraqa-anonymous-visitor";
+  const known = localStorage.getItem(key);
+  if (known) return known;
+  const created = crypto.randomUUID();
+  localStorage.setItem(key, created);
+  return created;
+}
+
 export default function VisitorFeedback() {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
-  const visits = trpc.metrics.get.useQuery();
-  const recordVisit = trpc.metrics.recordVisit.useMutation({ onSuccess: () => visits.refetch() });
+  const visits = trpc.interactions.visitorCount.useQuery();
+  const recordVisit = trpc.interactions.recordVisitor.useMutation({ onSuccess: () => visits.refetch() });
   const feedback = trpc.feedback.listPublished.useQuery();
   const submit = trpc.feedback.submit.useMutation({
     onSuccess: () => {
@@ -16,9 +25,7 @@ export default function VisitorFeedback() {
   });
 
   useEffect(() => {
-    if (sessionStorage.getItem("ishraqa-visit-recorded")) return;
-    sessionStorage.setItem("ishraqa-visit-recorded", "1");
-    recordVisit.mutate();
+    recordVisit.mutate({ visitorId: getVisitorId() });
   }, []);
 
   return (
@@ -28,7 +35,7 @@ export default function VisitorFeedback() {
           <span className="eyebrow"><i /> صوت الزائر</span>
           <h2>رأيك يساعدنا على تحسين التجربة.</h2>
           <p>يعرض الموقع عدد الزيارات بصورة إجمالية. أما التقييمات والتعليقات فلا تظهر للعامة إلا بعد مراجعة الإدارة، ولذلك لا نعرض أي تقييمات غير حقيقية.</p>
-          <div className="visit-count"><span>{visits.data ?? 0}</span><small>زيارة مسجلة للموقع</small></div>
+          <div className="visit-count"><span>{visits.data ?? 0}</span><small>زائر مجهول مسجل للموقع</small></div>
         </div>
         <form className="feedback-form" onSubmit={(event) => { event.preventDefault(); submit.mutate({ rating, comment }); }}>
           <strong>شارك ملاحظتك</strong>

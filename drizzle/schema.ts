@@ -40,3 +40,36 @@ export const visitorFeedback = mysqlTable("visitor_feedback", {
 });
 
 export type VisitorFeedback = typeof visitorFeedback.$inferSelect;
+
+/** A browser-generated anonymous ID; no IP address, telephone number, or account is stored here. */
+export const siteVisitors = mysqlTable("site_visitors", {
+  visitorId: varchar("visitorId", { length: 64 }).primaryKey(),
+  firstSeenAt: timestamp("firstSeenAt").defaultNow().notNull(),
+  lastSeenAt: timestamp("lastSeenAt").defaultNow().onUpdateNow().notNull(),
+  visitCount: int("visitCount").notNull().default(1),
+});
+
+/** Public comments remain pending until the site owner publishes them. */
+export const siteComments = mysqlTable("site_comments", {
+  id: int("id").autoincrement().primaryKey(),
+  pageKey: varchar("pageKey", { length: 160 }).notNull(),
+  displayName: varchar("displayName", { length: 64 }).notNull(),
+  avatarKind: varchar("avatarKind", { length: 32 }).notNull().default("wave"),
+  avatarUrl: varchar("avatarUrl", { length: 1024 }),
+  body: text("body").notNull(),
+  status: mysqlEnum("status", ["pending", "published", "rejected"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+/** The composite identifier guarantees one selectable reaction per anonymous visitor and comment. */
+export const commentReactions = mysqlTable("comment_reactions", {
+  id: varchar("id", { length: 160 }).primaryKey(),
+  commentId: int("commentId").notNull(),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  reaction: mysqlEnum("reaction", ["heart", "broken"]).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type SiteComment = typeof siteComments.$inferSelect;

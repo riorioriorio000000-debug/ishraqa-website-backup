@@ -57,6 +57,9 @@ export type AIChatBoxProps = {
    * Click to send directly
    */
   suggestedPrompts?: string[];
+
+  /** Optional in-chat shortcuts that prefill a request without leaving the conversation. */
+  quickActions?: Array<{ label: string; prompt: string; icon?: React.ReactNode }>;
 };
 
 /**
@@ -119,6 +122,7 @@ export function AIChatBox({
   height = "600px",
   emptyStateMessage = "Start a conversation with AI",
   suggestedPrompts,
+  quickActions,
 }: AIChatBoxProps) {
   const [input, setInput] = useState("");
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -205,6 +209,26 @@ export function AIChatBox({
                 <Sparkles className="size-12 opacity-20" />
                 <p className="text-sm">{emptyStateMessage}</p>
               </div>
+
+              {quickActions && quickActions.length > 0 && (
+                <div className="flex max-w-2xl flex-wrap justify-center gap-2" aria-label="أدوات المحادثة">
+                  {quickActions.map((action) => (
+                    <button
+                      key={action.label}
+                      type="button"
+                      onClick={() => {
+                        setInput(action.prompt);
+                        requestAnimationFrame(() => textareaRef.current?.focus());
+                      }}
+                      disabled={isLoading}
+                      className="inline-flex items-center gap-2 rounded-full border border-teal-100 bg-white px-4 py-2 text-sm font-semibold text-teal-800 transition-colors hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {action.icon}
+                      {action.label}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {suggestedPrompts && suggestedPrompts.length > 0 && (
                 <div className="flex max-w-2xl flex-wrap justify-center gap-2">

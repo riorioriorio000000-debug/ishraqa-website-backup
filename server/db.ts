@@ -1,6 +1,8 @@
 import { desc, eq, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, siteMetrics, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, commentReactions, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { and, inArray } from "drizzle-orm";
+import { makeReactionId } from "../shared/interactionHelpers";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -116,4 +118,64 @@ export async function getPublishedFeedback() {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(visitorFeedback).where(eq(visitorFeedback.status, "published")).orderBy(desc(visitorFeedback.createdAt)).limit(12);
+}
+
+export async function recordAnonymousVisitor(visitorId: string) {
+  const db = await getDb();
+  if (!db) return 0;
+  await db.insert(siteVisitors).values({ visitorId, visitCount: 1 }).onDuplicateKeyUpdate({
+    set: { visitCount: sql`${siteVisitors.visitCount} + 1`, lastSeenAt: new Date() },
+  });
+  return getUniqueVisitorCount();
+}
+
+export async function getUniqueVisitorCount() {
+  const db = await getDb();
+  if (!db) return 0;
+  const result = await db.select({ count: sql<number>`count(*)` }).from(siteVisitors);
+  return Number(result[0]?.count ?? 0);
+}
+
+export async function submitSiteComment(input: { pageKey: string; displayName: string; body: string; avatarKind: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  await db.insert(siteComments).values({
+    pageKey: input.pageKey,
+    displayName: input.displayName.trim(),
+    body: input.body.trim(),
+    avatarKind: input.avatarKind,
+    status: "pending",
+  });
+  return { accepted: true as const };
+}
+
+export async function getPublishedComments(pageKey: string, visitorId?: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const comments = await db.select().from(siteComments).where(and(eq(siteComments.pageKey, pageKey), eq(siteComments.status, "published"))).orderBy(desc(siteComments.createdAt)).limit(30);
+  if (!comments.length) return [];
+  const ids = comments.map((comment) => comment.id);
+  const reactions = await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction, count: sql<number>`count(*)` })
+    .from(commentReactions).where(inArray(commentReactions.commentId, ids)).groupBy(commentReactions.commentId, commentReactions.reaction);
+  const ownReactions = visitorId
+    ? await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction }).from(commentReactions).where(and(inArray(commentReactions.commentId, ids), eq(commentReactions.visitorId, visitorId)))
+    : [];
+  return comments.map((comment) => ({
+    ...comment,
+    hearts: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "heart")?.count ?? 0),
+    broken: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "broken")?.count ?? 0),
+    viewerReaction: ownReactions.find((item) => item.commentId === comment.id)?.reaction ?? null,
+  }));
+}
+
+export async function setCommentReaction(input: { commentId: number; visitorId: string; reaction: "heart" | "broken" | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const id = makeReactionId(input.commentId, input.visitorId);
+  if (!input.reaction) {
+    await db.delete(commentReactions).where(eq(commentReactions.id, id));
+    return { reaction: null };
+  }
+  await db.insert(commentReactions).values({ id, commentId: input.commentId, visitorId: input.visitorId, reaction: input.reaction }).onDuplicateKeyUpdate({ set: { reaction: input.reaction, updatedAt: new Date() } });
+  return { reaction: input.reaction };
 }
