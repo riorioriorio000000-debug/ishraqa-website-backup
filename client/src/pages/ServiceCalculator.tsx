@@ -10,8 +10,15 @@ export default function ServiceCalculator() {
   const [size, setSize] = useState<SizeKey>("medium");
   const [city, setCity] = useState("الرياض");
   const [details, setDetails] = useState("");
+  const [customService, setCustomService] = useState("");
+  const [customProperty, setCustomProperty] = useState("");
+  const [customSize, setCustomSize] = useState("");
   const plan = useMemo(() => calculateServicePlan({ service, property, size, city, details }), [service, property, size, city, details]);
-  const whatsappUrl = `https://wa.me/966509614797?text=${encodeURIComponent(plan.message)}`;
+  const selectedService = customService.trim() || serviceLabels[service];
+  const selectedProperty = customProperty.trim() || propertyLabels[property];
+  const selectedSize = customSize.trim() || sizeLabels[size];
+  const customSummary = [customService.trim() && `الخدمة المكتوبة: ${customService.trim()}`, customProperty.trim() && `نوع المكان المكتوب: ${customProperty.trim()}`, customSize.trim() && `الحجم المكتوب: ${customSize.trim()}`].filter(Boolean).join("\n");
+  const whatsappUrl = `https://wa.me/966552610151?text=${encodeURIComponent(`${plan.message}${customSummary ? `\n${customSummary}` : ""}`)}`;
 
   return (
     <SiteShell>
@@ -32,20 +39,23 @@ export default function ServiceCalculator() {
               <div className="choice-grid three">
                 {(Object.keys(serviceLabels) as ServiceKey[]).map((key) => <button type="button" key={key} aria-pressed={service === key} className={service === key ? "choice active" : "choice"} onClick={() => setService(key)}><strong>{serviceLabels[key]}</strong><small>{key === "cleaning" ? "عناية دورية أو عميقة" : key === "maintenance" ? "ترتيب أعمال المنزل" : "تغليف ونقل منظم"}</small></button>)}
               </div>
+              <label className="calculator-select">أو اكتب نوع الخدمة بنفسك<input value={customService} onChange={(event) => setCustomService(event.target.value)} placeholder="مثال: تنظيف مجلس أو تعقيم شقة" /></label>
 
               <div className="calculator-heading"><Sparkles size={24} /><div><span>الخطوة 02</span><h2>صف المكان باختصار</h2></div></div>
               <div className="choice-grid">
                 {(Object.keys(propertyLabels) as PropertyKey[]).map((key) => <button type="button" key={key} aria-pressed={property === key} className={property === key ? "choice active" : "choice"} onClick={() => setProperty(key)}>{propertyLabels[key]}</button>)}
               </div>
+              <label className="calculator-select">أو اكتب نوع المكان بنفسك<input value={customProperty} onChange={(event) => setCustomProperty(event.target.value)} placeholder="مثال: استراحة صغيرة أو مكتب" /></label>
               <label className="calculator-select">حجم المكان<select value={size} onChange={(event) => setSize(event.target.value as SizeKey)}>{(Object.keys(sizeLabels) as SizeKey[]).map((key) => <option value={key} key={key}>{sizeLabels[key]}</option>)}</select></label>
+              <label className="calculator-select">أو اكتب الحجم أو المساحة بنفسك<input value={customSize} onChange={(event) => setCustomSize(event.target.value)} placeholder="مثال: 180 مترًا أو خمس غرف" /></label>
               <label className="calculator-select">المدينة<input value={city} onChange={(event) => setCity(event.target.value)} placeholder="مثال: الرياض" /></label>
               <label className="calculator-select">اكتب تفاصيلك بنفسك <textarea value={details} onChange={(event) => setDetails(event.target.value)} maxLength={700} placeholder="مثال: لدي موعد مفضل، أو غرفة محددة، أو نوع عطل، أو تفاصيل لا توجد ضمن الخيارات." /></label>
             </form>
 
             <aside className="calculator-result" aria-live="polite">
               <span className="eyebrow"><i /> ملخص احتياجك</span>
-              <h2>{serviceLabels[service]} لـ {propertyLabels[property]}</h2>
-              <div className="result-line"><CheckCircle2 size={19} /><p><strong>حجم المساحة:</strong> {sizeLabels[size]}</p></div>
+              <h2>{selectedService} لـ {selectedProperty}</h2>
+              <div className="result-line"><CheckCircle2 size={19} /><p><strong>حجم المساحة:</strong> {selectedSize}</p></div>
               <div className="result-line"><CheckCircle2 size={19} /><p><strong>طريقة التنسيق:</strong> {plan.visitLevel}</p></div>
               <div className="result-line"><CheckCircle2 size={19} /><p><strong>ما نحتاج معرفته:</strong> {plan.focus}</p></div>
               {details.trim() && <div className="result-line"><CheckCircle2 size={19} /><p><strong>تفاصيلك:</strong> {details.trim()}</p></div>}

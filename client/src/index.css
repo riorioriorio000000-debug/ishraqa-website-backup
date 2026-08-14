@@ -22,6 +22,8 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .desktop-nav { display: flex; align-items: center; gap: clamp(14px, 2vw, 30px); margin-inline: auto; color: #35585a; font-size: .81rem; font-weight: 700; }
 .desktop-nav a, .header-phone, .text-link { transition: color .2s ease, transform .2s ease; }
 .desktop-nav a:hover, .header-phone:hover, .text-link:hover { color: var(--teal); }
+.header-phone { display: inline-grid; place-items: center; width: 58px; height: 34px; border: 1px solid rgba(15,92,99,.18); border-radius: 999px; background: rgba(255,253,248,.72); color: var(--teal); box-shadow: 0 6px 17px rgba(15,92,99,.08); }
+.header-phone:hover { transform: translateY(-2px); border-color: rgba(15,92,99,.36); background: rgba(230,243,240,.9); }
 .calculator-nav-link { display: inline-flex !important; align-items: center; gap: 5px; }.calculator-nav-link span { padding: 2px 6px; border-radius: 999px; background: var(--orange); color: #fff; font-size: .57rem; font-weight: 800; line-height: 1.35; }
 
 /* توسعات الهوية والمسارات المشتركة */
@@ -421,6 +423,11 @@ img { -webkit-user-drag: none; user-drag: none; }
 .article-card-visual strong { position: relative; z-index: 1; margin-right: auto; font-size: .72rem; font-weight: 900; }
 .article-number { display: none; }.article-card-copy { margin-top: 140px; padding-inline: .55rem; }.article-card-copy > span { color: #e9c979; opacity: 1; }.article-card-copy h2 { max-width: 16ch; font-size: clamp(1.25rem, 2vw, 1.7rem); }.article-card-copy p { min-height: 5.3em; margin-top: .7rem; font-size: .88rem; line-height: 1.85; }
 .article-card-actions { margin-top: 1.05rem; padding-inline: .55rem .35rem; }.article-read-button { background: #f8f6ee; }.article-rating-link { color: #f8f6ee; }
+.featured-article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.featured-article-media { position: relative; z-index: 1; aspect-ratio: 16 / 7; overflow: hidden; border-radius: 15px; background: #dce9e4; }
+.featured-article-media img { display: block; width: 100%; height: 100%; object-fit: cover; transition: transform .22s var(--ease-out, ease-out); }
+.featured-article-card:hover .featured-article-media img, .featured-article-card:focus-within .featured-article-media img { transform: scale(1.025); }
+.featured-article-card .article-card-copy { position: relative; z-index: 1; margin-top: 1rem; }
 .more-article-wrap { margin-top: 2.75rem; }.secondary-article-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.05rem; }.secondary-article-grid article { position: relative; display: flex; min-height: 0; flex-direction: column; align-items: stretch; gap: 0; overflow: hidden; padding: .75rem; border-radius: 22px; background: #0e4d51; color: #f8f6ee; }.secondary-article-grid article::before { position: absolute; z-index: 0; width: calc(100% - 1.5rem); height: 102px; border-radius: 15px; background: linear-gradient(135deg, #e7f1ed 0%, #f8e9c9 100%); content: ""; inset: .75rem; }.secondary-article-grid article > span { display: none; }.secondary-article-grid article > div { position: relative; z-index: 1; margin-top: 114px; }.secondary-article-grid article > a { position: relative; z-index: 1; }.secondary-article-grid article:hover { background: #0d565b; transform: translateY(-3px); }.secondary-article-grid .article-card-visual { min-height: 102px; }.secondary-article-grid small { display: block; margin-top: 1rem; color: #e9c979; font-size: .72rem; font-weight: 800; }.secondary-article-grid h3 { margin-top: .55rem; color: #fffdf6; font-size: 1.15rem; line-height: 1.55; }.secondary-article-grid p { min-height: 5.2em; color: rgba(248,246,238,.86); }.secondary-article-grid .article-read-button { align-self: flex-start; margin-top: auto; }
 
 /* قراءة المقال: عناوين واضحة وفواصل هادئة بدلاً من الترقيم أو الإطارات. */

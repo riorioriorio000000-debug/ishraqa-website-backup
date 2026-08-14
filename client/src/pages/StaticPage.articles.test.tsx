@@ -20,4 +20,12 @@ describe("بحث مكتبة المقالات", () => {
     fireEvent.change(search, { target: { value: "عبارة لا تطابق أي مقال" } });
     expect(screen.getByText("لا توجد مقالة مطابقة بعد.")).toBeTruthy();
   });
+
+  it("يعرض أربعة أدلة رئيسية فقط مع صور معتمدة ويبقي المكتبة عند 62 مقالة", () => {
+    const { container } = render(<ArticlesPage />);
+
+    expect(container.querySelectorAll(".featured-article-card")).toHaveLength(4);
+    expect(container.querySelectorAll(".featured-article-media img")).toHaveLength(4);
+    expect(container.querySelectorAll(".secondary-article-grid article")).toHaveLength(58);
+  });
 });

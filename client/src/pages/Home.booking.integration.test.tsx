@@ -27,7 +27,7 @@ describe("نموذج الحجز", () => {
 
     render(<Home />);
 
-    expect(screen.getByRole("link", { name: "تواصل معنا" }).getAttribute("href")).toBe("tel:0509614797");
+    expect(screen.getByRole("link", { name: "تواصل عبر واتساب" }).getAttribute("href")).toBe("https://wa.me/966552610151");
 
     await user.click(screen.getByRole("button", { name: /التالي/ }));
     await user.click(screen.getByRole("button", { name: /التالي/ }));
@@ -35,11 +35,11 @@ describe("نموذج الحجز", () => {
     await user.click(screen.getByRole("button", { name: /إرسال عبر واتساب/ }));
 
     expect(openSpy).toHaveBeenCalledWith(
-      expect.stringContaining("https://wa.me/966509614797?text="),
+      expect.stringContaining("https://wa.me/966552610151?text="),
       "_blank",
       "noopener,noreferrer",
     );
-    expect(openSpy.mock.calls[0]?.[0]).toContain("0509614797");
+    expect(openSpy.mock.calls[0]?.[0]).toContain("966552610151");
   });
 
   it("يعرض كل صور الصفحة الرئيسية بنص بديل وصفي بعد التصيير", () => {
