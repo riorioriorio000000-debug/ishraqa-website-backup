@@ -1,0 +1,20 @@
+{
+  "name": "شركة الإشراقة للتنظيف والصيانة ونقل العفش",
+  "short_name": "الإشراقة",
+  "description": "خدمات الإشراقة للتنظيف والصيانة ونقل العفش في مدن السعودية.",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#0f5c63",
+  "icons": [
+    {
+      "src": "/manus-storage/ishraqa-blue-mark_51e1bd1d.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
