@@ -15,4 +15,11 @@ describe("الحركة المخففة", () => {
     expect(css).toContain(".service-card:focus-within .service-art");
     expect(css).toContain(".hero-caddy-art:hover img");
   });
+
+  it("يضيف تحويمًا هادئًا للأسئلة المصغرة وتكوينًا متدرجًا لبطاقات المقالات", () => {
+    expect(css).toContain(".home-faq-preview details:hover");
+    expect(css).toContain(".article-grid .article-card::before");
+    expect(css).toContain(".article-grid .article-card:nth-child(2)::before");
+    expect(css).toContain(".article-read-button::before");
+  });
 });
