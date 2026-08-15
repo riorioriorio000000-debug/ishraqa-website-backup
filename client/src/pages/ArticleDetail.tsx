@@ -66,10 +66,10 @@ const editorialAdditions = {
 } satisfies Record<string, readonly ArticleSection[]>;
 
 const mainArticles: readonly ArticleEntry[] = [
-  { slug: "home-cleaning-guide", title: "دليل تنظيف المنزل: من أول رسالة إلى ترتيب النتيجة", intro: "دليل طويل وعملي لتحديد احتياج التنظيف المنزلي، ترتيب الأولويات، وكتابة رسالة حجز واضحة بلا أسعار ثابتة أو وعود مبالغ فيها.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-home-cleaning-guide_b2ca9d9e.jpg", imageAlt: "أدوات تنظيف منزلية هادئة على سطح مطبخ بلون عاجي", shareImage: articleShareImages["home-cleaning-guide"], keywords: ["تنظيف منازل", "تنظيف عميق", "خدمات تنظيف", "حجز تنظيف"], sections: [...longGuideSections("منزلك", "تنظيف المنزل", "إذا كنت في مدينة أخرى، اكتب اسمها وحيّك في الرسالة."), ...editorialAdditions.home] },
-  { slug: "ac-maintenance-guide", title: "دليل صيانة التكييف: الإشارات المبكرة وخطوات التنسيق", intro: "كيف تصف ملاحظة التكييف بوضوح، ومتى تتجنب الحلول الارتجالية، وما الذي يسهّل ترتيب فحص مناسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-maintenance-guide_52abc686.jpg", imageAlt: "عدة صيانة منزلية مرتبة بدرجات تركوازية وعاجية", shareImage: articleShareImages["ac-maintenance-guide"], keywords: ["صيانة تكييف", "فحص مكيف", "ضعف تبريد", "خدمة صيانة"], sections: [...longGuideSections("موقعك", "فحص وصيانة التكييف", "اذكر إن كانت المشكلة في تدفق الهواء أو التبريد أو الصوت أو الرائحة."), ...editorialAdditions.ac] },
-  { slug: "furniture-moving-guide", title: "دليل نقل العفش: تجهيز هادئ من باب إلى باب", intro: "خطوات عملية تسبق نقل الأثاث، من القطع الحساسة والمداخل إلى إعداد رسالة واضحة لفريق التنسيق.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-moving-guide_b9d108ef.jpg", imageAlt: "صناديق نقل وتجهيزات حماية مرتبة في مساحة منزلية هادئة", shareImage: articleShareImages["furniture-moving-guide"], keywords: ["نقل عفش", "تغليف أثاث", "شركة نقل", "نقل أثاث"], sections: [...longGuideSections("العنوانين", "نقل العفش", "اذكر الطابق والمصعد ومواقف التحميل والقطع الحساسة قبل تثبيت التفاصيل."), ...editorialAdditions.furniture] },
-  { slug: "kitchen-care-guide", title: "دليل العناية بالمطبخ: ترتيب مستمر بلا إرهاق", intro: "منهج بسيط لتقسيم تنظيف المطبخ، حماية الأسطح، ومعرفة متى يكون طلب العناية المتخصصة هو الأنسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-kitchen-cleaning-guide_dbd0ccb9.jpg", imageAlt: "أدوات عناية بالمطبخ وليمون وقطعة قماش على سطح عاجي", shareImage: articleShareImages["kitchen-care-guide"], keywords: ["تنظيف مطبخ", "تنظيف أفران", "تنظيف عميق", "العناية بالمنزل"], sections: [...longGuideSections("مطبخك", "العناية بالمطبخ", "اذكر نوع السطح أو الجهاز إذا كانت هناك نقطة تحتاج اهتمامًا خاصًا."), ...editorialAdditions.kitchen] },
+  { slug: "home-cleaning-guide", title: "شركة تنظيف منازل: دليل ترتيب طلب الخدمة", intro: "دليل طويل وعملي لتحديد احتياج التنظيف المنزلي، ترتيب الأولويات، وكتابة رسالة حجز واضحة بلا أسعار ثابتة أو وعود مبالغ فيها.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-home-cleaning-guide_b2ca9d9e.jpg", imageAlt: "أدوات تنظيف منزلية هادئة على سطح مطبخ بلون عاجي", shareImage: articleShareImages["home-cleaning-guide"], keywords: ["تنظيف منازل", "تنظيف عميق", "خدمات تنظيف", "حجز تنظيف"], sections: [...longGuideSections("منزلك", "تنظيف المنزل", "إذا كنت في مدينة أخرى، اكتب اسمها وحيّك في الرسالة."), ...editorialAdditions.home] },
+  { slug: "ac-maintenance-guide", title: "شركة صيانة تكييف: دليل ترتيب الفحص", intro: "كيف تصف ملاحظة التكييف بوضوح، ومتى تتجنب الحلول الارتجالية، وما الذي يسهّل ترتيب فحص مناسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-maintenance-guide_52abc686.jpg", imageAlt: "عدة صيانة منزلية مرتبة بدرجات تركوازية وعاجية", shareImage: articleShareImages["ac-maintenance-guide"], keywords: ["صيانة تكييف", "فحص مكيف", "ضعف تبريد", "خدمة صيانة"], sections: [...longGuideSections("موقعك", "فحص وصيانة التكييف", "اذكر إن كانت المشكلة في تدفق الهواء أو التبريد أو الصوت أو الرائحة."), ...editorialAdditions.ac] },
+  { slug: "furniture-moving-guide", title: "شركة نقل عفش: دليل تجهيز النقل", intro: "خطوات عملية تسبق نقل الأثاث، من القطع الحساسة والمداخل إلى إعداد رسالة واضحة لفريق التنسيق.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-moving-guide_b9d108ef.jpg", imageAlt: "صناديق نقل وتجهيزات حماية مرتبة في مساحة منزلية هادئة", shareImage: articleShareImages["furniture-moving-guide"], keywords: ["نقل عفش", "تغليف أثاث", "شركة نقل", "نقل أثاث"], sections: [...longGuideSections("العنوانين", "نقل العفش", "اذكر الطابق والمصعد ومواقف التحميل والقطع الحساسة قبل تثبيت التفاصيل."), ...editorialAdditions.furniture] },
+  { slug: "kitchen-care-guide", title: "شركة تنظيف مطابخ: دليل العناية العميقة", intro: "منهج بسيط لتقسيم تنظيف المطبخ، حماية الأسطح، ومعرفة متى يكون طلب العناية المتخصصة هو الأنسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-kitchen-cleaning-guide_dbd0ccb9.jpg", imageAlt: "أدوات عناية بالمطبخ وليمون وقطعة قماش على سطح عاجي", shareImage: articleShareImages["kitchen-care-guide"], keywords: ["تنظيف مطبخ", "تنظيف أفران", "تنظيف عميق", "العناية بالمنزل"], sections: [...longGuideSections("مطبخك", "العناية بالمطبخ", "اذكر نوع السطح أو الجهاز إذا كانت هناك نقطة تحتاج اهتمامًا خاصًا."), ...editorialAdditions.kitchen] },
 ];
 
 const localCities = [
@@ -77,6 +77,13 @@ const localCities = [
 ] as const;
 
 const localFocuses = ["تنظيف المنزل", "صيانة التكييف", "نقل العفش", "تنظيف عميق للمطبخ", "ترتيب موعد خدمة منزلية"] as const;
+const localTitleByFocus = (city: string, focus: typeof localFocuses[number]) => {
+  if (focus === "تنظيف المنزل") return `شركة تنظيف منازل ${city}: ترتيب طلب الخدمة`;
+  if (focus === "صيانة التكييف") return `شركة صيانة تكييف ${city}: ترتيب الفحص`;
+  if (focus === "نقل العفش") return `شركة نقل عفش ${city}: تجهيز الطلب`;
+  if (focus === "تنظيف عميق للمطبخ") return `شركة تنظيف مطابخ ${city}: ترتيب العناية العميقة`;
+  return `شركة خدمات منزلية ${city}: ترتيب موعد الخدمة`;
+};
 const localArticleVisuals: Readonly<Record<string, { readonly src: string; readonly alt: string }>> = {
   riyadh: { src: "/manus-storage/article-visual-bathroom-care_9449151f.webp", alt: "حمام مرتب بأدوات عناية منزلية هادئة" },
   jeddah: { src: "/manus-storage/article-visual-ac-maintenance_e644ca83.webp", alt: "وحدة تكييف نظيفة وأدوات صيانة مرتبة" },
@@ -94,7 +101,7 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
   const visual = localArticleVisuals[slug];
   return {
     slug: `${slug}-service-guide`,
-    title: `دليل ${city}: كيف ترتب ${focus} بوضوح؟`,
+    title: localTitleByFocus(city, focus),
     intro: `دليل محلي عملي لسكان ${city} يشرح ما الذي يُكتب في طلب ${focus} وكيف تُراجع التفاصيل قبل تنسيق الموعد.`,
     category: "دليل محلي",
     image: visual?.src,

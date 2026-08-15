@@ -10,13 +10,13 @@ type PageMetaProps = {
 };
 
 const conciseTitlesByPath: Record<string, string> = {
-  "/services": "الخدمات",
-  "/calculator": "الحاسبة التقديرية",
-  "/booking": "الحجز",
-  "/articles": "المقالات",
-  "/where-we-work": "نطاق الخدمة",
+  "/services": "خدمات التنظيف والصيانة ونقل العفش",
+  "/calculator": "حاسبة تقديرية لخدمات المنزل",
+  "/booking": "حجز خدمة منزلية",
+  "/articles": "دليل التنظيف والصيانة ونقل العفش",
+  "/where-we-work": "خدماتنا في أنحاء السعودية",
   "/about": "عنّا",
-  "/faq": "الأسئلة الشائعة",
+  "/faq": "أسئلة شائعة عن خدمات المنزل",
   "/customer-service": "خدمة العملاء",
 };
 
