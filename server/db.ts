@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, commentReactions, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, articleFeedback, commentReactions, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -136,6 +136,42 @@ export async function getUniqueVisitorCount() {
   return Number(result[0]?.count ?? 0);
 }
 
+function makeArticleFeedbackId(pageKey: string, visitorId: string) {
+  return `${pageKey}:${visitorId}`;
+}
+
+export async function upsertArticleFeedback(input: { pageKey: string; visitorId: string; rating: number; isPublic: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  await db.insert(articleFeedback).values({
+    id: makeArticleFeedbackId(input.pageKey, input.visitorId),
+    pageKey: input.pageKey,
+    visitorId: input.visitorId,
+    rating: input.rating,
+    isPublic: input.isPublic,
+  }).onDuplicateKeyUpdate({
+    set: { rating: input.rating, isPublic: input.isPublic, updatedAt: new Date() },
+  });
+  return { accepted: true as const };
+}
+
+export async function getArticleFeedbackSummary(pageKey: string, visitorId?: string) {
+  const db = await getDb();
+  if (!db) return { count: 0, average: 0, ownRating: null as number | null, ownIsPublic: true };
+  const published = await db.select({ rating: articleFeedback.rating })
+    .from(articleFeedback)
+    .where(and(eq(articleFeedback.pageKey, pageKey), eq(articleFeedback.isPublic, true)));
+  const own = visitorId
+    ? await db.select({ rating: articleFeedback.rating, isPublic: articleFeedback.isPublic })
+      .from(articleFeedback)
+      .where(and(eq(articleFeedback.pageKey, pageKey), eq(articleFeedback.visitorId, visitorId)))
+      .limit(1)
+    : [];
+  const count = published.length;
+  const average = count ? Math.round((published.reduce((sum, item) => sum + item.rating, 0) / count) * 10) / 10 : 0;
+  return { count, average, ownRating: own[0]?.rating ?? null, ownIsPublic: own[0]?.isPublic ?? true };
+}
+
 type VisitorOwnedCommentInput = {
   pageKey: string;
   visitorId: string;
@@ -218,12 +254,16 @@ export async function getPublishedComments(pageKey: string, visitorId?: string) 
   const ownReactions = visitorId
     ? await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction }).from(commentReactions).where(and(inArray(commentReactions.commentId, ids), eq(commentReactions.visitorId, visitorId)))
     : [];
+  const publicRatings = await db.select({ visitorId: articleFeedback.visitorId, rating: articleFeedback.rating })
+    .from(articleFeedback)
+    .where(and(eq(articleFeedback.pageKey, pageKey), eq(articleFeedback.isPublic, true), inArray(articleFeedback.visitorId, comments.map((comment) => comment.visitorId ?? ""))));
   return comments.map(({ visitorId: commentVisitorId, ...comment }) => ({
     ...comment,
     isOwner: Boolean(visitorId && commentVisitorId === visitorId),
     hearts: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "heart")?.count ?? 0),
     broken: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "broken")?.count ?? 0),
     viewerReaction: ownReactions.find((item) => item.commentId === comment.id)?.reaction ?? null,
+    rating: publicRatings.find((item) => item.visitorId === commentVisitorId)?.rating ?? null,
   }));
 }
 

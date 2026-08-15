@@ -21,7 +21,7 @@ const AboutPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ de
 const FaqPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.FaqPage })));
 
 function PageLoader() {
-  return <main className="route-loading" role="status" aria-live="polite">جارٍ تجهيز الصفحة...</main>;
+  return <main className="route-loading" role="status" aria-live="polite"><video className="route-loading-video" src="/manus-storage/loader-reference_77ede9ac.webm" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" /><span>جارٍ تجهيز الصفحة...</span></main>;
 }
 
 function Router() {

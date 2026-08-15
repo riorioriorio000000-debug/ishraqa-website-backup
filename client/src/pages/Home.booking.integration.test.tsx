@@ -11,6 +11,20 @@ vi.mock("@/components/SiteShell", () => ({
 vi.mock("@/components/VisitorFeedback", () => ({ default: () => null }));
 vi.mock("@/components/ServiceVideo", () => ({ default: () => null }));
 
+vi.mock("@/lib/trpc", () => ({
+  trpc: {
+    booking: {
+      submit: {
+        useMutation: ({ onSuccess }: { onSuccess: (result: { notificationSent: boolean }) => void }) => ({
+          mutate: () => onSuccess({ notificationSent: true }),
+          isPending: false,
+          isError: false,
+        }),
+      },
+    },
+  },
+}));
+
 vi.mock("wouter", () => ({
   Link: ({ href, children, ...props }: { href: string; children: React.ReactNode }) => <a href={href} {...props}>{children}</a>,
 }));
@@ -21,9 +35,8 @@ describe("نموذج الحجز", () => {
     vi.restoreAllMocks();
   });
 
-  it("يفتح رسالة واتساب جاهزة إلى رقم الإشراقة المعتمد", async () => {
+  it("يرسل الطلب ويعرض رسالة نجاح واضحة تؤكد تنبيه الإدارة", async () => {
     const user = userEvent.setup();
-    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
 
     render(<Home />);
 
@@ -37,14 +50,11 @@ describe("نموذج الحجز", () => {
     await user.type(screen.getByLabelText("اكتب الموعد المفضل"), "الخميس");
     await user.type(screen.getByLabelText("اكتب الوقت المفضل"), "بعد المغرب");
     await user.type(screen.getByLabelText(/رقم التواصل/), "0552610151");
-    await user.click(screen.getByRole("button", { name: /إرسال عبر واتساب/ }));
+    await user.click(screen.getByRole("button", { name: /إرسال الطلب/ }));
 
-    expect(openSpy).toHaveBeenCalledWith(
-      expect.stringContaining("https://wa.me/966552610151?text="),
-      "_blank",
-      "noopener,noreferrer",
-    );
-    expect(openSpy.mock.calls[0]?.[0]).toContain("966552610151");
+    expect(screen.getByRole("status").textContent).toContain("تم استلام طلبك بنجاح.");
+    expect(screen.getByText("وصل إشعار فوري إلى إدارة الإشراقة لمراجعة تفاصيلك.")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /متابعة عبر واتساب/ }).getAttribute("href")).toContain("https://wa.me/966552610151?text=");
   });
 
   it("يعرض كل صور الصفحة الرئيسية بنص بديل وصفي بعد التصيير", () => {

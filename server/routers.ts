@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
+import { notifyOwner } from "./_core/notification";
 import { aiRouter } from "./routers/ai";
 import * as db from "./db";
 import { storagePut } from "./storage";
@@ -50,10 +51,29 @@ export const appRouter = router({
     listPublished: publicProcedure.query(() => db.getPublishedFeedback()),
     submit: publicProcedure.input(z.object({ rating: z.number().int().min(1).max(5), comment: z.string().trim().max(800).optional() })).mutation(({ input }) => db.submitVisitorFeedback(input)),
   }),
+  booking: router({
+    submit: publicProcedure.input(z.object({
+      cityDetail: z.string().trim().max(160).optional(),
+      serviceDetail: z.string().trim().max(220).optional(),
+      details: z.string().trim().max(700).optional(),
+      dateDetail: z.string().trim().max(160).optional(),
+      timeDetail: z.string().trim().max(160).optional(),
+      phone: z.string().trim().max(40).optional(),
+    })).mutation(async ({ input }) => {
+      const value = (item?: string) => item?.trim() || "لم يُحدَّد";
+      const notificationSent = await notifyOwner({
+        title: "طلب خدمة جديد من موقع الإشراقة",
+        content: `الخدمة: ${value(input.serviceDetail)}\nالمدينة أو الحي: ${value(input.cityDetail)}\nالموعد: ${value(input.dateDetail)} — ${value(input.timeDetail)}\nرقم التواصل: ${value(input.phone)}\nالتفاصيل: ${value(input.details)}`,
+      });
+      return { accepted: true as const, notificationSent };
+    }),
+  }),
   interactions: router({
     visitorCount: publicProcedure.query(() => db.getUniqueVisitorCount()),
     recordVisitor: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).mutation(({ input }) => db.recordAnonymousVisitor(input.visitorId)),
     listComments: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getPublishedComments(input.pageKey, input.visitorId)),
+    articleFeedback: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getArticleFeedbackSummary(input.pageKey, input.visitorId)),
+    submitArticleFeedback: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid(), rating: z.number().int().min(1).max(5), isPublic: z.boolean() })).mutation(({ input }) => db.upsertArticleFeedback(input)),
     uploadAvatar: publicProcedure.input(avatarUploadSchema).mutation(async ({ input }) => {
       const uploaded = await storagePut(`comment-avatars/${input.visitorId}/${Date.now()}-${safeUploadName(input.name)}`, decodeAvatarData(input), input.mimeType);
       return { url: uploaded.url };

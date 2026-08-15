@@ -21,6 +21,7 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
     description: article.intro,
     url: canonicalUrl,
     mainEntityOfPage: canonicalUrl,
+    image: article.shareImage,
     inLanguage: "ar-SA",
     keywords: article.keywords.join(", "),
     datePublished: "2026-08-14T00:00:00+03:00",
@@ -36,7 +37,7 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
       url: "https://al-eshraqa.co/",
       logo: {
         "@type": "ImageObject",
-        url: "https://al-eshraqa.co/manus-storage/ishraqa-blue-mark_51e1bd1d.png",
+        url: "https://al-eshraqa.co/manus-storage/ishraqa-user-logo_64a160a3.png",
       },
     },
   };

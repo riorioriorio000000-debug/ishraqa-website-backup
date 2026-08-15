@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -40,6 +40,21 @@ export const visitorFeedback = mysqlTable("visitor_feedback", {
 });
 
 export type VisitorFeedback = typeof visitorFeedback.$inferSelect;
+
+/** A per-article score owned by one anonymous browser. The composite ID prevents duplicate ratings. */
+export const articleFeedback = mysqlTable("article_feedback", {
+  id: varchar("id", { length: 240 }).primaryKey(),
+  pageKey: varchar("pageKey", { length: 160 }).notNull(),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  rating: int("rating").notNull(),
+  isPublic: boolean("isPublic").notNull().default(true),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  articleFeedbackVisitorUnique: uniqueIndex("article_feedback_visitor_unique").on(table.pageKey, table.visitorId),
+}));
+
+export type ArticleFeedback = typeof articleFeedback.$inferSelect;
 
 /** A browser-generated anonymous ID; no IP address, telephone number, or account is stored here. */
 export const siteVisitors = mysqlTable("site_visitors", {

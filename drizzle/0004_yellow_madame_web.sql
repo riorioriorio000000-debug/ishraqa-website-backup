@@ -1,0 +1,1 @@
+ALTER TABLE `article_feedback` ADD CONSTRAINT `article_feedback_visitor_unique` UNIQUE(`pageKey`,`visitorId`);

@@ -9,9 +9,11 @@ describe("مكتبة المقالات وSEO", () => {
       expect(article.title.trim()).not.toBe("");
       expect(article.intro.trim()).not.toBe("");
       expect(article.keywords.length).toBeGreaterThanOrEqual(3);
+      expect(article.shareImage).toMatch(/^https:\/\/al-eshraqa\.co\/manus-storage\/.+\.png$/);
       expect(article.sections.length).toBeGreaterThanOrEqual(21);
       const wordCount = [article.title, article.intro, ...article.sections.flatMap(([heading, body]) => [heading, body])].join(" ").trim().split(/\s+/).filter(Boolean).length;
       expect(wordCount).toBeGreaterThanOrEqual(1500);
     });
+    expect(new Set(articleEntries.map((article) => article.shareImage)).size).toBe(articleEntries.length);
   });
 });
