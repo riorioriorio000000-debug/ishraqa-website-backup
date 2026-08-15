@@ -1,8 +1,8 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, recommendationFilterMetrics, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, recommendationFilterMetrics, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
-import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
+import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening, replyCooldownRemainingSeconds } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -359,14 +359,39 @@ export async function getPublishedComments(pageKey: string, visitorId?: string) 
   const comments = await db.select().from(siteComments).where(and(eq(siteComments.pageKey, pageKey), eq(siteComments.status, "published"), isNull(siteComments.deletedAt))).orderBy(desc(siteComments.createdAt)).limit(30);
   if (!comments.length) return [];
   const ids = comments.map((comment) => comment.id);
+  const replies = await db.select().from(commentReplies)
+    .where(and(eq(commentReplies.pageKey, pageKey), eq(commentReplies.status, "published"), isNull(commentReplies.deletedAt), inArray(commentReplies.commentId, ids)))
+    .orderBy(commentReplies.createdAt)
+    .limit(180);
   const reactions = await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction, count: sql<number>`count(*)` })
     .from(commentReactions).where(inArray(commentReactions.commentId, ids)).groupBy(commentReactions.commentId, commentReactions.reaction);
+  const replyIds = replies.map((reply) => reply.id);
+  const replyReactions = replyIds.length
+    ? await db.select({ replyId: commentReplyReactions.replyId, reaction: commentReplyReactions.reaction, count: sql<number>`count(*)` })
+      .from(commentReplyReactions).where(inArray(commentReplyReactions.replyId, replyIds)).groupBy(commentReplyReactions.replyId, commentReplyReactions.reaction)
+    : [];
   const ownReactions = visitorId
     ? await db.select({ commentId: commentReactions.commentId, reaction: commentReactions.reaction }).from(commentReactions).where(and(inArray(commentReactions.commentId, ids), eq(commentReactions.visitorId, visitorId)))
+    : [];
+  const ownReplyReactions = visitorId && replyIds.length
+    ? await db.select({ replyId: commentReplyReactions.replyId, reaction: commentReplyReactions.reaction }).from(commentReplyReactions).where(and(inArray(commentReplyReactions.replyId, replyIds), eq(commentReplyReactions.visitorId, visitorId)))
     : [];
   const publicRatings = await db.select({ visitorId: articleFeedback.visitorId, rating: articleFeedback.rating })
     .from(articleFeedback)
     .where(and(eq(articleFeedback.pageKey, pageKey), eq(articleFeedback.isPublic, true), inArray(articleFeedback.visitorId, comments.map((comment) => comment.visitorId ?? ""))));
+  const repliesByParent = new Map<number | null, typeof replies>();
+  for (const reply of replies) {
+    const parent = reply.parentReplyId ?? null;
+    repliesByParent.set(parent, [...(repliesByParent.get(parent) ?? []), reply]);
+  }
+  const decorateReply = (reply: typeof replies[number]): any => ({
+    ...reply,
+    isOwner: Boolean(visitorId && reply.visitorId === visitorId),
+    hearts: Number(replyReactions.find((item) => item.replyId === reply.id && item.reaction === "heart")?.count ?? 0),
+    broken: Number(replyReactions.find((item) => item.replyId === reply.id && item.reaction === "broken")?.count ?? 0),
+    viewerReaction: ownReplyReactions.find((item) => item.replyId === reply.id)?.reaction ?? null,
+    replies: (repliesByParent.get(reply.id) ?? []).map(decorateReply),
+  });
   return comments.map(({ visitorId: commentVisitorId, ...comment }) => ({
     ...comment,
     isOwner: Boolean(visitorId && commentVisitorId === visitorId),
@@ -374,7 +399,47 @@ export async function getPublishedComments(pageKey: string, visitorId?: string) 
     broken: Number(reactions.find((item) => item.commentId === comment.id && item.reaction === "broken")?.count ?? 0),
     viewerReaction: ownReactions.find((item) => item.commentId === comment.id)?.reaction ?? null,
     rating: publicRatings.find((item) => item.visitorId === commentVisitorId)?.rating ?? null,
+    replies: (repliesByParent.get(null) ?? []).filter((reply) => reply.commentId === comment.id).map(decorateReply),
   }));
+}
+
+export async function submitCommentReply(input: VisitorOwnedCommentInput & { commentId: number; parentReplyId?: number | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const normalized = {
+    ...normalizeCommentSubmission(input),
+    visitorId: input.visitorId,
+    avatarUrl: input.avatarUrl?.trim() || null,
+  };
+  if (!passesAutomaticCommentScreening(normalized)) return { accepted: false as const, reason: "content-not-allowed" as const };
+  const [comment] = await db.select({ id: siteComments.id }).from(siteComments)
+    .where(and(eq(siteComments.id, input.commentId), eq(siteComments.pageKey, normalized.pageKey), eq(siteComments.status, "published"), isNull(siteComments.deletedAt)))
+    .limit(1);
+  if (!comment) return { accepted: false as const, reason: "message-not-found" as const };
+  if (input.parentReplyId) {
+    const [parentReply] = await db.select({ id: commentReplies.id }).from(commentReplies)
+      .where(and(eq(commentReplies.id, input.parentReplyId), eq(commentReplies.commentId, input.commentId), eq(commentReplies.status, "published"), isNull(commentReplies.deletedAt)))
+      .limit(1);
+    if (!parentReply) return { accepted: false as const, reason: "message-not-found" as const };
+  }
+  const targetConstraint = input.parentReplyId ? eq(commentReplies.parentReplyId, input.parentReplyId) : isNull(commentReplies.parentReplyId);
+  const [latest] = await db.select({ createdAt: commentReplies.createdAt }).from(commentReplies)
+    .where(and(eq(commentReplies.commentId, input.commentId), eq(commentReplies.visitorId, input.visitorId), targetConstraint, isNull(commentReplies.deletedAt)))
+    .orderBy(desc(commentReplies.createdAt)).limit(1);
+  const retryAfterSeconds = replyCooldownRemainingSeconds(latest?.createdAt);
+  if (retryAfterSeconds > 0) return { accepted: false as const, reason: "reply-rate-limited" as const, retryAfterSeconds };
+  await db.insert(commentReplies).values({
+    pageKey: normalized.pageKey,
+    commentId: input.commentId,
+    parentReplyId: input.parentReplyId ?? null,
+    visitorId: normalized.visitorId,
+    displayName: normalized.displayName,
+    body: normalized.body,
+    avatarKind: normalized.avatarKind,
+    avatarUrl: normalized.avatarUrl,
+    status: directCommentStatus,
+  });
+  return { accepted: true as const };
 }
 
 export async function setCommentReaction(input: { commentId: number; visitorId: string; reaction: "heart" | "broken" | null }) {
@@ -386,5 +451,17 @@ export async function setCommentReaction(input: { commentId: number; visitorId: 
     return { reaction: null };
   }
   await db.insert(commentReactions).values({ id, commentId: input.commentId, visitorId: input.visitorId, reaction: input.reaction }).onDuplicateKeyUpdate({ set: { reaction: input.reaction, updatedAt: new Date() } });
+  return { reaction: input.reaction };
+}
+
+export async function setCommentReplyReaction(input: { replyId: number; visitorId: string; reaction: "heart" | "broken" | null }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const id = makeReactionId(input.replyId, input.visitorId);
+  if (!input.reaction) {
+    await db.delete(commentReplyReactions).where(eq(commentReplyReactions.id, id));
+    return { reaction: null };
+  }
+  await db.insert(commentReplyReactions).values({ id, replyId: input.replyId, visitorId: input.visitorId, reaction: input.reaction }).onDuplicateKeyUpdate({ set: { reaction: input.reaction, updatedAt: new Date() } });
   return { reaction: input.reaction };
 }

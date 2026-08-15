@@ -26,7 +26,7 @@ describe("بحث مكتبة المقالات", () => {
     fireEvent.change(search, { target: { value: "الرياض" } });
     expect(screen.getByText(/شركة تنظيف منازل الرياض:/)).toBeTruthy();
     expect(screen.queryByText(/شركة صيانة تكييف جدة:/)).toBeNull();
-    expect(screen.getByText("نتائج مفلترة: 1 مقالة")).toBeTruthy();
+    expect(screen.getByText("إجمالي النتائج: 1 مقالة")).toBeTruthy();
 
     fireEvent.change(search, { target: { value: "عبارة لا تطابق أي مقال" } });
     expect(screen.getByText("لا توجد مقالة مطابقة لهذه التصفية بعد.")).toBeTruthy();
@@ -39,9 +39,20 @@ describe("بحث مكتبة المقالات", () => {
     fireEvent.change(serviceFilter, { target: { value: "maintenance" } });
 
     expect(serviceFilter.value).toBe("maintenance");
-    expect(screen.getByText("يعرض الآن:")).toBeTruthy();
-    expect(screen.getByText(/نتائج مفلترة:/)).toBeTruthy();
+    expect(screen.getByText(/إجمالي النتائج:/)).toBeTruthy();
     expect(screen.queryByText(/شركة نقل عفش/)).toBeNull();
+  });
+
+  it("يتيح مرشح مدينة مستقلًا ويحدّث إجمالي النتائج بعد اختياره", () => {
+    render(<ArticlesPage />);
+    const cityFilter = screen.getByLabelText("تصفية المقالات حسب المدينة") as HTMLSelectElement;
+
+    fireEvent.change(cityFilter, { target: { value: "الرياض" } });
+
+    expect(cityFilter.value).toBe("الرياض");
+    expect(screen.getByText("إجمالي النتائج: 1 مقالة")).toBeTruthy();
+    expect(screen.getByText(/شركة تنظيف منازل الرياض:/)).toBeTruthy();
+    expect(screen.queryByText(/شركة صيانة تكييف جدة:/)).toBeNull();
   });
 
   it("يعرض أربعة أدلة رئيسية فقط مع صور معتمدة ويبقي المكتبة عند 62 مقالة", () => {
@@ -60,6 +71,14 @@ describe("بحث مكتبة المقالات", () => {
     expect(screen.getAllByText("جديد")).toHaveLength(12);
   });
 
+  it("يعرض تاريخ نشر فعليًا ومقروءًا على كل بطاقة مقال", () => {
+    const { container } = render(<ArticlesPage />);
+
+    expect(articleEntries.every((article) => Boolean(article.publishedAt))).toBe(true);
+    expect(container.querySelectorAll("time.article-published-date")).toHaveLength(62);
+    expect(screen.getAllByText(/نُشر في/)).toHaveLength(62);
+  });
+
   it("يفرز الأدلة المحلية أبجديًا أو حسب تاريخ الإضافة دون إخفاء العناوين المحلية", () => {
     const { container } = render(<ArticlesPage />);
     const sort = screen.getByLabelText("فرز المقالات حسب المدينة أو تاريخ الإضافة") as HTMLSelectElement;
@@ -76,7 +95,7 @@ describe("بحث مكتبة المقالات", () => {
     fireEvent.change(sort, { target: { value: "newest" } });
     expect(sort.value).toBe("newest");
     expect((container.querySelector(".local-article-grid h3")?.textContent ?? "").trim()).toBe(localArticles.at(-1)?.title);
-    expect(screen.getByText("ترتيب المكتبة: الأحدث إضافة")).toBeTruthy();
+    expect(container.querySelector(".article-filter-status")?.textContent).toContain("الأحدث إضافة");
   });
 
   it("يضم صورًا وملاحظات تحريرية مواءمة داخل الأدلة الرئيسية من دون الاسم السابق", () => {

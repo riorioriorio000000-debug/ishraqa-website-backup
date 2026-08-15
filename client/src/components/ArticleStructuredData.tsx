@@ -13,8 +13,8 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
     image: article.shareImage,
     inLanguage: "ar-SA",
     keywords: article.keywords.join(", "),
-    datePublished: "2026-08-14T00:00:00+03:00",
-    dateModified: "2026-08-14T00:00:00+03:00",
+    datePublished: article.publishedAt ?? "2026-08-14T00:00:00+03:00",
+    dateModified: article.updatedAt ?? article.publishedAt ?? "2026-08-14T00:00:00+03:00",
     author: {
       "@type": "Organization",
       name: "شركة الإشراقة للتنظيف والصيانة ونقل العفش",

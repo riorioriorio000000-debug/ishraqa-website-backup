@@ -39,7 +39,12 @@ const getArticlePreview = (article: typeof articleEntries[number]) => {
   const firstSection = article.sections[0]?.[1] ?? article.intro;
   return `${firstSection.slice(0, 138).trim()}…`;
 };
-const isNewArticle = (article: typeof articleEntries[number]) => article.category === "دليل محلي" && articleEntries.indexOf(article) >= articleEntries.length - 12;
+const articleCityFilters = Array.from(new Set(articleEntries.filter((article) => article.category === "دليل محلي").map(getArticleCity).filter(Boolean))).sort((first, second) => first.localeCompare(second, "ar"));
+const articleDateFormatter = new Intl.DateTimeFormat("ar-SA", { day: "numeric", month: "long", year: "numeric" });
+const getArticlePublishedLabel = (article: typeof articleEntries[number]) => article.publishedAt ? articleDateFormatter.format(new Date(article.publishedAt)) : "تاريخ النشر غير متاح";
+const getArticlePublishedTime = (article: typeof articleEntries[number]) => article.publishedAt ? new Date(article.publishedAt).getTime() : 0;
+const newestLocalGuideSlugs = new Set(articleEntries.filter((article) => article.category === "دليل محلي").slice(-12).map((article) => article.slug));
+const isNewArticle = (article: typeof articleEntries[number]) => article.category === "دليل محلي" && newestLocalGuideSlugs.has(article.slug) && Boolean(article.publishedAt) && Date.now() - getArticlePublishedTime(article) <= 1000 * 60 * 60 * 24 * 21;
 
 function ArticleCardRating({ articleTitle, rating, count, ownRating, pending, onRate }: { articleTitle: string; rating: number; count: number; ownRating: number | null; pending: boolean; onRate: (value: number) => void }) {
   const selected = ownRating ?? 0;
@@ -66,6 +71,7 @@ export function BookingPage() {
 export function ArticlesPage() {
   const [query, setQuery] = useState("");
   const [serviceFilter, setServiceFilter] = useState<ArticleServiceFilter>("all");
+  const [cityFilter, setCityFilter] = useState("all");
   const [sortBy, setSortBy] = useState<ArticleSortOption>("default");
   const [visitorId, setVisitorId] = useState<string>();
   const feedbackSummaries = trpc.interactions.articleFeedbackSummaries.useQuery({ pageKeys: articlePageKeys, visitorId });
@@ -89,18 +95,19 @@ export function ArticlesPage() {
   };
   const matches = articleEntries.filter((article) => {
     const searchable = [article.title, article.intro, article.category, ...article.keywords].join(" ").toLowerCase();
-    return (!normalizedQuery || searchable.includes(normalizedQuery)) && matchesService(article);
+    return (!normalizedQuery || searchable.includes(normalizedQuery)) && matchesService(article) && (cityFilter === "all" || getArticleCity(article) === cityFilter);
   });
   const featured = matches.filter((article) => article.category === "دليل رئيسي");
   const localGuides = [...matches.filter((article) => article.category === "دليل محلي")].sort((first, second) => {
     if (sortBy === "city") return getArticleCity(first).localeCompare(getArticleCity(second), "ar");
-    if (sortBy === "newest") return articleEntries.indexOf(second) - articleEntries.indexOf(first);
+    if (sortBy === "newest") return getArticlePublishedTime(second) - getArticlePublishedTime(first) || articleEntries.indexOf(second) - articleEntries.indexOf(first);
     return articleEntries.indexOf(first) - articleEntries.indexOf(second);
   });
   const activeFilterLabel = articleServiceFilters.find((filter) => filter.value === serviceFilter)?.label ?? "كل أنواع الخدمات";
   const activeSortLabel = articleSortOptions.find((option) => option.value === sortBy)?.label ?? "الترتيب الافتراضي";
-  const hasActiveFilter = Boolean(normalizedQuery) || serviceFilter !== "all";
-  const resultLabel = hasActiveFilter ? `نتائج مفلترة: ${matches.length} مقالة` : sortBy !== "default" ? `ترتيب المكتبة: ${activeSortLabel}` : "الأدلة الرئيسية";
+  const activeCityLabel = cityFilter === "all" ? "كل المدن" : cityFilter;
+  const hasActiveFilter = Boolean(normalizedQuery) || serviceFilter !== "all" || cityFilter !== "all";
+  const resultLabel = `إجمالي النتائج: ${matches.length} مقالة`;
   const getSummary = (slug: string) => feedbackSummaries.data?.[slug] ?? { count: 0, average: 0, ownRating: null };
   const chooseRating = (slug: string, value: number) => { if (visitorId && !rateArticle.isPending) rateArticle.mutate({ pageKey: slug, visitorId, rating: value, isPublic: true }); };
 
@@ -113,12 +120,13 @@ export function ArticlesPage() {
         <div className="article-search-controls">
           <label className="article-search" htmlFor="article-search-input"><Search size={19} aria-hidden="true" /><span className="sr-only">البحث في المقالات</span><input id="article-search-input" type="search" aria-label="البحث في المقالات" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="ابحث باسم مدينة أو خدمة أو موضوع…" autoComplete="off" /></label>
           <label className="article-filter" htmlFor="article-service-filter"><span>نوع الخدمة</span><select id="article-service-filter" value={serviceFilter} onChange={(event) => setServiceFilter(event.target.value as ArticleServiceFilter)} aria-label="تصفية المقالات حسب نوع الخدمة">{articleServiceFilters.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></label>
+          <label className="article-filter" htmlFor="article-city-filter"><span>المدينة</span><select id="article-city-filter" value={cityFilter} onChange={(event) => setCityFilter(event.target.value)} aria-label="تصفية المقالات حسب المدينة"><option value="all">كل المدن</option>{articleCityFilters.map((city) => <option key={city} value={city}>{city}</option>)}</select></label>
           <label className="article-filter article-sort" htmlFor="article-sort"><span>ترتيب المكتبة</span><select id="article-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value as ArticleSortOption)} aria-label="فرز المقالات حسب المدينة أو تاريخ الإضافة">{articleSortOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
         </div>
         {matches.length > 0 ? <>
-          <div className="article-filter-status"><BarChart3 size={17} aria-hidden="true" /><span>يعرض الآن: <strong>{activeFilterLabel}</strong>{sortBy !== "default" && <> · <strong>{activeSortLabel}</strong></>}</span></div>
-          <div className="featured-article-grid">{featured.map((article, index) => { const summary = getSummary(article.slug); return <article className={`featured-article-card featured-article-card-${(index % 4) + 1}`} key={article.slug}>{article.image && <div className="featured-article-media"><img src={article.image} alt={article.imageAlt ?? ""} loading="lazy" decoding="async" /></div>}<p className="article-card-preview"><span>لمحة سريعة</span>{getArticlePreview(article)}</p><div className="article-card-copy"><span>{article.category}</span><h2>{article.title}</h2><p>{article.intro}</p></div><div className="article-card-actions"><Link href={`/articles/${article.slug}`} className="article-read-button">قراءة المقال <ArrowLeft size={16} /></Link><ArticleCardRating articleTitle={article.title} rating={summary.average} count={summary.count} ownRating={summary.ownRating} pending={!visitorId || rateArticle.isPending} onRate={(value) => chooseRating(article.slug, value)} /></div></article>; })}</div>
-          {localGuides.length > 0 && <div className="more-article-wrap"><div className="more-article-heading"><span>{hasActiveFilter ? "مقالات إضافية مطابقة" : "أدلة المدن"}</span><p>{hasActiveFilter ? "نتائج إضافية مرتبطة بعبارة البحث ونوع الخدمة." : `${localGuides.length} مقالًا محليًا أصليًا: ابدأ باسم مدينتك ثم عدّل رسالة الطلب بما يلائم مكانك.`}</p></div><div className="secondary-article-grid local-article-grid">{localGuides.map((article) => { const summary = getSummary(article.slug); return <article key={article.slug}>{isNewArticle(article) && <span className="article-new-badge">جديد</span>}<p className="article-card-preview"><span>لمحة سريعة</span>{getArticlePreview(article)}</p><div><small>{article.keywords[0]}</small><h3>{article.title}</h3><p>{article.intro}</p><ArticleCardRating articleTitle={article.title} rating={summary.average} count={summary.count} ownRating={summary.ownRating} pending={!visitorId || rateArticle.isPending} onRate={(value) => chooseRating(article.slug, value)} /></div><Link href={`/articles/${article.slug}`} aria-label={`قراءة ${article.title}`}><ArrowLeft size={18} /></Link></article>; })}</div></div>}
+          <div className="article-filter-status"><BarChart3 size={17} aria-hidden="true" /><span>يعرض الآن: <strong>{matches.length} مقالة</strong> · <strong>{activeFilterLabel}</strong> · <strong>{activeCityLabel}</strong>{sortBy !== "default" && <> · <strong>{activeSortLabel}</strong></>}</span></div>
+          <div className="featured-article-grid">{featured.map((article, index) => { const summary = getSummary(article.slug); return <article className={`featured-article-card featured-article-card-${(index % 4) + 1}`} key={article.slug}>{article.image && <div className="featured-article-media"><img src={article.image} alt={article.imageAlt ?? ""} loading="lazy" decoding="async" /></div>}<p className="article-card-preview"><span>لمحة سريعة</span>{getArticlePreview(article)}</p><div className="article-card-copy"><span>{article.category}</span><time className="article-published-date" dateTime={article.publishedAt}>نُشر في {getArticlePublishedLabel(article)}</time><h2>{article.title}</h2><p>{article.intro}</p></div><div className="article-card-actions"><Link href={`/articles/${article.slug}`} className="article-read-button">قراءة المقال <ArrowLeft size={16} /></Link><ArticleCardRating articleTitle={article.title} rating={summary.average} count={summary.count} ownRating={summary.ownRating} pending={!visitorId || rateArticle.isPending} onRate={(value) => chooseRating(article.slug, value)} /></div></article>; })}</div>
+          {localGuides.length > 0 && <div className="more-article-wrap"><div className="more-article-heading"><span>{hasActiveFilter ? "مقالات إضافية مطابقة" : "أدلة المدن"}</span><p>{hasActiveFilter ? "نتائج إضافية مرتبطة بعبارة البحث ونوع الخدمة والمدينة المختارة." : `${localGuides.length} مقالًا محليًا أصليًا: ابدأ باسم مدينتك ثم عدّل رسالة الطلب بما يلائم مكانك.`}</p></div><div className="secondary-article-grid local-article-grid">{localGuides.map((article) => { const summary = getSummary(article.slug); return <article key={article.slug}>{isNewArticle(article) && <span className="article-new-badge">جديد</span>}<p className="article-card-preview"><span>لمحة سريعة</span>{getArticlePreview(article)}</p><div><small>{article.keywords[0]}</small><time className="article-published-date" dateTime={article.publishedAt}>نُشر في {getArticlePublishedLabel(article)}</time><h3>{article.title}</h3><p>{article.intro}</p><ArticleCardRating articleTitle={article.title} rating={summary.average} count={summary.count} ownRating={summary.ownRating} pending={!visitorId || rateArticle.isPending} onRate={(value) => chooseRating(article.slug, value)} /></div><Link href={`/articles/${article.slug}`} aria-label={`قراءة ${article.title}`}><ArrowLeft size={18} /></Link></article>; })}</div></div>}
         </> : <div className="article-search-empty"><strong>لا توجد مقالة مطابقة لهذه التصفية بعد.</strong><p>جرّب اسم مدينة أو كلمة أقصر، أو اختر نوع خدمة آخر.</p></div>}
       </div></section>
     </main>

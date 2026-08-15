@@ -120,4 +120,31 @@ export const commentReactions = mysqlTable("comment_reactions", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+/** Replies may target a top-level comment or another published reply on that comment. */
+export const commentReplies = mysqlTable("comment_replies", {
+  id: int("id").autoincrement().primaryKey(),
+  pageKey: varchar("pageKey", { length: 160 }).notNull(),
+  commentId: int("commentId").notNull(),
+  parentReplyId: int("parentReplyId"),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  displayName: varchar("displayName", { length: 64 }).notNull(),
+  avatarKind: varchar("avatarKind", { length: 32 }).notNull().default("wave"),
+  avatarUrl: varchar("avatarUrl", { length: 1024 }),
+  body: text("body").notNull(),
+  status: mysqlEnum("status", ["pending", "published", "rejected"]).default("pending").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  deletedAt: timestamp("deletedAt"),
+});
+
+/** Each visitor can choose one reaction per reply, independently from parent-comment reactions. */
+export const commentReplyReactions = mysqlTable("comment_reply_reactions", {
+  id: varchar("id", { length: 160 }).primaryKey(),
+  replyId: int("replyId").notNull(),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  reaction: mysqlEnum("reaction", ["heart", "broken"]).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export type SiteComment = typeof siteComments.$inferSelect;

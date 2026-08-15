@@ -14,6 +14,8 @@ export type ArticleEntry = {
   title: string;
   intro: string;
   category: "دليل رئيسي" | "دليل محلي";
+  publishedAt?: string;
+  updatedAt?: string;
   image?: string;
   imageAlt?: string;
   shareImage: string;
@@ -112,7 +114,13 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
   };
 });
 
-export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...localArticleEntries];
+// يمثل تاريخ الإتاحة الفعلي للنسخة المنشورة من هذه الأدلة؛ يستهلكه العرض والبيانات المنظمة معًا.
+const publishedArticleAt = "2026-08-14T00:00:00+03:00";
+export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...localArticleEntries].map((article) => ({
+  ...article,
+  publishedAt: publishedArticleAt,
+  updatedAt: publishedArticleAt,
+}));
 
 export default function ArticleDetailPage() {
   const [, params] = useRoute("/articles/:slug");
@@ -131,10 +139,11 @@ export default function ArticleDetailPage() {
     <PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} />
     <ArticleStructuredData article={article} />
     <main className={`article-detail article-tone-${articleTone}`} dir="rtl">
-      <header className="article-hero"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> قراءة إرشادية من الإشراقة</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header>
+      <header className="article-hero article-hero-compact"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><h1 className="sr-only">{article.title}</h1></div></header>
       <article className="section article-reading-section"><div className="shell article-prose">
         {article.image ? <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure> : <figure className="article-feature-image article-tone-visual" role="img" aria-label={`تكوين تجريدي هادئ لمقال ${article.title}`}><span aria-hidden="true" /><figcaption>تكوين بصري تجريدي بدرجات هوية الإشراقة.</figcaption></figure>}
         {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
+        <section className="article-primary-guide" aria-label="الدليل الإرشادي للمقال"><span>قراءة إرشادية من الإشراقة</span><h2>{article.title}</h2><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></section>
         <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
         <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>
         <div className="article-actions"><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="article-share-button" aria-label="مشاركة المقال عبر واتساب"><MessageCircle size={18} /><span>واتساب</span></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" className="article-share-button article-share-facebook" aria-label="مشاركة المقال عبر فيسبوك"><span aria-hidden="true" className="article-facebook-mark">f</span><span>فيسبوك</span></a><button className="article-share-button" type="button" onClick={copyArticleLink} aria-label="نسخ رابط المقال"><Link2 size={18} /><span>نسخ الرابط</span></button><button className="article-share-button article-share-more" type="button" onClick={shareArticle} aria-label="خيارات مشاركة إضافية"><Share2 size={18} /><span>مشاركة</span></button></div>
