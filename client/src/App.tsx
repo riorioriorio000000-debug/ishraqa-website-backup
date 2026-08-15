@@ -1,31 +1,22 @@
-import ContentGuard from "@/components/ContentGuard";
-import SelectionExplainer from "@/components/SelectionExplainer";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { lazy, Suspense } from "react";
+import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
-import RouteScrollTop from "./components/RouteScrollTop";
-
-const NotFound = lazy(() => import("@/pages/NotFound"));
-const CustomerService = lazy(() => import("@/pages/CustomerService"));
-const ArticleDetailPage = lazy(() => import("@/pages/ArticleDetail"));
-const ServiceCalculator = lazy(() => import("@/pages/ServiceCalculator"));
-const ServicesPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.ServicesPage })));
-const BookingPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.BookingPage })));
-const ArticlesPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.ArticlesPage })));
-const CoveragePage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.CoveragePage })));
-const AboutPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.AboutPage })));
-const FaqPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.FaqPage })));
-
-function PageLoader() {
-  return <main className="route-loading" role="status" aria-live="polite">جارٍ تجهيز الصفحة...</main>;
-}
-
+import { ArticleDetail, ArticlesIndex } from "./pages/ArticlePages";
 function Router() {
-  return <Suspense fallback={<PageLoader />}><Switch><Route path="/" component={Home} /><Route path="/services" component={ServicesPage} /><Route path="/booking" component={BookingPage} /><Route path="/calculator" component={ServiceCalculator} /><Route path="/articles" component={ArticlesPage} /><Route path="/articles/:slug" component={ArticleDetailPage} /><Route path="/where-we-work" component={CoveragePage} /><Route path="/about" component={AboutPage} /><Route path="/faq" component={FaqPage} /><Route path="/customer-service" component={CustomerService} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch></Suspense>;
+  return (
+    <Switch>
+      <Route path={"/"} component={Home} />
+      <Route path={"/articles"} component={ArticlesIndex} />
+      <Route path={"/articles/:slug"} component={({ params }) => <ArticleDetail slug={params.slug} />} />
+      <Route path={"/404"} component={NotFound} />
+      {/* Final fallback route */}
+      <Route component={NotFound} />
+    </Switch>
+  );
 }
 
 // NOTE: About Theme
@@ -41,11 +32,8 @@ function App() {
         // switchable
       >
         <TooltipProvider>
-          <ContentGuard />
-          <RouteScrollTop />
-          <Router />
-          <SelectionExplainer />
           <Toaster />
+          <Router />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
