@@ -83,7 +83,7 @@ describe("نموذج الحجز", () => {
     render(<Home />);
 
     expect(screen.getByRole("heading", { name: /إجابات أوضح.*قبل أن تبدأ/ })).toBeTruthy();
-    expect(document.querySelectorAll(".home-faq-grid details")).toHaveLength(6);
+    expect(document.querySelectorAll(".home-faq-grid details")).toHaveLength(17);
     expect(screen.getByText("هل يمكن ترتيب تنظيف شقة بعد الانتقال أو قبل التسليم؟")).toBeTruthy();
     expect(screen.getByText("ما المعلومات التي تساعد على تنسيق نقل العفش؟")).toBeTruthy();
   });

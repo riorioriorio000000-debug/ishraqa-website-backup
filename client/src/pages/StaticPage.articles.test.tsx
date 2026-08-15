@@ -7,6 +7,14 @@ import { ArticlesPage } from "./StaticPage";
 
 vi.mock("@/components/SiteShell", () => ({ default: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
 vi.mock("@/components/PageMeta", () => ({ default: () => null }));
+vi.mock("@/lib/trpc", () => ({
+  trpc: {
+    interactions: {
+      articleFeedbackSummaries: { useQuery: () => ({ data: {}, refetch: vi.fn() }) },
+      submitArticleFeedback: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
+    },
+  },
+}));
 
 describe("بحث مكتبة المقالات", () => {
   it("يرشح بحسب اسم المدينة ويعرض حالة واضحة عند عدم وجود نتائج", () => {

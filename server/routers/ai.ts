@@ -17,6 +17,18 @@ const attachmentSchema = z.object({
   dataUrl: z.string().min(32).max(7_000_000),
 });
 
+const estimateImageSchema = attachmentSchema.refine((attachment) => attachment.mimeType.startsWith("image/"), {
+  message: "تقبل الحاسبة صورة بصيغة JPG أو PNG أو WebP فقط.",
+});
+
+const estimateResponseSchema = z.object({
+  estimateBand: z.enum(["تقدير خفيف", "تقدير متوسط", "تقدير موسّع"]),
+  summary: z.string().trim().min(24).max(520),
+  factors: z.array(z.string().trim().min(3).max(120)).min(2).max(4),
+  missingDetails: z.array(z.string().trim().min(3).max(120)).max(4),
+  whatsappDraft: z.string().trim().min(20).max(1_000),
+});
+
 const MAX_ATTACHMENT_BYTES = 5_000_000;
 
 const requestLedger = new Map<string, { startedAt: number; count: number }>();
@@ -44,6 +56,14 @@ function readReply(response: Awaited<ReturnType<typeof invokeLLM>>) {
     .map(part => part.text)
     .join('\n')
     .trim() || 'تعذر إنشاء رد الآن. يمكنك التواصل عبر واتساب للحصول على المساعدة.';
+}
+
+function readEstimateReply(response: Awaited<ReturnType<typeof invokeLLM>>) {
+  try {
+    return estimateResponseSchema.parse(JSON.parse(readReply(response)));
+  } catch {
+    throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "تعذر إعداد التقدير التوضيحي الآن. يمكنك إرسال التفاصيل مباشرة عبر واتساب." });
+  }
 }
 
 function identityFor(request: { ip?: string }) {
@@ -161,6 +181,54 @@ export const aiRouter = router({
         navigation: internalNavigation,
         contentCards: recommendSiteContent(latestUserMessage?.content || ""),
       };
+    }),
+  serviceEstimate: publicProcedure
+    .input(z.object({
+      service: z.string().trim().max(160),
+      property: z.string().trim().max(160),
+      size: z.string().trim().max(160),
+      city: z.string().trim().max(160),
+      details: z.string().trim().max(900),
+      attachment: estimateImageSchema.optional(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      protectBudget(identityFor(ctx.req));
+      const attachmentContent = input.attachment
+        ? await (async () => {
+          const data = decodeAttachment(input.attachment!);
+          const stored = await storagePut(`estimate-attachments/${Date.now()}-${safeAttachmentName(input.attachment!.name)}`, data, input.attachment!.mimeType);
+          const signedUrl = await storageGetSignedUrl(stored.key);
+          return { type: "image_url" as const, image_url: { url: signedUrl, detail: "auto" as const } };
+        })()
+        : null;
+      const requestSummary = [`الخدمة: ${input.service || "غير محددة"}`, `نوع المكان: ${input.property || "غير محدد"}`, `المساحة أو العدد: ${input.size || "غير محدد"}`, `المدينة أو الحي: ${input.city || "غير محدد"}`, `التفاصيل الإضافية: ${input.details || "لا توجد"}`].join("\n");
+      const response = await invokeLLM({
+        messages: [
+          { role: "system", content: "أنت مساعد تقدير أولي لخدمات الإشراقة. حلّل وصف العميل لتحديد حجم الاحتياج فقط، لا لتسعير الخدمة. لا تذكر أي مبلغ أو عملة أو نطاق مالي أو خصم أو توفر أو موعد. لا تدّعِ أن الصورة تؤكد أي شيء غير واضح. لا تعرض سلسلة تفكير. اختر estimateBand واحدًا فقط: تقدير خفيف أو تقدير متوسط أو تقدير موسّع. اكتب summary عمليًا ومختصرًا، واذكر أن التقدير غير نهائي وأن الفريق يراجع المكان قبل تأكيد السعر. اكتب factors كعوامل تؤثر في التقدير، وmissingDetails كتفاصيل قد يسأل عنها الفريق فقط عند الحاجة. صغ whatsappDraft كرسالة عربية لطيفة وجاهزة للفريق وتضم التفاصيل التي قدمها العميل." },
+          { role: "user", content: attachmentContent ? [{ type: "text" as const, text: `بيانات طلب التقدير:\n${requestSummary}` }, attachmentContent] : `بيانات طلب التقدير:\n${requestSummary}` },
+        ],
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "service_estimate",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                estimateBand: { type: "string", enum: ["تقدير خفيف", "تقدير متوسط", "تقدير موسّع"] },
+                summary: { type: "string" },
+                factors: { type: "array", items: { type: "string" }, minItems: 2, maxItems: 4 },
+                missingDetails: { type: "array", items: { type: "string" }, maxItems: 4 },
+                whatsappDraft: { type: "string" },
+              },
+              required: ["estimateBand", "summary", "factors", "missingDetails", "whatsappDraft"],
+              additionalProperties: false,
+            },
+          },
+        },
+        maxTokens: 700,
+      });
+      return readEstimateReply(response);
     }),
   summarizeSelection: publicProcedure
     .input(z.object({ text: z.string().trim().min(1).max(6_000) }))

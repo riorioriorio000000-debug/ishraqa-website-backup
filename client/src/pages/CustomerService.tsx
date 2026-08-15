@@ -100,7 +100,7 @@ export default function CustomerService() {
 
   return (
     <SiteShell>
-      <PageMeta title="خدمة العملاء الذكية" description="اسأل مساعد الإشراقة عن خدمات التنظيف والصيانة ونقل العفش ومقالات الموقع، واحصل على روابط موثوقة للخطوة التالية." keywords={["خدمة العملاء", "مساعد شركة تنظيف", "تنظيف وصيانة", "نقل عفش", "مقالات الإشراقة"]} path="/customer-service" />
+      <PageMeta title="تواصل مع الإشراقة" description="اسأل مساعد الإشراقة عن خدمات التنظيف والصيانة ونقل العفش ومقالات الموقع، واحصل على روابط موثوقة للخطوة التالية." keywords={["خدمة العملاء", "مساعد شركة تنظيف", "تنظيف وصيانة", "نقل عفش", "مقالات الإشراقة"]} path="/customer-service" />
       <main className="assistant-page" dir="rtl">
         <section className="assistant-hero">
           <div className="shell assistant-hero-grid">

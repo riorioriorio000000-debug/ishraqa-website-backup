@@ -76,13 +76,28 @@ const localCities = [
 ] as const;
 
 const localFocuses = ["تنظيف المنزل", "صيانة التكييف", "نقل العفش", "تنظيف عميق للمطبخ", "ترتيب موعد خدمة منزلية"] as const;
+const localArticleVisuals: Readonly<Record<string, { readonly src: string; readonly alt: string }>> = {
+  riyadh: { src: "/manus-storage/article-visual-bathroom-care_9449151f.webp", alt: "حمام مرتب بأدوات عناية منزلية هادئة" },
+  jeddah: { src: "/manus-storage/article-visual-ac-maintenance_e644ca83.webp", alt: "وحدة تكييف نظيفة وأدوات صيانة مرتبة" },
+  makkah: { src: "/manus-storage/article-visual-moving-plan_3fb9a477.webp", alt: "خطة منظمة لتغليف ونقل الأثاث" },
+  madinah: { src: "/manus-storage/article-visual-kitchen-deep-clean_f5c395b7.webp", alt: "سطح مطبخ نظيف وأدوات تنظيف عميق" },
+  dammam: { src: "/manus-storage/article-visual-scheduled-care_47ea76e0.webp", alt: "جدول هادئ لتنظيم العناية المنزلية" },
+  khobar: { src: "/manus-storage/article-visual-sofa-care_0001dda1.webp", alt: "كنب مرتب وتجهيزات عناية بالأقمشة" },
+  unaizah: { src: "/manus-storage/article-visual-window-care_5fb807c6.webp", alt: "نافذة مضيئة وأدوات عناية بالزجاج" },
+  jubail: { src: "/manus-storage/article-visual-marble-care_b0c1f72f.webp", alt: "سطح رخامي نظيف وتجهيزات عناية لطيفة" },
+  "khamis-mushait": { src: "/manus-storage/article-visual-exterior-care_8deeb043.webp", alt: "واجهة منزل مرتبة وأدوات عناية خارجية" },
+};
+
 const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index) => {
   const focus = localFocuses[index % localFocuses.length];
+  const visual = localArticleVisuals[slug];
   return {
     slug: `${slug}-service-guide`,
     title: `دليل ${city}: كيف ترتب ${focus} بوضوح؟`,
     intro: `دليل محلي عملي لسكان ${city} يشرح ما الذي يُكتب في طلب ${focus} وكيف تُراجع التفاصيل قبل تنسيق الموعد.`,
     category: "دليل محلي",
+    image: visual?.src,
+    imageAlt: visual?.alt,
     shareImage: articleShareImages[`${slug}-service-guide`],
     keywords: [`${focus} ${city}`, `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
     sections: longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`),
@@ -103,5 +118,22 @@ export default function ArticleDetailPage() {
   };
   const copyArticleLink = () => { void navigator.clipboard?.writeText(window.location.href); };
   const relatedArticles = articleEntries.filter((entry) => entry.slug !== article.slug && (entry.category === article.category || entry.keywords.some((keyword) => article.keywords.includes(keyword)))).slice(0, 3);
-  return <SiteShell><PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} /><ArticleStructuredData article={article} /><main className="article-detail" dir="rtl"><header className="article-hero"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> {article.category}</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header><article className="section article-reading-section"><div className="shell article-prose">{article.image && <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure>}{article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}<aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside><section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section><div className="article-actions"><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="article-share-button" aria-label="مشاركة المقال عبر واتساب"><MessageCircle size={18} /><span>واتساب</span></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" className="article-share-button article-share-facebook" aria-label="مشاركة المقال عبر فيسبوك"><span aria-hidden="true" className="article-facebook-mark">f</span><span>فيسبوك</span></a><button className="article-share-button" type="button" onClick={copyArticleLink} aria-label="نسخ رابط المقال"><Link2 size={18} /><span>نسخ الرابط</span></button><button className="article-share-button article-share-more" type="button" onClick={shareArticle} aria-label="خيارات مشاركة إضافية"><Share2 size={18} /><span>مشاركة</span></button></div><section className="article-feedback-hub" aria-label="تقييم وتعليقات القرّاء"><ArticleRating articleTitle={article.title} /><ArticleComments pageKey={article.slug} /></section></div></article><button className="article-scroll-top" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="العودة إلى أعلى المقال"><ChevronUp size={20} /></button></main></SiteShell>;
+  const primaryGuide = mainArticles.find((entry) => entry.slug !== article.slug) || mainArticles[0];
+  return <SiteShell>
+    <PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} />
+    <ArticleStructuredData article={article} />
+    <main className="article-detail" dir="rtl">
+      <header className="article-hero"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> {article.category}</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header>
+      <article className="section article-reading-section"><div className="shell article-prose">
+        {article.image && <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure>}
+        {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
+        <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
+        <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>
+        <div className="article-actions"><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="article-share-button" aria-label="مشاركة المقال عبر واتساب"><MessageCircle size={18} /><span>واتساب</span></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" className="article-share-button article-share-facebook" aria-label="مشاركة المقال عبر فيسبوك"><span aria-hidden="true" className="article-facebook-mark">f</span><span>فيسبوك</span></a><button className="article-share-button" type="button" onClick={copyArticleLink} aria-label="نسخ رابط المقال"><Link2 size={18} /><span>نسخ الرابط</span></button><button className="article-share-button article-share-more" type="button" onClick={shareArticle} aria-label="خيارات مشاركة إضافية"><Share2 size={18} /><span>مشاركة</span></button></div>
+        <section className="article-feedback-hub" aria-label="تقييم وتعليقات القرّاء"><ArticleRating articleTitle={article.title} pageKey={article.slug} /><ArticleComments pageKey={article.slug} /></section>
+        <section className="article-primary-guide" aria-label="دليل رئيسي"><span>دليل رئيسي</span><h2>{primaryGuide.title}</h2><p>{primaryGuide.intro}</p><Link href={`/articles/${primaryGuide.slug}`} className="text-link">افتح الدليل الرئيسي <ArrowLeft size={15} /></Link></section>
+        <button className="article-scroll-top" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="العودة إلى أعلى المقال"><ChevronUp size={20} /> العودة إلى أعلى المقال</button>
+      </div></article>
+    </main>
+  </SiteShell>;
 }

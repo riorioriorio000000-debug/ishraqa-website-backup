@@ -172,6 +172,41 @@ export async function getArticleFeedbackSummary(pageKey: string, visitorId?: str
   return { count, average, ownRating: own[0]?.rating ?? null, ownIsPublic: own[0]?.isPublic ?? true };
 }
 
+export async function getArticleFeedbackSummaries(pageKeys: string[], visitorId?: string) {
+  const db = await getDb();
+  const keys = [...new Set(pageKeys.map((key) => key.trim()).filter(Boolean))];
+  const empty = Object.fromEntries(keys.map((key) => [key, { count: 0, average: 0, ownRating: null as number | null, ownIsPublic: true }]));
+  if (!db || !keys.length) return empty;
+
+  const [published, ownRatings] = await Promise.all([
+    db.select({ pageKey: articleFeedback.pageKey, rating: articleFeedback.rating })
+      .from(articleFeedback)
+      .where(and(inArray(articleFeedback.pageKey, keys), eq(articleFeedback.isPublic, true))),
+    visitorId
+      ? db.select({ pageKey: articleFeedback.pageKey, rating: articleFeedback.rating, isPublic: articleFeedback.isPublic })
+        .from(articleFeedback)
+        .where(and(inArray(articleFeedback.pageKey, keys), eq(articleFeedback.visitorId, visitorId)))
+      : Promise.resolve([]),
+  ]);
+
+  const totals = new Map<string, { count: number; total: number }>();
+  for (const item of published) {
+    const current = totals.get(item.pageKey) || { count: 0, total: 0 };
+    totals.set(item.pageKey, { count: current.count + 1, total: current.total + item.rating });
+  }
+  const ownByPage = new Map(ownRatings.map((item) => [item.pageKey, item]));
+  return Object.fromEntries(keys.map((key) => {
+    const total = totals.get(key) || { count: 0, total: 0 };
+    const own = ownByPage.get(key);
+    return [key, {
+      count: total.count,
+      average: total.count ? Math.round((total.total / total.count) * 10) / 10 : 0,
+      ownRating: own?.rating ?? null,
+      ownIsPublic: own?.isPublic ?? true,
+    }];
+  }));
+}
+
 type VisitorOwnedCommentInput = {
   pageKey: string;
   visitorId: string;
