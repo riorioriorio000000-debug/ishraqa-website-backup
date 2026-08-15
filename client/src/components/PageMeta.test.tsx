@@ -17,7 +17,7 @@ describe("PageMeta", () => {
     expect(keywords?.content.split(",").map((value) => value.trim())).toHaveLength(5);
     expect(document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe("https://al-eshraqa.co/");
     expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:locale"]')?.content).toBe("ar_SA");
-    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:image"]')?.content).toContain("ishraqa-blue-mark");
+    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:image"]')?.content).toContain("ishraqa-user-logo_64a160a3.png");
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="twitter:card"]')?.content).toBe("summary");
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toContain("index");
   });

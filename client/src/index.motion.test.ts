@@ -9,4 +9,10 @@ describe("الحركة المخففة", () => {
     expect(css).toMatch(/animation:\s*none\s*!important/);
     expect(css).toMatch(/scroll-behavior:\s*auto\s*!important/);
   });
+
+  it("يثبت لون زر المزيد ويضيف حركة تحويم للصور الرئيسية", () => {
+    expect(css).toMatch(/\.nav-more-trigger[^}]*color:\s*var\(--teal-dark\)\s*!important/);
+    expect(css).toContain(".service-card:focus-within .service-art");
+    expect(css).toContain(".hero-caddy-art:hover img");
+  });
 });

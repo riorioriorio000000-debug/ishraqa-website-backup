@@ -31,7 +31,7 @@ export default function PageMeta({ title, description, keywords, path, image, im
     setMeta("property", "og:url", canonicalUrl);
     setMeta("property", "og:type", "website");
     setMeta("property", "og:locale", "ar_SA");
-    const shareImage = image ?? "https://al-eshraqa.co/manus-storage/ishraqa-blue-mark_51e1bd1d.png";
+    const shareImage = image ?? "https://al-eshraqa.co/manus-storage/ishraqa-user-logo_64a160a3.png";
     setMeta("property", "og:image", shareImage);
     setMeta("property", "og:image:alt", imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش");
     setMeta("name", "twitter:image", shareImage);
