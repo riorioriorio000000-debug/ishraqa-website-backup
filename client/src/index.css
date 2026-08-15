@@ -700,7 +700,23 @@ img { -webkit-user-drag: none; user-drag: none; }
 .quick-service-answer-stars button { display: grid; width: 2rem; height: 2rem; place-items: center; padding: 0; border: 0; border-radius: 0; background: transparent; color: #b5c7c0; cursor: pointer; transition: color .16s var(--ease-out), transform .16s var(--ease-out); }
 .quick-service-answer-stars button:hover, .quick-service-answer-stars button:focus-visible, .quick-service-answer-stars button.selected { color: #bd8b37; outline: none; }.quick-service-answer-stars button:hover, .quick-service-answer-stars button:focus-visible { transform: translateY(-2px) scale(1.08); }.quick-service-answer-stars button:focus-visible { outline: 3px solid rgba(193,157,89,.28); outline-offset: 2px; }.quick-service-answer-stars button:active { transform: scale(.94); }.quick-service-answer-stars button:disabled { cursor: wait; opacity: .62; }
 .quick-service-answer-rating-status { display: inline-flex; align-items: center; gap: .35rem; color: #197064 !important; font-weight: 800; }.quick-service-answer-rating-error { color: #ae3f36 !important; }
+.quick-service-recommendation-filters { padding: .9rem 1rem; border: 1px solid #d7e5de; border-radius: .95rem; background: rgba(247, 252, 250, .72); }
+.quick-service-recommendation-filters > div { display: grid; grid-template-columns: 1fr 1fr; gap: .65rem; }
+.quick-service-recommendation-filters label, .quick-service-answer-note label { display: grid; gap: .34rem; color: #315d5e; font-size: .75rem; font-weight: 800; }
+.quick-service-recommendation-filters select, .quick-service-recommendation-filters input, .quick-service-answer-note textarea { width: 100%; border: 1px solid #cfe0da; border-radius: .65rem; background: #fff; color: #164e52; font: inherit; outline: none; transition: border-color .16s var(--ease-out), box-shadow .16s var(--ease-out); }
+.quick-service-recommendation-filters select, .quick-service-recommendation-filters input { min-height: 2.65rem; padding: .5rem .65rem; font-size: .82rem; }
+.quick-service-recommendation-filters select:focus-visible, .quick-service-recommendation-filters input:focus-visible, .quick-service-answer-note textarea:focus-visible { border-color: #b88d42; box-shadow: 0 0 0 3px rgba(193,157,89,.19); }
+.quick-service-answer-note { display: grid; gap: .55rem; padding-top: .18rem; }
+.quick-service-answer-note label > span { color: #758b87; font-weight: 600; }
+.quick-service-answer-note textarea { min-height: 5rem; padding: .65rem .72rem; resize: vertical; font-size: .84rem; line-height: 1.75; }
+.quick-service-answer-note .button-small { justify-self: start; min-height: 2.45rem; padding-inline: .9rem; font-size: .8rem; }
+.quick-service-answer-rating-summary { padding-top: .1rem; border-top: 1px dashed #c8dbd4; color: #496c68; font-size: .79rem; }
+.quick-service-answer-rating-summary summary { padding-top: .7rem; color: #15565a; font-weight: 800; cursor: pointer; }
+.quick-service-answer-rating-summary summary::marker { color: #bd8b37; }
+.quick-service-answer-rating-summary p { padding-top: .45rem; }
+@media (prefers-reduced-motion: no-preference) { .quick-service-answer-stars button.selected { animation: quick-service-star-pop .28s var(--ease-out) both; } @keyframes quick-service-star-pop { 0% { transform: scale(.92); } 55% { transform: translateY(-3px) scale(1.16); } 100% { transform: translateY(0) scale(1); } } }
 @media (max-width: 520px) { .quick-service-answer-dialog { max-height: 82vh; padding: 1.25rem; }.quick-service-answer-dialog [data-slot="dialog-header"] { padding-left: 2rem; }.quick-service-content-cards { grid-template-columns: 1fr; }.quick-service-answer-reply { font-size: .94rem; line-height: 1.9; } }
+@media (max-width: 520px) { .quick-service-recommendation-filters > div { grid-template-columns: 1fr; }.quick-service-answer-stars button { width: 1.85rem; height: 1.85rem; } }
 
 /* فلاتر المكتبة وملخص الزيارات: أدوات واضحة من دون أن تزاحم محتوى المقالات. */
 .article-search-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, .35fr); gap: .8rem; align-items: end; margin-block: 1.7rem .75rem; }

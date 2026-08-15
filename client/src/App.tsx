@@ -1,5 +1,4 @@
 import ContentGuard from "@/components/ContentGuard";
-import SelectionExplainer from "@/components/SelectionExplainer";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { lazy, Suspense } from "react";
@@ -44,7 +43,6 @@ function App() {
           <ContentGuard />
           <RouteScrollTop />
           <Router />
-          <SelectionExplainer />
           <Toaster />
         </TooltipProvider>
       </ThemeProvider>

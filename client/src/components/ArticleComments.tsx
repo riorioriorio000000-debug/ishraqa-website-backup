@@ -1,9 +1,10 @@
 import { Camera, Heart, HeartCrack, MessageCircle, Pencil, Send, Star, Trash2, X } from "lucide-react";
-import { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from "react";
+import React, { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { nextReaction } from "@shared/interactionHelpers";
+import { toast } from "sonner";
 
 const AVATAR_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 const avatarKinds = ["wave", "spark", "leaf", "star"] as const;
@@ -50,14 +51,33 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   const [editingCommentId, setEditingCommentId] = useState<number>();
   const [commentPendingDeletion, setCommentPendingDeletion] = useState<number>();
   const [reactingTo, setReactingTo] = useState<number[]>([]);
+  const [undoingCommentId, setUndoingCommentId] = useState<number>();
   const [status, setStatus] = useState<string>();
 
+  const utils = trpc.useUtils();
   const comments = trpc.interactions.listComments.useQuery({ pageKey, visitorId });
   const feedback = trpc.interactions.articleFeedback.useQuery({ pageKey, visitorId });
   const uploadAvatar = trpc.interactions.uploadAvatar.useMutation();
   const updateFeedback = trpc.interactions.submitArticleFeedback.useMutation({ onSuccess: () => { void feedback.refetch(); void comments.refetch(); } });
+  const undoPublishedComment = trpc.interactions.deleteComment.useMutation({ onSuccess: result => {
+    if (result.deleted) { setStatus("تم التراجع عن نشر تعليقك."); void comments.refetch(); }
+    else setStatus("تعذر التراجع لأن التعليق لم يعد متاحًا ضمن ملكيتك.");
+    setUndoingCommentId(undefined);
+  }, onError: () => { setUndoingCommentId(undefined); setStatus("تعذر التراجع الآن. يمكنك حذف التعليق من خياراته."); } });
   const submit = trpc.interactions.submitComment.useMutation({ onSuccess: result => {
-    if (result.accepted) { clearEditor(); setProfileOpen(false); setStatus("نُشر تعليقك الآن بعد فحص آلي سريع للمحتوى."); void comments.refetch(); void feedback.refetch(); }
+    if (result.accepted) {
+      clearEditor();
+      setProfileOpen(false);
+      setStatus("تم نشر تعليقك.");
+      void comments.refetch();
+      void feedback.refetch();
+      if (result.commentId && visitorId) {
+        toast.success("تم نشر تعليقك.", { action: { label: "تراجع", onClick: () => {
+          setUndoingCommentId(result.commentId ?? undefined);
+          undoPublishedComment.mutate({ commentId: result.commentId!, visitorId });
+        } } });
+      }
+    }
     else setStatus(result.reason === "active-comment-exists" ? "لديك تعليق منشور بالفعل. احذفه أولًا قبل إضافة تعليق جديد." : "تعذر نشر التعليق لأن الصياغة تحتاج تعديلًا بسيطًا.");
   } });
   const update = trpc.interactions.updateComment.useMutation({ onSuccess: result => {
@@ -69,7 +89,13 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     setStatus(result.deleted ? "حُذف تعليقك. يمكنك إضافة تعليق جديد متى أردت." : "تعذر حذف التعليق لأنه لم يعد متاحًا ضمن ملكيتك.");
     void comments.refetch();
   } });
-  const react = trpc.interactions.react.useMutation({ onSuccess: () => void comments.refetch(), onSettled: (_value, _error, variables) => setReactingTo(current => current.filter(id => id !== variables.commentId)) });
+  const react = trpc.interactions.react.useMutation({
+    onError: () => { void comments.refetch(); },
+    onSettled: (_value, _error, variables) => {
+      setReactingTo(current => current.filter(id => id !== variables.commentId));
+      void comments.refetch();
+    },
+  });
 
   useEffect(() => setVisitorId(getVisitorId()), []);
   useEffect(() => { if (feedback.data) setRatingPrivate(!feedback.data.ownIsPublic); }, [feedback.data]);
@@ -119,8 +145,15 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   }
   function toggleReaction(commentId: number, current: "heart" | "broken" | null, requested: "heart" | "broken") {
     if (!visitorId || reactingTo.includes(commentId)) return;
+    const reaction = nextReaction(current, requested);
     setReactingTo(items => [...items, commentId]);
-    window.setTimeout(() => react.mutate({ commentId, visitorId, reaction: nextReaction(current, requested) }), 80);
+    utils.interactions.listComments.setData({ pageKey, visitorId }, existing => existing?.map(comment => comment.id !== commentId ? comment : {
+      ...comment,
+      viewerReaction: reaction,
+      hearts: Math.max(0, comment.hearts + (reaction === "heart" ? 1 : 0) - (current === "heart" ? 1 : 0)),
+      broken: Math.max(0, comment.broken + (reaction === "broken" ? 1 : 0) - (current === "broken" ? 1 : 0)),
+    }));
+    react.mutate({ commentId, visitorId, reaction });
   }
 
   const dialogTitle = profileMode === "rating-settings" ? "إعدادات تقييمك" : editingCommentId ? "تعديل تعليقك" : "قبل نشر تعليقك";

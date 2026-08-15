@@ -1,0 +1,1 @@
+ALTER TABLE `assistant_answer_feedback` ADD `note` varchar(600);

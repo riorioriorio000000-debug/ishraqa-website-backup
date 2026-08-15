@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
 import { publicProcedure, router } from "../_core/trpc";
-import { classifySiteQuestion, internalNavigation, recommendSiteContent, siteKnowledge } from "../siteKnowledge";
+import { classifySiteQuestion, internalNavigation, recommendSiteContent, recommendSiteContentByContext, siteKnowledge } from "../siteKnowledge";
 import { fetchPublicPageText } from "../webPage";
 import { storageGetSignedUrl, storagePut } from "../storage";
 
@@ -131,6 +131,9 @@ ${siteKnowledge}
 `;
 
 export const aiRouter = router({
+  recommendContent: publicProcedure
+    .input(z.object({ service: z.enum(["cleaning", "maintenance", "moving", "general"]), city: z.string().trim().min(2).max(96).optional() }))
+    .query(({ input }) => recommendSiteContentByContext({ service: input.service, city: input.city })),
   chat: publicProcedure
     .input(z.object({
       messages: z.array(messageSchema).min(1).max(12),
@@ -231,19 +234,6 @@ export const aiRouter = router({
         maxTokens: 700,
       });
       return readEstimateReply(response);
-    }),
-  summarizeSelection: publicProcedure
-    .input(z.object({ text: z.string().trim().min(1).max(6_000) }))
-    .mutation(async ({ input, ctx }) => {
-      protectBudget(identityFor(ctx.req));
-      const response = await invokeLLM({
-        messages: [
-          { role: 'system', content: 'أنت مساعد عربي يشرح النص المحدد للزائر. لخص بدقة في 3 نقاط قصيرة، ثم أضف سطرًا بعنوان "بمعنى أبسط". لا تضف حقائق غير موجودة في النص.' },
-          { role: 'user', content: input.text },
-        ],
-        maxTokens: 500,
-      });
-      return { summary: readReply(response) };
     }),
   browseAndSummarize: publicProcedure
     .input(z.object({ url: z.string().url().max(2_048), question: z.string().trim().max(800).optional() }))

@@ -55,6 +55,7 @@ export const assistantAnswerFeedback = mysqlTable("assistant_answer_feedback", {
   service: mysqlEnum("service", ["cleaning", "maintenance", "moving", "general"]).notNull(),
   city: varchar("city", { length: 96 }),
   contentCardIds: varchar("contentCardIds", { length: 512 }).notNull().default(""),
+  note: varchar("note", { length: 600 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

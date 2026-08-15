@@ -148,7 +148,10 @@ export function classifySiteQuestion(question: string): RecommendationContext {
 }
 
 export function recommendSiteContent(question: string): SiteContentCard[] {
-  const context = classifySiteQuestion(question);
+  return recommendSiteContentByContext(classifySiteQuestion(question));
+}
+
+export function recommendSiteContentByContext(context: RecommendationContext): SiteContentCard[] {
   if (context.service === "general") {
     return context.city
       ? [siteContentCards.booking, { id: `city-${context.city}`, kind: "article", title: `دليل الخدمات المنزلية في ${context.city}`, description: `مرجع محلي يساعدك على ترتيب تفاصيل الموقع قبل اختيار الخدمة المناسبة في ${context.city}.`, href: `/articles/${supportedCities.find(([name]) => name === context.city)?.[1]}-service-guide` }, siteContentCards["cleaning-guide"]]

@@ -132,7 +132,7 @@ export async function submitVisitorFeedback(input: { rating: number; comment?: s
 }
 
 /** Stores only anonymous quality signals and recommendation categories, not the visitor's question or answer text. */
-export async function upsertAssistantAnswerFeedback(input: { id: string; rating: number; service: "cleaning" | "maintenance" | "moving" | "general"; city?: string; contentCardIds: string[] }) {
+export async function upsertAssistantAnswerFeedback(input: { id: string; rating: number; service: "cleaning" | "maintenance" | "moving" | "general"; city?: string; contentCardIds: string[]; note?: string }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
   const contentCardIds = input.contentCardIds.join(",").slice(0, 512);
@@ -142,10 +142,20 @@ export async function upsertAssistantAnswerFeedback(input: { id: string; rating:
     service: input.service,
     city: input.city || null,
     contentCardIds,
+    note: input.note?.trim() || null,
   }).onDuplicateKeyUpdate({
-    set: { rating: input.rating, service: input.service, city: input.city || null, contentCardIds, updatedAt: new Date() },
+    set: { rating: input.rating, service: input.service, city: input.city || null, contentCardIds, note: input.note?.trim() || null, updatedAt: new Date() },
   });
   return { accepted: true as const };
+}
+
+export async function getAssistantAnswerFeedbackSummary() {
+  const db = await getDb();
+  if (!db) return { count: 0, average: 0, noteCount: 0 };
+  const rows = await db.select({ rating: assistantAnswerFeedback.rating, note: assistantAnswerFeedback.note }).from(assistantAnswerFeedback);
+  const count = rows.length;
+  const total = rows.reduce((sum, row) => sum + row.rating, 0);
+  return { count, average: count ? Math.round((total / count) * 10) / 10 : 0, noteCount: rows.filter((row) => Boolean(row.note?.trim())).length };
 }
 
 export async function getPublishedFeedback() {
@@ -273,7 +283,11 @@ export async function submitSiteComment(input: VisitorOwnedCommentInput) {
     avatarUrl: normalized.avatarUrl,
     status: directCommentStatus,
   });
-  return { accepted: true as const };
+  const [created] = await db.select({ id: siteComments.id })
+    .from(siteComments)
+    .where(and(eq(siteComments.pageKey, normalized.pageKey), eq(siteComments.visitorId, normalized.visitorId), isNull(siteComments.deletedAt)))
+    .limit(1);
+  return { accepted: true as const, commentId: created?.id ?? null };
 }
 
 export async function updateVisitorComment(input: VisitorOwnedCommentInput & { commentId: number }) {

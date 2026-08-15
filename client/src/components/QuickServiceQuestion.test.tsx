@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import QuickServiceQuestion from "./QuickServiceQuestion";
 
-const { chatMutate, feedbackMutate } = vi.hoisted(() => ({ chatMutate: vi.fn(), feedbackMutate: vi.fn() }));
+const { chatMutate, feedbackMutate, recommendUseQuery } = vi.hoisted(() => ({ chatMutate: vi.fn(), feedbackMutate: vi.fn(), recommendUseQuery: vi.fn() }));
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
@@ -25,6 +25,12 @@ vi.mock("@/lib/trpc", () => ({
           isPending: false,
         }),
       },
+      recommendContent: {
+        useQuery: (input: unknown) => {
+          recommendUseQuery(input);
+          return { data: undefined, isLoading: false };
+        },
+      },
     },
     feedback: {
       submitAssistantAnswer: {
@@ -33,6 +39,9 @@ vi.mock("@/lib/trpc", () => ({
           error: null,
           isPending: false,
         }),
+      },
+      assistantAnswerSummary: {
+        useQuery: () => ({ data: { count: 3, average: 4.3, noteCount: 2 }, isLoading: false }),
       },
     },
   },
@@ -46,6 +55,7 @@ afterEach(() => {
   cleanup();
   chatMutate.mockClear();
   feedbackMutate.mockClear();
+  recommendUseQuery.mockClear();
 });
 
 describe("QuickServiceQuestion", () => {
@@ -76,7 +86,7 @@ describe("QuickServiceQuestion", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
-  it("يحفظ تقييم النجوم مع نوع الخدمة والمدينة وبطاقات المحتوى المقترحة", async () => {
+  it("يحفظ تقييم النجوم وملاحظة اختيارية مع نوع الخدمة والمدينة وبطاقات المحتوى المقترحة", async () => {
     const user = userEvent.setup();
     render(<QuickServiceQuestion />);
 
@@ -84,8 +94,28 @@ describe("QuickServiceQuestion", () => {
     await user.click(screen.getByRole("button", { name: /اسأل الآن/ }));
     await screen.findByRole("dialog");
     await user.click(screen.getByRole("radio", { name: /4 من 5 نجوم/ }));
+    expect(screen.getByRole("radio", { name: /4 من 5 نجوم/ }).className).toContain("selected");
+    await user.type(screen.getByLabelText(/ملاحظة إضافية/), "أحتاج خطوات أكثر وضوحًا.");
+    await user.click(screen.getByRole("button", { name: "إرسال التقييم" }));
 
-    expect(feedbackMutate).toHaveBeenCalledWith(expect.objectContaining({ rating: 4, service: "maintenance", city: "الرياض", contentCardIds: ["maintenance-guide"] }));
+    expect(feedbackMutate).toHaveBeenCalledWith(expect.objectContaining({ rating: 4, service: "maintenance", city: "الرياض", contentCardIds: ["maintenance-guide"], note: "أحتاج خطوات أكثر وضوحًا." }));
     expect(screen.getByRole("status").textContent).toContain("شكرًا، سُجّل تقييمك");
+  });
+
+  it("يتيح للزائر تخصيص خدمة ومدينة المقالات المقترحة وطي ملخص التقييمات", async () => {
+    const user = userEvent.setup();
+    render(<QuickServiceQuestion />);
+
+    await user.type(screen.getByLabelText("اكتب سؤالك عن التنظيف أو الصيانة أو نقل العفش"), "أحتاج صيانة مكيف في الرياض");
+    await user.click(screen.getByRole("button", { name: /اسأل الآن/ }));
+    await screen.findByRole("dialog");
+    await user.selectOptions(screen.getByLabelText("نوع الخدمة"), "cleaning");
+    await user.clear(screen.getByLabelText("المدينة أو الحي"));
+    await user.type(screen.getByLabelText("المدينة أو الحي"), "جدة");
+
+    expect(recommendUseQuery).toHaveBeenLastCalledWith(expect.objectContaining({ service: "cleaning", city: "جدة" }));
+    const summary = screen.getByText("عرض ملخص ملاحظات التقييمات");
+    await user.click(summary);
+    expect(screen.getByText(/متوسط التقييم 4.3 من 5/)).toBeTruthy();
   });
 });
