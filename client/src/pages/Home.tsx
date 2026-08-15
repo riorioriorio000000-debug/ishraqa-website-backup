@@ -1,54 +1,33 @@
-// Design reminder: calm editorial service brand; preserve warm ivory space, deep teal actions, asymmetric sections, and gentle motion.
-import { ArrowLeft, Check, Clock3, Droplets, Home as HomeIcon, MessageCircle, Phone, ShieldCheck, Sparkles, Truck, Wrench } from "lucide-react";
-import React, { FormEvent, useState } from "react";
+import { ArrowLeft, BookOpen, MessageCircle, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import SiteShell from "@/components/SiteShell";
-import VisitorFeedback from "@/components/VisitorFeedback";
-import ServiceVideo from "@/components/ServiceVideo";
-import PageMeta from "@/components/PageMeta";
-
-const assets = {
-  hero: { src: "/manus-storage/cleaning-caddy-720w_1d6eb6fe.png", srcSet: "/manus-storage/cleaning-caddy-360w_e0c8e5c3.png 360w, /manus-storage/cleaning-caddy-720w_1d6eb6fe.png 720w", sizes: "(max-width: 640px) 82vw, 427px" },
-  map: { src: "/manus-storage/coverage-map-960w_90cea723.png", srcSet: "/manus-storage/coverage-map-480w_93822fdf.png 480w, /manus-storage/coverage-map-960w_90cea723.png 960w", sizes: "(max-width: 640px) 92vw, 500px" },
-  cleaning: { src: "/manus-storage/cleaning-spark-720w_eba13623.png", srcSet: "/manus-storage/cleaning-spark-360w_6d1ffe9a.png 360w, /manus-storage/cleaning-spark-720w_eba13623.png 720w", sizes: "(max-width: 640px) 40vw, 240px" },
-  maintenance: { src: "/manus-storage/maintenance-tools-720w_14b5c2ac.png", srcSet: "/manus-storage/maintenance-tools-360w_0405e169.png 360w, /manus-storage/maintenance-tools-720w_14b5c2ac.png 720w", sizes: "(max-width: 640px) 62vw, 420px" },
-  moving: { src: "/manus-storage/moving-box-720w_8c727804.png", srcSet: "/manus-storage/moving-box-360w_f82108eb.png 360w, /manus-storage/moving-box-720w_8c727804.png 720w", sizes: "(max-width: 640px) 40vw, 240px" },
-};
-const services = [
-  { icon: HomeIcon, number: "01", title: "تنظيف المنازل", image: assets.cleaning, text: "تنظيف يومي وعميق للمنازل والشقق والمساحات التي تحتاج عناية منتظمة." },
-  { icon: Wrench, number: "02", title: "الصيانة المنزلية", image: assets.maintenance, text: "تنسيق خدمات الصيانة الأساسية بوضوح، من التكييف إلى التفاصيل التي لا تحتمل التأجيل." },
-  { icon: Truck, number: "03", title: "نقل العفش", image: assets.moving, text: "ترتيب ونقل الأثاث بعناية، مع تجهيز يناسب حجم المكان والموعد المطلوب." },
-];
-const cities = ["الرياض", "جدة", "مكة المكرمة", "المدينة المنورة", "الدمام", "الخبر", "الطائف", "أبها", "تبوك", "القصيم", "جازان", "مدن أخرى"];
-
-function BookingCard() {
-  const [step, setStep] = useState(1);
-  const [data, setData] = useState({ city: "", cityDetail: "", service: "", serviceDetail: "", details: "", date: "", dateDetail: "", time: "", timeDetail: "", phone: "" });
-  const update = (key: keyof typeof data, value: string) => setData((current) => ({ ...current, [key]: value }));
-  const submit = (event: FormEvent) => { event.preventDefault(); const city = data.cityDetail.trim() || data.city || "لم يحدد"; const service = data.serviceDetail.trim() || data.service || "لم تحدد"; const date = data.dateDetail.trim() || data.date || "مرن"; const time = data.timeDetail.trim() || data.time || "مرن"; const message = encodeURIComponent(`السلام عليكم، أرغب في حجز خدمة من شركة الإشراقة.%0Aالمدينة أو الحي: ${city}%0Aالخدمة: ${service}%0Aالتاريخ: ${date}%0Aالوقت: ${time}%0Aتفاصيل إضافية: ${data.details || "لا توجد"}%0Aرقم التواصل: ${data.phone || "لم يكتب"}`); window.open(`https://wa.me/966552610151?text=${message}`, "_blank", "noopener,noreferrer"); };
-  return <div className="booking-card" id="booking"><div className="booking-intro"><span className="eyebrow">نموذج حجز مختصر</span><h2>اكتب ما تحتاجه، أو استخدم الاختيارات المساعدة.</h2><p>أربع خطوات بسيطة تجهز لك رسالة واضحة على واتساب. لا يوجد دفع إلكتروني داخل هذه النسخة.</p><div className="stepper">{[1, 2, 3, 4].map((item) => <span key={item} className={item <= step ? "step active" : "step"}>{item.toString().padStart(2, "0")}</span>)}</div></div><form onSubmit={submit} className="booking-form">{step === 1 && <><label>اكتب مدينتك أو الحي بنفسك<input value={data.cityDetail} onChange={(event) => update("cityDetail", event.target.value)} placeholder="مثال: حي النزهة، جدة" /></label><label>أو اختر المدينة إن رغبت<select value={data.city} onChange={(event) => update("city", event.target.value)}><option value="">اختر المدينة</option>{cities.map((city) => <option key={city}>{city}</option>)}</select></label></>}{step === 2 && <><label>اكتب نوع الخدمة بنفسك<input value={data.serviceDetail} onChange={(event) => update("serviceDetail", event.target.value)} placeholder="مثال: تنظيف شقة بعد انتقال" /></label><label>أو اختر الخدمة إن رغبت<select value={data.service} onChange={(event) => update("service", event.target.value)}><option value="">اختر الخدمة</option><option>تنظيف المنازل</option><option>الصيانة المنزلية</option><option>نقل العفش</option></select></label></>}{step === 3 && <><div className="form-split"><label>اختر التاريخ إن رغبت<input type="date" value={data.date} onChange={(event) => update("date", event.target.value)} /></label><label>اختر الوقت إن رغبت<input type="time" value={data.time} onChange={(event) => update("time", event.target.value)} /></label></div><div className="form-split"><label>أو اكتب الموعد بنفسك<input value={data.dateDetail} onChange={(event) => update("dateDetail", event.target.value)} placeholder="مثال: خلال الأسبوع القادم" /></label><label>أو اكتب الوقت بنفسك<input value={data.timeDetail} onChange={(event) => update("timeDetail", event.target.value)} placeholder="مثال: بعد المغرب" /></label></div><label>أي تفاصيل تهمك؟<textarea value={data.details} onChange={(event) => update("details", event.target.value)} maxLength={700} placeholder="اكتب أي تفاصيل إضافية، أو اترك الحقل فارغًا." /></label></>}{step === 4 && <label>رقم التواصل<input inputMode="tel" value={data.phone} onChange={(event) => update("phone", event.target.value)} placeholder="05xxxxxxxx" /><small>سيفتح واتساب برسالة جاهزة لتأكيد التفاصيل.</small></label>}<div className="booking-actions">{step > 1 && <button type="button" className="button button-ghost" onClick={() => setStep((current) => current - 1)}>السابق</button>}{step < 4 ? <button type="button" className="button" onClick={() => setStep((current) => current + 1)}>التالي <ArrowLeft size={16} /></button> : <button className="button" type="submit">إرسال عبر واتساب <MessageCircle size={16} /></button>}</div></form></div>;
-}
+import { articles } from "@/content/articles";
 
 export default function Home() {
-  const [dustPointer, setDustPointer] = useState({ x: 56, y: 42 });
-  const updateDustPointer = (event: React.PointerEvent<HTMLHeadingElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    setDustPointer({
-      x: Math.round(((event.clientX - rect.left) / rect.width) * 100),
-      y: Math.round(((event.clientY - rect.top) / rect.height) * 100),
-    });
-  };
+  const featured = articles.slice(0, 4);
+  return (
+    <SiteShell>
+      <main>
+        <section className="home-hero">
+          <div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" />
+          <div className="shell-inner hero-grid">
+            <div>
+              <span className="eyebrow"><Sparkles size={15} /> دليل هادئ للعناية بالمنزل</span>
+              <h1>بيتك أنظف.<br /><em>يومك أخف.</em></h1>
+              <p>الإشراقة تجمع لك دليلاً واضحًا حول العناية بالتفاصيل اليومية، مع طرق للتواصل وشرح احتياجك بدون تعقيد.</p>
+              <div className="hero-actions"><Link href="/articles" className="primary-link">استكشف المقالات <ArrowLeft size={17} /></Link><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="secondary-link">تواصل عبر واتساب <MessageCircle size={17} /></a></div>
+            </div>
+            <div className="hero-panel"><span>مكتبة عملية</span><b>{articles.length}</b><small>مقالًا حول التنظيف<br />والصيانة المنزلية</small><div className="hero-panel-lines"><i /><i /><i /></div></div>
+          </div>
+        </section>
 
-  return <SiteShell><PageMeta title="تنظيف وصيانة ونقل عفش في السعودية" description="شركة الإشراقة للتنظيف والصيانة ونقل العفش: خدمات منزلية واضحة وحجز منسق عبر واتساب في مدن السعودية." keywords={["شركة تنظيف", "تنظيف منازل", "صيانة منزلية", "نقل عفش", "حجز خدمات منزلية"]} path="/" /><main dir="rtl">
-    <section className="hero-section" id="top"><div className="shell hero-grid"><div className="hero-copy"><span className="eyebrow"><i /> عناية تُرى، وراحة تُحس</span><h1 className="hero-dust-title" onPointerMove={updateDustPointer} onPointerLeave={() => setDustPointer({ x: 56, y: 42 })} style={{ "--dust-x": `${dustPointer.x}%`, "--dust-y": `${dustPointer.y}%` } as React.CSSProperties}><span>بيتك أنظف.</span><em>يومك أخف.</em></h1><p>نمنح مساحتك عناية تستحقها، بخدمات تنظيف وصيانة ونقل عفش موثوقة تصل إليك في الوقت الذي يناسبك.</p><div className="hero-actions"><Link href="/booking" className="button">ابدأ الحجز <ArrowLeft size={17} /></Link><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="text-link"><Phone size={16} /> تواصل عبر واتساب</a></div><div className="hero-stats"><span><strong>+12</strong> مدينة</span><span><strong>24/7</strong> دعم</span><span><strong>3</strong> مسارات عناية</span></div></div><div className="hero-art hero-caddy-art"><div className="hero-orbit" /><img src={assets.hero.src} srcSet={assets.hero.srcSet} sizes={assets.hero.sizes} alt="رسم شفاف لصندوق أدوات تنظيف الإشراقة" decoding="async" fetchPriority="high" /><span className="art-note"><Sparkles size={16} /> تفاصيل صغيرة<br /><b>تصنع فرقًا كبيرًا</b></span></div></div><div className="wave-divider" /></section>
-    <section className="section section-paper" id="services"><div className="shell"><div className="section-heading"><div><span className="eyebrow">خدماتنا</span><h2>نرتّب التفاصيل بهدوء،<br /><em>لتعود إلى يومك بخفة.</em></h2></div><p>خدمات عملية للأماكن التي نعيش ونعمل فيها. اختر المسار الأقرب لاحتياجك، وسنساعدك على ترتيب الخطوة التالية.</p></div><div className="service-grid">{services.map(({ icon: Icon, image, number, title, text }) => <article className="service-card" key={title}><span className="service-number">{number}</span><img className="service-art" src={image.src} srcSet={image.srcSet} sizes={image.sizes} alt={`رسم توضيحي لخدمة ${title} من شركة الإشراقة`} draggable={false} loading="lazy" decoding="async" /><Icon size={28} /><h3>{title}</h3><p>{text}</p><Link href="/services" className="card-link">استكشف التفاصيل <ArrowLeft size={15} /></Link></article>)}</div></div></section>
-    <section className="section service-showcase"><div className="shell"><ServiceVideo featured title="تنظيف يراعي تفاصيل يومك" description="لقطة سريعة من روح الخدمة: عناية هادئة بالمكان، وترتيب واضح للأولويات قبل أن يبدأ اليوم من جديد." src="/manus-storage/ad-home-cleaning_8b448cef.mp4" /></div></section>
-    <section className="section split-section" id="why"><div className="shell split-grid"><div className="service-illustration"><div className="service-illustration-halo" /><img src={assets.maintenance.src} srcSet={assets.maintenance.srcSet} sizes={assets.maintenance.sizes} alt="رسم أدوات الصيانة المنزلية المستخدمة في خدمات الإشراقة" loading="lazy" decoding="async" /></div><div className="split-copy"><span className="eyebrow">لماذا الإشراقة؟</span><h2>خدمة واضحة،<br /><em>وفريق يعرف ماذا يفعل.</em></h2><p>نبدأ من التفاصيل التي تهمك: نوع المكان، الأولوية، الوقت، وطريقة التواصل. ثم ننسّق ما يلزم دون وعود مبالغ فيها أو خطوات معقدة.</p><div className="check-list"><span><Check size={17} /> تحديد الأولويات قبل الوصول</span><span><Check size={17} /> مواد وتجهيزات تناسب الخدمة</span><span><Check size={17} /> تواصل مباشر لتأكيد الموعد</span></div><Link href="/about" className="text-link">اعرف أكثر عن طريقتنا <ArrowLeft size={16} /></Link></div></div></section>
-    <section className="section coverage-section" id="coverage"><div className="shell coverage-grid"><div><span className="eyebrow">مدن ومناطق نصل إليها</span><h2>التغطية تبدأ<br /><em>برسالة واضحة.</em></h2><p>نصل إلى أكثر من 12 مدينة، وننسق معك قبل تثبيت الموعد. إذا لم تجد مدينتك، اكتبها داخل نموذج الحجز وسيتواصل معك الفريق.</p><div className="city-pills">{cities.map((city) => <span key={city}>{city}</span>)}</div><Link href="/where-we-work" className="button button-ghost">شاهد نطاق الخدمة <ArrowLeft size={16} /></Link></div><div className="map-panel"><img src={assets.map.src} srcSet={assets.map.srcSet} sizes={assets.map.sizes} alt="خريطة مدن تغطية شركة الإشراقة في السعودية" loading="lazy" decoding="async" /></div></div></section>
-    <section className="section process-section"><div className="shell"><div className="section-heading centered"><div><span className="eyebrow">كيف تسير الخدمة؟</span><h2>ثلاث خطوات، بلا تعقيد.</h2></div><p>نترك لك الوضوح من أول رسالة حتى نهاية الزيارة.</p></div><div className="process-grid"><div><span>01</span><Clock3 /><h3>حدد احتياجك</h3><p>اختر الخدمة والمدينة والموعد المناسب.</p></div><div><span>02</span><ShieldCheck /><h3>نصل في موعدنا</h3><p>فريق مدرّب يصل بالمعدات المناسبة.</p></div><div><span>03</span><Droplets /><h3>استمتع بالفرق</h3><p>مكان أهدأ، أنظف، وأقرب لما تحب.</p></div></div></div></section>
-    <section className="section booking-section"><div className="shell"><BookingCard /></div></section>
-    <section className="section article-section"><div className="shell"><div className="section-heading"><div><span className="eyebrow">من دليل العناية</span><h2>ملاحظات صغيرة<br /><em>تجعل المكان ألطف.</em></h2></div><Link href="/articles" className="text-link">كل المقالات <ArrowLeft size={16} /></Link></div><div className="article-grid"><Link href="/articles/riyadh-service-guide" className="article-card"><span>01 / الرياض</span><h3>تنظيف المنزل في الرياض: من أين تبدأ؟</h3><p>خريطة بسيطة لترتيب الأولويات قبل طلب الخدمة.</p></Link><Link href="/articles/jeddah-service-guide" className="article-card accent"><span>02 / جدة</span><h3>كيف تحافظ على خفة المكان بعد التنظيف؟</h3><p>عادات قصيرة تساعد على بقاء أثر العناية.</p></Link><Link href="/articles/makkah-service-guide" className="article-card"><span>03 / مكة</span><h3>اختيار خدمة مناسبة للمساحة</h3><p>أسئلة عملية تجعل تنسيق الموعد أسرع.</p></Link></div></div></section>
-    <VisitorFeedback />
-    <section className="final-cta"><div className="shell final-cta-inner"><div><span className="eyebrow">نقاء يومك</span><h2>جاهز ترتّب الخطوة الأولى؟</h2><p>أرسل تفاصيل بسيطة، وسنساعدك على اختيار المسار المناسب.</p></div><Link href="/booking" className="button button-light">ابدأ الحجز <ArrowLeft size={17} /></Link></div></section>
-  </main></SiteShell>;
+        <section className="home-guides shell-inner">
+          <div className="section-heading"><div><span className="eyebrow"><BookOpen size={15} /> ابدأ من هنا</span><h2>أدلة مختارة بعناية</h2><p>موضوعات عملية تعالج أكثر النقاط التي تحتاج إليها الأسرة في المكان اليومي.</p></div><Link href="/articles">المكتبة كاملة <ArrowLeft size={16} /></Link></div>
+          <div className="home-card-grid">{featured.map((article) => <article className="home-card" key={article.slug}><span>{article.category}</span><h3>{article.title}</h3><p>{article.excerpt}</p><Link href={`/articles/${article.slug}`}>قراءة المقال <ArrowLeft size={15} /></Link></article>)}</div>
+        </section>
+
+        <section className="home-contact"><div className="shell-inner"><div><span className="eyebrow">خطوة واحدة كافية</span><h2>اكتب ما تحتاجه،<br />ونرتب البداية معك.</h2></div><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer">ابدأ محادثة <MessageCircle size={18} /></a></div></section>
+      </main>
+    </SiteShell>
+  );
 }
