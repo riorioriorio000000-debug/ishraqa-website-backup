@@ -9,7 +9,7 @@ export default function QuickServiceQuestion() {
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState<QuestionAnswer | null>(null);
   const ask = trpc.ai.chat.useMutation({
-    onSuccess: (data) => setAnswer({ reply: data.reply, workSummary: data.workSummary }),
+    onSuccess: (data) => setAnswer({ reply: data.reply, workSummary: data.workSummary?.join(" • ") }),
   });
 
   function submit(event: FormEvent<HTMLFormElement>) {

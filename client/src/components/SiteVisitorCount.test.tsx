@@ -30,7 +30,9 @@ describe("عداد الزوار الفريد", () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("3fa85f64-5717-4562-b3fc-2c963f66afa6");
     render(<SiteVisitorCount />);
 
-    expect(screen.getByText((_, element) => element?.tagName === "P" && element.textContent?.includes("42 زائرًا فريدًا للموقع") === true)).toBeTruthy();
+    const visitorCounter = document.querySelector(".footer-visitor-count");
+    expect(visitorCounter?.textContent).toContain("42");
+    expect(visitorCounter?.textContent).toContain("زائرًا للموقع");
     expect(record).toHaveBeenCalledWith({ visitorId: "3fa85f64-5717-4562-b3fc-2c963f66afa6" });
     expect(refetch).toHaveBeenCalledTimes(1);
   });

@@ -23,5 +23,5 @@ export default function SiteVisitorCount() {
   }, []);
 
   if (!visitorId) return null;
-  return <p className="footer-visitor-count" aria-live="polite"><span>{count.data ?? 0}</span> زائرًا فريدًا للموقع</p>;
+  return <p className="footer-visitor-count" aria-live="polite"><span className="footer-visitor-number">{count.data ?? 0}</span><span className="footer-visitor-label">زائرًا للموقع</span></p>;
 }

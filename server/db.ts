@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, commentReactions, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, articleFeedback, commentReactions, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -107,6 +107,23 @@ export async function getSiteVisitCount() {
   return result[0]?.value ?? 0;
 }
 
+export async function recordServicePageView(pagePath: string) {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(servicePageMetrics).values({ pagePath, views: 1 }).onDuplicateKeyUpdate({
+    set: { views: sql`${servicePageMetrics.views} + 1`, updatedAt: new Date() },
+  });
+}
+
+export async function getMostVisitedServicePages() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({ pagePath: servicePageMetrics.pagePath, views: servicePageMetrics.views, updatedAt: servicePageMetrics.updatedAt })
+    .from(servicePageMetrics)
+    .orderBy(desc(servicePageMetrics.views), desc(servicePageMetrics.updatedAt))
+    .limit(4);
+}
+
 export async function submitVisitorFeedback(input: { rating: number; comment?: string }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
@@ -174,7 +191,7 @@ export async function getArticleFeedbackSummary(pageKey: string, visitorId?: str
 
 export async function getArticleFeedbackSummaries(pageKeys: string[], visitorId?: string) {
   const db = await getDb();
-  const keys = [...new Set(pageKeys.map((key) => key.trim()).filter(Boolean))];
+  const keys = Array.from(new Set(pageKeys.map((key) => key.trim()).filter(Boolean)));
   const empty = Object.fromEntries(keys.map((key) => [key, { count: 0, average: 0, ownRating: null as number | null, ownIsPublic: true }]));
   if (!db || !keys.length) return empty;
 

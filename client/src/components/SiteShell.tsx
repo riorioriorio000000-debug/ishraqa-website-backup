@@ -6,6 +6,7 @@ import BrandMark from "./BrandMark";
 import WhatsAppFloat from "./WhatsAppFloat";
 import SiteVisitorCount from "./SiteVisitorCount";
 import ArticleComments from "./ArticleComments";
+import ServicePageVisitTracker from "./ServicePageVisitTracker";
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -35,5 +36,5 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const shouldShowPageComments = !location.startsWith("/articles/") && location !== "/articles";
   const pageKey = location === "/" ? "page:home" : `page:${location}`;
-  return <div className="site-frame"><SiteHeader />{children}{shouldShowPageComments && <section className="page-comments-section section section-paper" dir="rtl"><div className="shell"><ArticleComments pageKey={pageKey} showLinkedRating={false} /></div></section>}<section className="site-tail" dir="rtl"><div className="shell site-tail-grid"><div><span className="eyebrow"><i /> خطوة تالية أوضح</span><h2>كل ما تحتاجه<br /><em>قريب منك.</em></h2><p>إن لم تكن مستعدًا للحجز الآن، يمكنك قراءة دليل عملي أو حساب الاحتياج أو سؤال المساعد قبل إرسال أي رسالة.</p></div><div className="site-tail-links"><Link href="/calculator">حاسبة الخدمة <span>تقدير أولي بلا سعر ثابت</span></Link><Link href="/articles">دليل العناية <span>قراءات وخطوات عملية</span></Link><Link href="/customer-service">اسأل المساعد <span>شرح وبحث داخل الموقع</span></Link></div></div></section><SiteFooter /><WhatsAppFloat /></div>;
+  return <div className="site-frame"><SiteHeader /><ServicePageVisitTracker />{children}{shouldShowPageComments && <section className="page-comments-section section section-paper" dir="rtl"><div className="shell"><ArticleComments pageKey={pageKey} showLinkedRating={false} /></div></section>}<section className="site-tail" dir="rtl"><div className="shell site-tail-grid"><div><span className="eyebrow"><i /> خطوة تالية أوضح</span><h2>كل ما تحتاجه<br /><em>قريب منك.</em></h2><p>إن لم تكن مستعدًا للحجز الآن، يمكنك قراءة دليل عملي أو حساب الاحتياج أو سؤال المساعد قبل إرسال أي رسالة.</p></div><div className="site-tail-links"><Link href="/calculator">حاسبة الخدمة <span>تقدير أولي بلا سعر ثابت</span></Link><Link href="/articles">دليل العناية <span>قراءات وخطوات عملية</span></Link><Link href="/customer-service">اسأل المساعد <span>شرح وبحث داخل الموقع</span></Link></div></div></section><SiteFooter /><WhatsAppFloat /></div>;
 }

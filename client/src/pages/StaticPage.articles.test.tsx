@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { articleEntries } from "./ArticleDetail";
 import { ArticlesPage } from "./StaticPage";
 
@@ -16,6 +16,8 @@ vi.mock("@/lib/trpc", () => ({
   },
 }));
 
+afterEach(() => cleanup());
+
 describe("بحث مكتبة المقالات", () => {
   it("يرشح بحسب اسم المدينة ويعرض حالة واضحة عند عدم وجود نتائج", () => {
     render(<ArticlesPage />);
@@ -24,10 +26,22 @@ describe("بحث مكتبة المقالات", () => {
     fireEvent.change(search, { target: { value: "الرياض" } });
     expect(screen.getByText(/دليل الرياض:/)).toBeTruthy();
     expect(screen.queryByText(/دليل جدة:/)).toBeNull();
-    expect(screen.getByText("نتائج البحث: 1 مقالة")).toBeTruthy();
+    expect(screen.getByText("نتائج مفلترة: 1 مقالة")).toBeTruthy();
 
     fireEvent.change(search, { target: { value: "عبارة لا تطابق أي مقال" } });
-    expect(screen.getByText("لا توجد مقالة مطابقة بعد.")).toBeTruthy();
+    expect(screen.getByText("لا توجد مقالة مطابقة لهذه التصفية بعد.")).toBeTruthy();
+  });
+
+  it("يتيح تصفية المقالات بحسب نوع الخدمة مع نتيجة مفهومة للزائر", () => {
+    render(<ArticlesPage />);
+
+    const serviceFilter = screen.getByLabelText("تصفية المقالات حسب نوع الخدمة") as HTMLSelectElement;
+    fireEvent.change(serviceFilter, { target: { value: "maintenance" } });
+
+    expect(serviceFilter.value).toBe("maintenance");
+    expect(screen.getByText("يعرض الآن:")).toBeTruthy();
+    expect(screen.getByText(/نتائج مفلترة:/)).toBeTruthy();
+    expect(screen.queryByText(/دليل نقل العفش في/)).toBeNull();
   });
 
   it("يعرض أربعة أدلة رئيسية فقط مع صور معتمدة ويبقي المكتبة عند 62 مقالة", () => {

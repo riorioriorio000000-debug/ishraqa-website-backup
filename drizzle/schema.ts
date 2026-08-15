@@ -31,6 +31,13 @@ export const siteMetrics = mysqlTable("site_metrics", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+/** Aggregated first-party page views for the public service journeys; no IP address or personal profile is stored. */
+export const servicePageMetrics = mysqlTable("service_page_metrics", {
+  pagePath: varchar("pagePath", { length: 96 }).primaryKey(),
+  views: int("views").notNull().default(0),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const visitorFeedback = mysqlTable("visitor_feedback", {
   id: int("id").autoincrement().primaryKey(),
   rating: int("rating").notNull(),

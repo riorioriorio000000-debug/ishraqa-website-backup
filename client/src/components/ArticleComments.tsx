@@ -1,5 +1,5 @@
 import { Camera, Heart, HeartCrack, MessageCircle, Pencil, Send, Star, Trash2, X } from "lucide-react";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -27,7 +27,7 @@ function getVisitorId() {
 }
 
 function AvatarArt({ kind, className }: { kind: AvatarKind; className?: string }) {
-  const shapes: Record<AvatarKind, JSX.Element> = {
+  const shapes: Record<AvatarKind, ReactNode> = {
     wave: <><path d="M5 28c7-12 14 12 22 0s14 12 22 0" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /><circle cx="17" cy="15" r="4" fill="currentColor" opacity=".34" /></>,
     spark: <path d="M32 6l4.6 16.2L54 27l-17.4 4.8L32 48l-4.6-16.2L10 27l17.4-4.8L32 6z" fill="currentColor" />,
     leaf: <><path d="M12 47C12 19 32 9 53 9c0 23-12 42-37 38" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" /><path d="M14 46c10-10 18-18 30-30" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" /></>,

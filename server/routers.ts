@@ -71,6 +71,8 @@ export const appRouter = router({
   interactions: router({
     visitorCount: publicProcedure.query(() => db.getUniqueVisitorCount()),
     recordVisitor: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).mutation(({ input }) => db.recordAnonymousVisitor(input.visitorId)),
+    servicePageStats: publicProcedure.query(() => db.getMostVisitedServicePages()),
+    recordServicePageView: publicProcedure.input(z.object({ pagePath: z.enum(["/services", "/calculator", "/booking", "/customer-service"]) })).mutation(({ input }) => db.recordServicePageView(input.pagePath)),
     listComments: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getPublishedComments(input.pageKey, input.visitorId)),
     articleFeedback: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getArticleFeedbackSummary(input.pageKey, input.visitorId)),
     articleFeedbackSummaries: publicProcedure.input(z.object({ pageKeys: z.array(z.string().trim().min(1).max(160)).min(1).max(80), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getArticleFeedbackSummaries(input.pageKeys, input.visitorId)),
