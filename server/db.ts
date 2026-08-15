@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, commentReactions, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -128,6 +128,23 @@ export async function submitVisitorFeedback(input: { rating: number; comment?: s
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
   await db.insert(visitorFeedback).values({ rating: input.rating, comment: input.comment?.trim() || null, status: "published" });
+  return { accepted: true as const };
+}
+
+/** Stores only anonymous quality signals and recommendation categories, not the visitor's question or answer text. */
+export async function upsertAssistantAnswerFeedback(input: { id: string; rating: number; service: "cleaning" | "maintenance" | "moving" | "general"; city?: string; contentCardIds: string[] }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const contentCardIds = input.contentCardIds.join(",").slice(0, 512);
+  await db.insert(assistantAnswerFeedback).values({
+    id: input.id,
+    rating: input.rating,
+    service: input.service,
+    city: input.city || null,
+    contentCardIds,
+  }).onDuplicateKeyUpdate({
+    set: { rating: input.rating, service: input.service, city: input.city || null, contentCardIds, updatedAt: new Date() },
+  });
   return { accepted: true as const };
 }
 

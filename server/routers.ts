@@ -50,6 +50,7 @@ export const appRouter = router({
   feedback: router({
     listPublished: publicProcedure.query(() => db.getPublishedFeedback()),
     submit: publicProcedure.input(z.object({ rating: z.number().int().min(1).max(5), comment: z.string().trim().max(800).optional() })).mutation(({ input }) => db.submitVisitorFeedback(input)),
+    submitAssistantAnswer: publicProcedure.input(z.object({ id: z.string().uuid(), rating: z.number().int().min(1).max(5), service: z.enum(["cleaning", "maintenance", "moving", "general"]), city: z.string().trim().min(2).max(96).optional(), contentCardIds: z.array(z.string().trim().min(1).max(120)).max(3) })).mutation(({ input }) => db.upsertAssistantAnswerFeedback(input)),
   }),
   booking: router({
     submit: publicProcedure.input(z.object({

@@ -43,6 +43,13 @@
       "when": 1786814118638,
       "tag": "0005_slimy_sabra",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1786818160360,
+      "tag": "0006_mute_viper",
+      "breakpoints": true
     }
   ]
 }

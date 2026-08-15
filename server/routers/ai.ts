@@ -2,7 +2,7 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
 import { publicProcedure, router } from "../_core/trpc";
-import { internalNavigation, recommendSiteContent, siteKnowledge } from "../siteKnowledge";
+import { classifySiteQuestion, internalNavigation, recommendSiteContent, siteKnowledge } from "../siteKnowledge";
 import { fetchPublicPageText } from "../webPage";
 import { storageGetSignedUrl, storagePut } from "../storage";
 
@@ -149,6 +149,7 @@ export const aiRouter = router({
           workSummary,
           navigation: internalNavigation,
           contentCards: recommendSiteContent(latestUserMessage.content),
+          recommendationContext: classifySiteQuestion(latestUserMessage.content),
         };
       }
       protectBudget(identityFor(ctx.req));
@@ -180,6 +181,7 @@ export const aiRouter = router({
         workSummary,
         navigation: internalNavigation,
         contentCards: recommendSiteContent(latestUserMessage?.content || ""),
+        recommendationContext: classifySiteQuestion(latestUserMessage?.content || ""),
       };
     }),
   serviceEstimate: publicProcedure

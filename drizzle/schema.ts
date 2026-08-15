@@ -48,6 +48,19 @@ export const visitorFeedback = mysqlTable("visitor_feedback", {
 
 export type VisitorFeedback = typeof visitorFeedback.$inferSelect;
 
+/** Anonymous quality signal for one FAQ assistant answer; answer text and visitor question are intentionally not stored. */
+export const assistantAnswerFeedback = mysqlTable("assistant_answer_feedback", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  rating: int("rating").notNull(),
+  service: mysqlEnum("service", ["cleaning", "maintenance", "moving", "general"]).notNull(),
+  city: varchar("city", { length: 96 }),
+  contentCardIds: varchar("contentCardIds", { length: 512 }).notNull().default(""),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AssistantAnswerFeedback = typeof assistantAnswerFeedback.$inferSelect;
+
 /** A per-article score owned by one anonymous browser. The composite ID prevents duplicate ratings. */
 export const articleFeedback = mysqlTable("article_feedback", {
   id: varchar("id", { length: 240 }).primaryKey(),

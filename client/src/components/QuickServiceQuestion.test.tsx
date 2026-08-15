@@ -4,13 +4,13 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import QuickServiceQuestion from "./QuickServiceQuestion";
 
-const { chatMutate } = vi.hoisted(() => ({ chatMutate: vi.fn() }));
+const { chatMutate, feedbackMutate } = vi.hoisted(() => ({ chatMutate: vi.fn(), feedbackMutate: vi.fn() }));
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
     ai: {
       chat: {
-        useMutation: (options: { onSuccess?: (value: { reply: string; workSummary: string[]; navigation: ReadonlyArray<{ label: string; href: string }>; contentCards: Array<{ id: string; kind: string; title: string; description: string; href: string }> }) => void }) => ({
+        useMutation: (options: { onSuccess?: (value: { reply: string; workSummary: string[]; navigation: ReadonlyArray<{ label: string; href: string }>; contentCards: Array<{ id: string; kind: string; title: string; description: string; href: string }>; recommendationContext: { service: "maintenance"; city: string } }) => void }) => ({
           mutate: (input: unknown) => {
             chatMutate(input);
             options.onSuccess?.({
@@ -18,8 +18,18 @@ vi.mock("@/lib/trpc", () => ({
               workSummary: ["فهمت سؤال الصيانة.", "راجعت فهرس موقع الإشراقة."],
               navigation: [{ label: "المقالات", href: "/articles" }, { label: "الحجز", href: "/booking" }],
               contentCards: [{ id: "maintenance-guide", kind: "article", title: "دليل صيانة التكييف", description: "خطوات عملية لوصف احتياج الصيانة.", href: "/articles/ac-maintenance-guide" }],
+              recommendationContext: { service: "maintenance", city: "الرياض" },
             });
           },
+          error: null,
+          isPending: false,
+        }),
+      },
+    },
+    feedback: {
+      submitAssistantAnswer: {
+        useMutation: (options: { onSuccess?: () => void }) => ({
+          mutate: (input: unknown) => { feedbackMutate(input); options.onSuccess?.(); },
           error: null,
           isPending: false,
         }),
@@ -35,6 +45,7 @@ vi.mock("wouter", () => ({
 afterEach(() => {
   cleanup();
   chatMutate.mockClear();
+  feedbackMutate.mockClear();
 });
 
 describe("QuickServiceQuestion", () => {
@@ -63,5 +74,18 @@ describe("QuickServiceQuestion", () => {
     await user.click(screen.getByRole("button", { name: "إغلاق إجابة المساعد" }));
 
     expect(screen.queryByRole("dialog")).toBeNull();
+  });
+
+  it("يحفظ تقييم النجوم مع نوع الخدمة والمدينة وبطاقات المحتوى المقترحة", async () => {
+    const user = userEvent.setup();
+    render(<QuickServiceQuestion />);
+
+    await user.type(screen.getByLabelText("اكتب سؤالك عن التنظيف أو الصيانة أو نقل العفش"), "أحتاج صيانة مكيف في الرياض");
+    await user.click(screen.getByRole("button", { name: /اسأل الآن/ }));
+    await screen.findByRole("dialog");
+    await user.click(screen.getByRole("radio", { name: /4 من 5 نجوم/ }));
+
+    expect(feedbackMutate).toHaveBeenCalledWith(expect.objectContaining({ rating: 4, service: "maintenance", city: "الرياض", contentCardIds: ["maintenance-guide"] }));
+    expect(screen.getByRole("status").textContent).toContain("شكرًا، سُجّل تقييمك");
   });
 });
