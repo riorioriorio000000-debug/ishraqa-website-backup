@@ -29,9 +29,14 @@ describe("نموذج الحجز", () => {
 
     expect(screen.getByRole("link", { name: "تواصل عبر واتساب" }).getAttribute("href")).toBe("https://wa.me/966552610151");
 
+    await user.type(screen.getByLabelText("اكتب مدينتك أو الحي"), "حي النزهة، جدة");
     await user.click(screen.getByRole("button", { name: /التالي/ }));
+    await user.type(screen.getByLabelText("اكتب نوع الخدمة التي تحتاجها"), "تنظيف شقة");
+    await user.type(screen.getByLabelText("أي تفاصيل تهمك؟"), "ثلاث غرف وصالة");
     await user.click(screen.getByRole("button", { name: /التالي/ }));
-    await user.click(screen.getByRole("button", { name: /التالي/ }));
+    await user.type(screen.getByLabelText("اكتب الموعد المفضل"), "الخميس");
+    await user.type(screen.getByLabelText("اكتب الوقت المفضل"), "بعد المغرب");
+    await user.type(screen.getByLabelText(/رقم التواصل/), "0552610151");
     await user.click(screen.getByRole("button", { name: /إرسال عبر واتساب/ }));
 
     expect(openSpy).toHaveBeenCalledWith(

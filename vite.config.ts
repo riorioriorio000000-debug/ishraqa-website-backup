@@ -169,6 +169,14 @@ export default defineConfig({
     emptyOutDir: true,
     // يخفف استهلاك الذاكرة في بيئة البناء؛ لا يغير الملفات المنتجة أو ضغط الاستضافة.
     reportCompressedSize: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "wouter"],
+          ui: ["lucide-react", "sonner"],
+        },
+      },
+    },
   },
   server: {
     host: true,

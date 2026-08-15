@@ -1,7 +1,8 @@
 import { trpc } from "@/lib/trpc";
 import { Loader2, Sparkles, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import { Streamdown } from "streamdown";
+import { lazy, Suspense, useEffect, useState } from "react";
+
+const Streamdown = lazy(() => import("streamdown").then((module) => ({ default: module.Streamdown })));
 
 type SelectionState = { text: string; top: number; right: number } | null;
 
@@ -56,7 +57,9 @@ export default function SelectionExplainer() {
           {summarize.isPending ? "يفكر بالمختصر…" : "فسّر النص المحدد"}
         </button>
       ) : (
-        <div className="selection-explainer-result"><Streamdown>{summary}</Streamdown></div>
+        <div className="selection-explainer-result">
+          <Suspense fallback={<span>جارٍ تجهيز الشرح…</span>}><Streamdown>{summary}</Streamdown></Suspense>
+        </div>
       )}
       {summarize.error && <p className="selection-explainer-error">تعذر التلخيص الآن. جرّب مرة أخرى.</p>}
     </aside>
