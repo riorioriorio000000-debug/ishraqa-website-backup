@@ -27,6 +27,7 @@ export default function QuickServiceQuestion() {
   const [feedbackSaved, setFeedbackSaved] = useState(false);
   const [manualService, setManualService] = useState<Service>("general");
   const [manualCity, setManualCity] = useState("");
+  const [recommendationRequest, setRecommendationRequest] = useState<{ service: Service; city?: string } | null>(null);
   const saveFeedback = trpc.feedback.submitAssistantAnswer.useMutation({ onSuccess: () => setFeedbackSaved(true) });
   const ask = trpc.ai.chat.useMutation({
     onSuccess: (data) => {
@@ -34,6 +35,7 @@ export default function QuickServiceQuestion() {
       setAnswer(nextAnswer);
       setManualService(nextAnswer.recommendationContext.service);
       setManualCity(nextAnswer.recommendationContext.city || "");
+      setRecommendationRequest(null);
       setFeedbackId(createFeedbackId());
       setSelectedRating(null);
       setFeedbackNote("");
@@ -42,8 +44,10 @@ export default function QuickServiceQuestion() {
     },
   });
   const { data: summary } = trpc.feedback.assistantAnswerSummary.useQuery(undefined, { enabled: isAnswerOpen });
-  const { data: filteredCards } = trpc.ai.recommendContent.useQuery({ service: manualService, city: manualCity.trim() || undefined }, { enabled: isAnswerOpen });
+  const { data: filteredCards, isFetching: isRefreshingRecommendations } = trpc.ai.recommendContent.useQuery(recommendationRequest || { service: "general" }, { enabled: isAnswerOpen && Boolean(recommendationRequest) });
+  const { data: filterStats } = trpc.ai.recommendationFilterStats.useQuery(undefined, { enabled: isAnswerOpen, staleTime: 30_000 });
   const displayedCards = useMemo(() => filteredCards || answer?.contentCards || [], [filteredCards, answer]);
+  const highestFilterUse = Math.max(...(filterStats || []).map((item) => item.uses), 1);
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -65,11 +69,16 @@ export default function QuickServiceQuestion() {
     saveFeedback.mutate({ id: feedbackId, rating: selectedRating, service: manualService, city: manualCity.trim() || undefined, contentCardIds: displayedCards.map((card) => card.id).slice(0, 3), note: feedbackNote.trim() || undefined });
   }
 
+  function applyRecommendationFilters() {
+    setRecommendationRequest({ service: manualService, city: manualCity.trim() || undefined });
+  }
+
   return <section className="quick-service-question" aria-labelledby="quick-service-question-title">
     <div className="quick-service-question-copy"><span className="eyebrow"><Sparkles size={15} /> اسأل المساعد</span><h2 id="quick-service-question-title">لم تجد إجابتك؟<br /><em>اكتب سؤالك بطريقتك.</em></h2><p>يشرح لك مساعد الإشراقة الخطوة المناسبة اعتمادًا على معلومات الموقع، ثم يمكنك متابعة التفاصيل مع فريق الخدمة.</p></div>
     <div className="quick-service-question-panel"><form onSubmit={submit}><label htmlFor="quick-service-question-input">اكتب سؤالك عن التنظيف أو الصيانة أو نقل العفش</label><textarea id="quick-service-question-input" value={question} onChange={(event) => setQuestion(event.target.value)} placeholder="مثال: ما المعلومات التي أحتاجها قبل طلب تنظيف شقة؟" rows={3} maxLength={800} disabled={ask.isPending} /><button className="button" type="submit" disabled={!question.trim() || ask.isPending}>{ask.isPending ? <><LoaderCircle size={17} className="spin" /> يجهّز الإجابة…</> : <>اسأل الآن <ArrowLeft size={16} /></>}</button></form>{ask.error && <p className="quick-service-question-error" role="alert">تعذر تجهيز الإجابة الآن. يمكنك المحاولة مرة أخرى أو التواصل عبر واتساب.</p>}</div>
     <Dialog open={isAnswerOpen} onOpenChange={setIsAnswerOpen}><DialogContent className="quick-service-answer-dialog" showCloseButton={false} dir="rtl" aria-describedby="quick-service-answer-description"><DialogClose className="quick-service-answer-close" aria-label="إغلاق إجابة المساعد"><X size={18} aria-hidden="true" /></DialogClose><DialogHeader><span className="quick-service-answer-kicker"><Sparkles size={15} aria-hidden="true" /> إجابة المساعد</span><DialogTitle>إجابة مرتبطة بموقع الإشراقة</DialogTitle><DialogDescription id="quick-service-answer-description">يمكنك تخصيص المقالات المقترحة أو الانتقال إليها مباشرة.</DialogDescription></DialogHeader>{answer && <div className="quick-service-answer-body" aria-live="polite"><p className="quick-service-answer-reply">{answer.reply}</p>{answer.workSummary && <p className="quick-service-answer-summary">{answer.workSummary}</p>}
-      <section className="quick-service-recommendation-filters" aria-labelledby="quick-service-recommendation-filters-title"><h3 id="quick-service-recommendation-filters-title">خصّص المقالات المقترحة</h3><div><label>نوع الخدمة<select value={manualService} onChange={(event) => setManualService(event.target.value as Service)}>{(Object.keys(serviceLabels) as Service[]).map((service) => <option key={service} value={service}>{serviceLabels[service]}</option>)}</select></label><label>المدينة أو الحي<input value={manualCity} onChange={(event) => setManualCity(event.target.value)} list="faq-city-suggestions" placeholder="مثال: الرياض" /><datalist id="faq-city-suggestions">{citySuggestions.map((city) => <option key={city} value={city} />)}</datalist></label></div></section>
+      <section className="quick-service-recommendation-filters" aria-labelledby="quick-service-recommendation-filters-title"><h3 id="quick-service-recommendation-filters-title">خصّص المقالات المقترحة</h3><div><label>نوع الخدمة<select value={manualService} onChange={(event) => setManualService(event.target.value as Service)}>{(Object.keys(serviceLabels) as Service[]).map((service) => <option key={service} value={service}>{serviceLabels[service]}</option>)}</select></label><label>المدينة أو الحي<input value={manualCity} onChange={(event) => setManualCity(event.target.value)} list="faq-city-suggestions" placeholder="مثال: الرياض" /><datalist id="faq-city-suggestions">{citySuggestions.map((city) => <option key={city} value={city} />)}</datalist></label><button type="button" className="button button-small" onClick={applyRecommendationFilters} disabled={isRefreshingRecommendations}>{isRefreshingRecommendations ? "يجري التحديث…" : "تحديث المقترحات"}</button></div></section>
+      {filterStats?.length ? <section className="quick-service-filter-stats" aria-labelledby="quick-service-filter-stats-title"><div><span className="quick-service-filter-stats-kicker">اختيارات الزوار</span><h3 id="quick-service-filter-stats-title">أكثر المرشحات استخدامًا</h3><p>ملخص تجميعي لا يرتبط بأسئلة أو هويات الزوار.</p></div><ol>{filterStats.map((item) => <li key={`${item.service}-${item.city || "all"}`}><div><strong>{serviceLabels[item.service as Service]}</strong><span>{item.city || "كل المدن"}</span></div><i aria-hidden="true"><b style={{ width: `${Math.round((item.uses / highestFilterUse) * 100)}%` }} /></i><em>{item.uses}</em></li>)}</ol></section> : null}
       {displayedCards.length > 0 && <section aria-labelledby="quick-service-content-links"><h3 id="quick-service-content-links">محتوى مقترح</h3><div className="quick-service-content-cards">{displayedCards.map((card) => <Link key={card.id} href={card.href} className="quick-service-content-card" onClick={() => setIsAnswerOpen(false)}><span>{card.kind === "article" ? "مقال" : card.kind === "booking" ? "حجز" : "خدمة"}</span><strong>{card.title}</strong><small>{card.description}</small><b>افتح الرابط <ArrowLeft size={15} aria-hidden="true" /></b></Link>)}</div></section>}
       {answer.navigation.length > 0 && <nav className="quick-service-navigation" aria-label="صفحات موقع الإشراقة"><h3>صفحات الموقع</h3><div>{answer.navigation.map((item) => <Link key={item.href} href={item.href} onClick={() => setIsAnswerOpen(false)}>{item.label}<ArrowLeft size={13} aria-hidden="true" /></Link>)}</div></nav>}
       <section className="quick-service-answer-rating" aria-labelledby="quick-service-answer-rating-title"><div><h3 id="quick-service-answer-rating-title">هل كانت هذه الإجابة مفيدة؟</h3><p>قيّمها بالنجوم، ثم أضف ملاحظة اختيارية إن أردت.</p></div><div className="quick-service-answer-stars" role="radiogroup" aria-label="تقييم إجابة المساعد">{[1, 2, 3, 4, 5].map((rating) => <button key={rating} type="button" role="radio" aria-checked={selectedRating === rating} aria-label={`${rating} من 5 نجوم: ${ratingLabels[rating - 1]}`} title={ratingLabels[rating - 1]} className={selectedRating !== null && rating <= selectedRating ? "selected" : ""} onClick={() => rateAnswer(rating)} disabled={saveFeedback.isPending}><Star size={20} fill={selectedRating !== null && rating <= selectedRating ? "currentColor" : "none"} aria-hidden="true" /></button>)}</div>

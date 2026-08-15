@@ -62,6 +62,15 @@ export const assistantAnswerFeedback = mysqlTable("assistant_answer_feedback", {
 
 export type AssistantAnswerFeedback = typeof assistantAnswerFeedback.$inferSelect;
 
+/** Aggregated manual recommendation-filter usage. No question, IP address, or visitor profile is stored. */
+export const recommendationFilterMetrics = mysqlTable("recommendation_filter_metrics", {
+  id: varchar("id", { length: 196 }).primaryKey(),
+  service: mysqlEnum("service", ["cleaning", "maintenance", "moving", "general"]).notNull(),
+  city: varchar("city", { length: 96 }),
+  uses: int("uses").notNull().default(0),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 /** A per-article score owned by one anonymous browser. The composite ID prevents duplicate ratings. */
 export const articleFeedback = mysqlTable("article_feedback", {
   id: varchar("id", { length: 240 }).primaryKey(),

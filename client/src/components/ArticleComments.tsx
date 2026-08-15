@@ -1,20 +1,22 @@
-import { Camera, Heart, HeartCrack, MessageCircle, Pencil, Send, Star, Trash2, X } from "lucide-react";
-import React, { ChangeEvent, FormEvent, ReactNode, useEffect, useState } from "react";
+import { Heart, HeartCrack, MessageCircle, Pencil, Send, Star, Trash2 } from "lucide-react";
+import React, { FormEvent, ReactNode, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { nextReaction } from "@shared/interactionHelpers";
 import { toast } from "sonner";
 
-const AVATAR_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 const avatarKinds = ["wave", "spark", "leaf", "star"] as const;
 const readyAvatarOptions = [
-  { kind: "wave", label: "رسم موجة تركوازية" },
-  { kind: "spark", label: "رسم شرارة ذهبية" },
-  { kind: "leaf", label: "رسم ورقة هادئة" },
-  { kind: "star", label: "رسم نجمة بسيطة" },
+  { url: "/manus-storage/saudi-flag-riyadh_2e59cf4a.jpg", label: "أعلام السعودية في الرياض" },
+  { url: "/manus-storage/saudi-traveler_31726f72.jpg", label: "مسافر سعودي" },
+  { url: "/manus-storage/saudi-portrait-bw_78e11ff7.jpg", label: "صورة شخصية سعودية بالأبيض والأسود" },
+  { url: "/manus-storage/desert-profile_5a61b5b1.jpg", label: "مشهد صحراوي سعودي" },
+  { url: "/manus-storage/heritage-portrait_85fda9b1.jpg", label: "صورة تراثية سعودية" },
+  { url: "/manus-storage/saudi-emblem_3ec6d2c3.jpg", label: "شعار نخلة وسيفين" },
+  { url: "/manus-storage/saudi-map-portrait_1fad012b.jpg", label: "رسم سعودي بخلفية خضراء" },
+  { url: "/manus-storage/neutral-silhouette_230b7d3c.png", label: "صورة رمزية محايدة" },
 ] as const;
-type AvatarMimeType = typeof AVATAR_MIME_TYPES[number];
 type AvatarKind = typeof avatarKinds[number];
 type ProfileMode = "comment" | "rating-settings";
 
@@ -42,9 +44,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   const [displayName, setDisplayName] = useState("");
   const [body, setBody] = useState("");
   const [avatarKind, setAvatarKind] = useState<AvatarKind>("wave");
-  const [avatarDataUrl, setAvatarDataUrl] = useState<string>();
   const [avatarPreview, setAvatarPreview] = useState<string>();
-  const [avatarName, setAvatarName] = useState("");
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileMode, setProfileMode] = useState<ProfileMode>("comment");
   const [ratingPrivate, setRatingPrivate] = useState(false);
@@ -57,7 +57,6 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   const utils = trpc.useUtils();
   const comments = trpc.interactions.listComments.useQuery({ pageKey, visitorId });
   const feedback = trpc.interactions.articleFeedback.useQuery({ pageKey, visitorId });
-  const uploadAvatar = trpc.interactions.uploadAvatar.useMutation();
   const updateFeedback = trpc.interactions.submitArticleFeedback.useMutation({ onSuccess: () => { void feedback.refetch(); void comments.refetch(); } });
   const undoPublishedComment = trpc.interactions.deleteComment.useMutation({ onSuccess: result => {
     if (result.deleted) { setStatus("تم التراجع عن نشر تعليقك."); void comments.refetch(); }
@@ -100,19 +99,11 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   useEffect(() => setVisitorId(getVisitorId()), []);
   useEffect(() => { if (feedback.data) setRatingPrivate(!feedback.data.ownIsPublic); }, [feedback.data]);
   const ownComment = comments.data?.find(comment => comment.isOwner);
-  const isWorking = submit.isPending || update.isPending || uploadAvatar.isPending || updateFeedback.isPending;
+  const isWorking = submit.isPending || update.isPending || updateFeedback.isPending;
 
-  function clearEditor() { setBody(""); setAvatarDataUrl(undefined); setAvatarPreview(undefined); setAvatarName(""); setEditingCommentId(undefined); }
+  function clearEditor() { setBody(""); setAvatarPreview(undefined); setEditingCommentId(undefined); }
   function openRatingSettings() { if (!feedback.data?.ownRating) return; setProfileMode("rating-settings"); setStatus(undefined); setProfileOpen(true); }
   function openProfile(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (!visitorId || ownComment || body.trim().length < 4) return; setStatus(undefined); setEditingCommentId(undefined); setProfileMode("comment"); setProfileOpen(true); }
-  function onAvatarChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    if (!AVATAR_MIME_TYPES.includes(file.type as AvatarMimeType) || file.size > 2_000_000) { setStatus("اختر صورة JPG أو PNG أو WebP بحجم لا يتجاوز 2 ميغابايت."); event.target.value = ""; return; }
-    const reader = new FileReader();
-    reader.onload = () => { const value = typeof reader.result === "string" ? reader.result : ""; setAvatarDataUrl(value); setAvatarPreview(value); setAvatarName(file.name); };
-    reader.readAsDataURL(file);
-  }
   async function publishWithProfile() {
     if (!visitorId) return;
     if (profileMode === "rating-settings") {
@@ -125,10 +116,8 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     if (displayName.trim().length < 2 || body.trim().length < 4) return;
     setStatus(undefined);
     try {
-      const mimeType = avatarDataUrl?.match(/^data:([^;]+);base64,/)?.[1] as AvatarMimeType | undefined;
-      const uploaded = avatarDataUrl && mimeType ? await uploadAvatar.mutateAsync({ visitorId, name: avatarName || "avatar", mimeType, dataUrl: avatarDataUrl }) : undefined;
       if (showLinkedRating && feedback.data?.ownRating) await updateFeedback.mutateAsync({ pageKey, visitorId, rating: feedback.data.ownRating, isPublic: !ratingPrivate });
-      const payload = { pageKey, visitorId, displayName: displayName.trim(), body: body.trim(), avatarKind, avatarUrl: uploaded?.url };
+      const payload = { pageKey, visitorId, displayName: displayName.trim(), body: body.trim(), avatarKind, avatarUrl: avatarPreview };
       if (editingCommentId) update.mutate({ ...payload, commentId: editingCommentId }); else submit.mutate(payload);
     } catch { setStatus("تعذر حفظ إعدادات الملف الشخصي الآن. يمكنك المحاولة لاحقًا."); }
   }
@@ -138,7 +127,6 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     setDisplayName(ownComment.displayName);
     setBody(ownComment.body);
     setAvatarPreview(ownComment.avatarUrl || undefined);
-    setAvatarDataUrl(undefined);
     setAvatarKind(avatarKinds.includes(ownComment.avatarKind as AvatarKind) ? ownComment.avatarKind as AvatarKind : "wave");
     setProfileMode("comment");
     setProfileOpen(true);
@@ -166,7 +154,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
       {!comments.isLoading && !comments.data?.length && <p className="comment-empty"><MessageCircle size={19} /> لا توجد تعليقات بعد. كن أول من يضيف رأيًا حقيقيًا.</p>}
       {comments.data?.map(comment => <article className="comment-card" key={comment.id}><div className="comment-avatar" aria-hidden="true">{comment.avatarUrl ? <img src={comment.avatarUrl} alt="" loading="lazy" /> : <AvatarArt kind={avatarKinds.includes(comment.avatarKind as AvatarKind) ? comment.avatarKind as AvatarKind : "wave"} />}</div><div className="comment-copy"><strong>{comment.displayName}</strong>{showLinkedRating && comment.rating && <span className="comment-rating" aria-label={`تقييم ${comment.rating} من 5`}><Star size={14} fill="currentColor" /> {comment.rating}/5</span>}<p>{comment.body}</p><div className="comment-reactions"><button type="button" className={`${comment.viewerReaction === "heart" ? "active " : ""}heart ${reactingTo.includes(comment.id) ? "is-reacting" : ""}`} onClick={() => toggleReaction(comment.id, comment.viewerReaction, "heart")} aria-pressed={comment.viewerReaction === "heart"} aria-label="أعجبني التعليق"><Heart size={17} fill="currentColor" /> <span>{comment.hearts}</span></button><button type="button" className={`${comment.viewerReaction === "broken" ? "active " : ""}broken ${reactingTo.includes(comment.id) ? "is-reacting" : ""}`} onClick={() => toggleReaction(comment.id, comment.viewerReaction, "broken")} aria-pressed={comment.viewerReaction === "broken"} aria-label="لم يعجبني التعليق"><HeartCrack size={17} /> <span>{comment.broken}</span></button></div></div></article>)}
     </div>
-    <Dialog open={profileOpen} onOpenChange={setProfileOpen}><DialogContent className="comment-profile-dialog" dir="rtl"><DialogHeader><DialogTitle>{dialogTitle}</DialogTitle><DialogDescription>{profileMode === "rating-settings" ? "غيّر ظهور تقييمك متى أردت. يبقى التقييم محفوظًا حتى عندما تختار إخفاءه." : "اختر اسم العرض وصورة شخصية اختيارية، ثم انشر تعليقك."}</DialogDescription></DialogHeader>{profileMode === "rating-settings" ? <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي للعامة.</label> : <div className="comment-profile-fields"><label>اسم العرض<input value={displayName} onChange={event => setDisplayName(event.target.value)} minLength={2} maxLength={64} placeholder="مثال: أحمد من الرياض" required /></label><div className="profile-avatar-picker"><span>صورة الملف الشخصي <small>اختيارية</small></span><div className="profile-avatar-preview">{avatarPreview ? <img src={avatarPreview} alt="معاينة صورة الملف الشخصي" /> : <AvatarArt kind={avatarKind} />}</div><div className="ready-avatar-options"><span>رسومات جاهزة</span><div>{readyAvatarOptions.map(avatar => <button type="button" key={avatar.kind} className={avatarKind === avatar.kind && !avatarPreview ? "active" : ""} onClick={() => { setAvatarDataUrl(undefined); setAvatarName(""); setAvatarPreview(undefined); setAvatarKind(avatar.kind); }} aria-label={avatar.label}><AvatarArt kind={avatar.kind} /></button>)}</div></div><label className="profile-upload-button"><Camera size={15} /> اختيار صورة<input type="file" accept="image/jpeg,image/png,image/webp" onChange={onAvatarChange} /></label>{avatarPreview && <button type="button" className="profile-remove-button" onClick={() => { setAvatarDataUrl(undefined); setAvatarPreview(undefined); setAvatarName(""); }}><X size={15} /> إزالة الصورة</button>}</div>{showLinkedRating && feedback.data?.ownRating && <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي بجانب تعليقي.</label>}</div>}<DialogFooter><button type="button" className="button ghost" onClick={() => setProfileOpen(false)}>إلغاء</button><button type="button" className="button" disabled={isWorking || (profileMode === "comment" && (displayName.trim().length < 2 || body.trim().length < 4))} onClick={publishWithProfile}>{isWorking ? "جارٍ الحفظ…" : profileMode === "rating-settings" ? "حفظ إعدادات التقييم" : editingCommentId ? "حفظ التعديل" : "نشر التعليق"}</button></DialogFooter></DialogContent></Dialog>
+    <Dialog open={profileOpen} onOpenChange={setProfileOpen}><DialogContent className="comment-profile-dialog" dir="rtl"><DialogHeader><DialogTitle>{dialogTitle}</DialogTitle><DialogDescription>{profileMode === "rating-settings" ? "غيّر ظهور تقييمك متى أردت. يبقى التقييم محفوظًا حتى عندما تختار إخفاءه." : "اختر اسم العرض وصورة شخصية من الخيارات المعتمدة، ثم انشر تعليقك."}</DialogDescription></DialogHeader>{profileMode === "rating-settings" ? <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي للعامة.</label> : <div className="comment-profile-fields"><label>اسم العرض<input value={displayName} onChange={event => setDisplayName(event.target.value)} minLength={2} maxLength={64} placeholder="مثال: أحمد من الرياض" required /></label><div className="profile-avatar-picker"><span>صورة الملف الشخصي <small>اختيارية</small></span><div className="profile-avatar-preview">{avatarPreview ? <img src={avatarPreview} alt="معاينة صورة الملف الشخصي" /> : <AvatarArt kind={avatarKind} />}</div><div className="ready-avatar-options"><span>اختر صورة جاهزة</span><div>{readyAvatarOptions.map(avatar => <button type="button" key={avatar.url} className={avatarPreview === avatar.url ? "active" : ""} onClick={() => setAvatarPreview(avatar.url)} aria-label={avatar.label}><img src={avatar.url} alt="" /></button>)}</div></div></div>{showLinkedRating && feedback.data?.ownRating && <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي بجانب تعليقي.</label>}</div>}<DialogFooter><button type="button" className="button ghost" onClick={() => setProfileOpen(false)}>إلغاء</button><button type="button" className="button" disabled={isWorking || (profileMode === "comment" && (displayName.trim().length < 2 || body.trim().length < 4))} onClick={publishWithProfile}>{isWorking ? "جارٍ الحفظ…" : profileMode === "rating-settings" ? "حفظ إعدادات التقييم" : editingCommentId ? "حفظ التعديل" : "نشر التعليق"}</button></DialogFooter></DialogContent></Dialog>
     <AlertDialog open={Boolean(commentPendingDeletion)} onOpenChange={open => { if (!open && !remove.isPending) setCommentPendingDeletion(undefined); }}><AlertDialogContent dir="rtl"><AlertDialogHeader><AlertDialogTitle>حذف تعليقك؟</AlertDialogTitle><AlertDialogDescription>سيُحذف تعليقك من الصفحة، وستتمكن من كتابة تعليق جديد بعد الحذف.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction className="bg-red-700 text-white hover:bg-red-800" disabled={remove.isPending || !visitorId} onClick={event => { event.preventDefault(); if (commentPendingDeletion && visitorId) remove.mutate({ commentId: commentPendingDeletion, visitorId }); }}>{remove.isPending ? "جارٍ الحذف…" : "حذف التعليق"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
   </section>;
 }

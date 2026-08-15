@@ -1,6 +1,6 @@
 import { and, desc, eq, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, recommendationFilterMetrics, servicePageMetrics, siteComments, siteMetrics, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -156,6 +156,33 @@ export async function getAssistantAnswerFeedbackSummary() {
   const count = rows.length;
   const total = rows.reduce((sum, row) => sum + row.rating, 0);
   return { count, average: count ? Math.round((total / count) * 10) / 10 : 0, noteCount: rows.filter((row) => Boolean(row.note?.trim())).length };
+}
+
+type RecommendationService = "cleaning" | "maintenance" | "moving" | "general";
+
+/** Records aggregated filter selections only; it never stores the visitor, question, or answer. */
+export async function recordRecommendationFilterUse(input: { service: RecommendationService; city?: string }) {
+  const db = await getDb();
+  if (!db) return;
+  const city = input.city?.trim() || null;
+  const id = `${input.service}:${city || "all"}`.slice(0, 196);
+  await db.insert(recommendationFilterMetrics).values({ id, service: input.service, city, uses: 1 }).onDuplicateKeyUpdate({
+    set: { uses: sql`${recommendationFilterMetrics.uses} + 1`, updatedAt: new Date() },
+  });
+}
+
+export async function getPopularRecommendationFilters() {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select({
+    service: recommendationFilterMetrics.service,
+    city: recommendationFilterMetrics.city,
+    uses: recommendationFilterMetrics.uses,
+    updatedAt: recommendationFilterMetrics.updatedAt,
+  })
+    .from(recommendationFilterMetrics)
+    .orderBy(desc(recommendationFilterMetrics.uses), desc(recommendationFilterMetrics.updatedAt))
+    .limit(5);
 }
 
 export async function getPublishedFeedback() {
