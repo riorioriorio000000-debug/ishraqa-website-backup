@@ -1,4 +1,5 @@
 import { ArrowLeft, ChevronUp, Link2, MessageCircle, Share2, Sparkles } from "lucide-react";
+import React from "react";
 import { Link, useRoute } from "wouter";
 import SiteShell from "@/components/SiteShell";
 import ArticleRating from "@/components/ArticleRating";
@@ -118,14 +119,14 @@ export default function ArticleDetailPage() {
   };
   const copyArticleLink = () => { void navigator.clipboard?.writeText(window.location.href); };
   const relatedArticles = articleEntries.filter((entry) => entry.slug !== article.slug && (entry.category === article.category || entry.keywords.some((keyword) => article.keywords.includes(keyword)))).slice(0, 3);
+  const articleTone = (articleEntries.indexOf(article) % 5) + 1;
   return <SiteShell>
     <PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} />
     <ArticleStructuredData article={article} />
-    <main className="article-detail" dir="rtl">
+    <main className={`article-detail article-tone-${articleTone}`} dir="rtl">
       <header className="article-hero"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> قراءة إرشادية من الإشراقة</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header>
       <article className="section article-reading-section"><div className="shell article-prose">
-        <header className="article-reading-intro"><span>تمهيد المقال</span><h2>{article.title}</h2><p>{article.intro}</p></header>
-        {article.image && <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure>}
+        {article.image ? <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure> : <figure className="article-feature-image article-tone-visual" role="img" aria-label={`تكوين تجريدي هادئ لمقال ${article.title}`}><span aria-hidden="true" /><figcaption>تكوين بصري تجريدي بدرجات هوية الإشراقة.</figcaption></figure>}
         {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
         <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
         <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>

@@ -21,4 +21,11 @@ describe("PageMeta", () => {
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="twitter:card"]')?.content).toBe("summary");
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toContain("index");
   });
+
+  it("يختصر عنوان الأسئلة الشائعة ويذكر اسم الشركة مرة واحدة", () => {
+    render(<PageMeta title="أسئلة شائعة | الإشراقة" description="وصف تجريبي" keywords={["أسئلة شائعة"]} path="/faq" />);
+
+    expect(document.title).toBe("الأسئلة الشائعة | شركة الإشراقة");
+    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe("الأسئلة الشائعة | شركة الإشراقة");
+  });
 });

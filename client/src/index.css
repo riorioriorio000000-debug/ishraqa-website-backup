@@ -54,7 +54,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible
 .header-actions { display: flex; align-items: center; gap: 12px; }
 .header-phone { display: inline-flex; align-items: center; gap: 6px; color: #31585a; font-size: .76rem; font-weight: 700; direction: ltr; }
 .nav-more-trigger { color: var(--teal-dark) !important; }
-.site-header-on-dark .nav-more-trigger { color: var(--teal-dark) !important; }
+.site-header-on-dark .nav-more-trigger { color: #fffdf8 !important; }
 .service-art, .service-illustration img, .map-panel img, .hero-caddy-art img { transition: transform .26s var(--ease-out), filter .26s var(--ease-out); will-change: transform; }
 @media (hover:hover) { .service-card:hover .service-art, .service-card:focus-within .service-art { transform: translateY(-8px) rotate(-2deg) scale(1.035); filter: drop-shadow(0 17px 18px rgba(15,92,99,.16)); } .service-illustration:hover img, .service-illustration:focus-within img { transform: translateY(-7px) scale(1.025); } .map-panel:hover img, .map-panel:focus-within img { transform: scale(1.025); } .hero-caddy-art:hover img, .hero-caddy-art:focus-within img { transform: translateY(-7px) rotate(-1deg); } }
 .home-faq-section { background: linear-gradient(180deg, #edf6f2 0%, #f7f5ef 100%); }
@@ -632,6 +632,70 @@ img { -webkit-user-drag: none; user-drag: none; }
 .brand-motion-wrap { background: transparent; isolation: isolate; }
 .brand-motion-wrap::before { pointer-events: none; background: radial-gradient(circle, rgba(247, 245, 239, .96) 0%, rgba(247, 245, 239, 0) 72%); }
 .brand-motion-video { mix-blend-mode: normal; filter: none; }
+
+/* تباين الترويسة: زر مستقل بوضوح على الخلفيات الفاتحة والداكنة. */
+.nav-more-trigger { padding: .46rem .7rem; border: 1px solid rgba(15,92,99,.22); border-radius: 999px; background: rgba(255,253,248,.86); box-shadow: 0 5px 14px rgba(15,92,99,.08); }
+.nav-more-trigger:hover, .nav-more-trigger:focus-visible { color: var(--teal-dark) !important; border-color: rgba(15,92,99,.48); background: #fffdf8; }
+.site-header-on-dark .desktop-nav { color: #f7f5ef; }
+.site-header-on-dark .desktop-nav > a { color: #f7f5ef; text-shadow: 0 1px 12px rgba(0,0,0,.24); }
+.site-header-on-dark .desktop-nav > a:hover { color: #f2d292; }
+.site-header-on-dark .nav-more-trigger { border-color: rgba(255,253,248,.6); background: rgba(9,52,55,.45); box-shadow: 0 8px 20px rgba(0,0,0,.17); text-shadow: 0 1px 10px rgba(0,0,0,.32); }
+.site-header-on-dark .nav-more-trigger:hover, .site-header-on-dark .nav-more-trigger:focus-visible { color: #fffdf8 !important; border-color: #f2d292; background: rgba(9,52,55,.72); }
+
+/* رابط البداية يميّزه خطان قصيران من ألوان الشعار دون تغيير تسلسل التنقل. */
+.nav-home-link { position: relative; padding-bottom: .62rem; }
+.nav-home-link::before, .nav-home-link::after { position: absolute; bottom: .12rem; height: 2px; border-radius: 999px; content: ""; }
+.nav-home-link::before { right: 0; width: calc(50% - .16rem); background: var(--teal); }
+.nav-home-link::after { left: 0; width: calc(50% - .16rem); background: var(--sand); }
+.site-header-on-dark .nav-home-link::before { background: #84d3c6; }
+.site-header-on-dark .nav-home-link::after { background: #f2d292; }
+
+/* صورة تجريدية هادئة عند غياب صورة المقال؛ تغيّر الدرجة فقط ولا تتضمن أشخاصًا. */
+.article-tone-visual { position: relative; display: grid; min-height: clamp(12rem, 30vw, 19rem); place-items: center; isolation: isolate; border-radius: 24px; background: linear-gradient(135deg, #dceee9, #f6edda); }
+.article-tone-visual::before, .article-tone-visual::after, .article-tone-visual > span { position: absolute; content: ""; border-radius: 46% 54% 62% 38%; }
+.article-tone-visual::before { width: 41%; aspect-ratio: 1; background: rgba(15,92,99,.72); transform: translate(16%, -12%) rotate(18deg); }
+.article-tone-visual::after { width: 32%; aspect-ratio: 1; border: 2px solid rgba(193,157,89,.86); transform: translate(-55%, 26%) rotate(-22deg); }
+.article-tone-visual > span { width: 12%; aspect-ratio: 1; background: rgba(255,253,248,.88); box-shadow: 0 12px 26px rgba(15,92,99,.12); transform: translate(-105%, -82%); }
+.article-tone-visual figcaption { position: absolute; z-index: 1; right: 1rem; bottom: .8rem; padding: .35rem .6rem; border-radius: 999px; background: rgba(255,253,248,.84); }
+.article-tone-2 .article-tone-visual { background: linear-gradient(135deg, #e5f1ee, #e5ebd8); }.article-tone-2 .article-tone-visual::before { background: rgba(61,119,112,.72); }.article-tone-2 .article-tone-visual::after { border-color: rgba(151,174,96,.9); }
+.article-tone-3 .article-tone-visual { background: linear-gradient(135deg, #e7edf0, #f0e3c9); }.article-tone-3 .article-tone-visual::before { background: rgba(51,99,110,.72); }.article-tone-3 .article-tone-visual::after { border-color: rgba(198,145,81,.88); }
+.article-tone-4 .article-tone-visual { background: linear-gradient(135deg, #edf1dc, #d9ebe5); }.article-tone-4 .article-tone-visual::before { background: rgba(91,126,93,.72); }.article-tone-4 .article-tone-visual::after { border-color: rgba(175,151,86,.9); }
+.article-tone-5 .article-tone-visual { background: linear-gradient(135deg, #e4eef0, #f2e1dc); }.article-tone-5 .article-tone-visual::before { background: rgba(51,111,121,.72); }.article-tone-5 .article-tone-visual::after { border-color: rgba(190,132,107,.9); }
+.article-tone-1 .article-feature-image img { filter: saturate(.88) sepia(.05); }.article-tone-2 .article-feature-image img { filter: saturate(.78) hue-rotate(9deg); }.article-tone-3 .article-feature-image img { filter: saturate(.8) hue-rotate(-7deg); }.article-tone-4 .article-feature-image img { filter: saturate(.74) sepia(.08); }.article-tone-5 .article-feature-image img { filter: saturate(.78) hue-rotate(14deg); }
+
+/* ظهور هادئ لأقسام القراءة وتفاعل النجوم من دون أقراص خلفية. */
+.article-stars button { border-radius: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .article-reading-step { animation: article-step-in .32s var(--ease-out, cubic-bezier(.23, 1, .32, 1)) both; }
+  .article-reading-step:nth-of-type(2) { animation-delay: .035s; }
+  .article-reading-step:nth-of-type(3) { animation-delay: .07s; }
+  .article-reading-step:nth-of-type(4) { animation-delay: .105s; }
+  .article-reading-step:nth-of-type(5) { animation-delay: .14s; }
+  .article-reading-step:nth-of-type(n+6) { animation-delay: .165s; }
+  .article-feature-image, .article-related, .article-feedback-hub { animation: article-step-in .36s var(--ease-out, cubic-bezier(.23, 1, .32, 1)) both; }
+  @keyframes article-step-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+}
+
+/* نافذة نتيجة سؤال FAQ: نصف الشاشة تقريبًا مع روابط مباشرة وإغلاق واضح. */
+.quick-service-answer-dialog { width: min(46rem, calc(100vw - 2rem)); max-width: min(46rem, calc(100vw - 2rem)) !important; max-height: min(76vh, 46rem); overflow-y: auto; border: 1px solid #c9ddd7; border-radius: 1.25rem; background: #fffdf8; color: var(--ink); box-shadow: 0 28px 72px rgba(7,63,69,.3); }
+.quick-service-answer-dialog [data-slot="dialog-header"] { gap: .55rem; padding-left: 2.1rem; text-align: right; }
+.quick-service-answer-dialog [data-slot="dialog-title"] { color: var(--teal-dark); font-family: var(--display); font-size: clamp(1.28rem, 2.8vw, 1.72rem); line-height: 1.38; }
+.quick-service-answer-dialog [data-slot="dialog-description"] { color: #58716e; line-height: 1.8; }
+.quick-service-answer-close { position: absolute; top: 1rem; left: 1rem; display: grid; width: 2.15rem; height: 2.15rem; place-items: center; border: 1px solid #bdd3cd; border-radius: 50%; background: #fff; color: var(--teal-dark); transition: transform .16s var(--ease-out), background .16s var(--ease-out); }
+.quick-service-answer-close:hover, .quick-service-answer-close:focus-visible { background: #eaf3ef; outline: 3px solid rgba(15,92,99,.18); outline-offset: 2px; }
+.quick-service-answer-close:active { transform: scale(.94); }
+.quick-service-answer-kicker { display: inline-flex; align-items: center; width: fit-content; gap: .35rem; color: #9a7131; font-size: .76rem; font-weight: 800; }
+.quick-service-answer-body { display: grid; gap: 1.2rem; padding-top: .1rem; }
+.quick-service-answer-reply { margin: 0; color: #213c3d; font-size: 1rem; line-height: 2; white-space: pre-line; }
+.quick-service-answer-summary { margin: 0; padding: .72rem .86rem; border-right: 3px solid var(--sand); background: #f8f3e7; color: #5e6251; font-size: .82rem; line-height: 1.75; }
+.quick-service-answer-body h3 { margin: 0 0 .62rem; color: var(--teal-dark); font-family: var(--display); font-size: 1rem; }
+.quick-service-content-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(11.5rem, 1fr)); gap: .62rem; }
+.quick-service-content-card { display: grid; min-height: 100%; gap: .32rem; padding: .86rem; border: 1px solid #cfe0da; border-radius: .85rem; background: #fff; color: inherit; text-decoration: none; transition: transform .18s var(--ease-out), border-color .18s var(--ease-out), box-shadow .18s var(--ease-out); }
+.quick-service-content-card:hover, .quick-service-content-card:focus-visible { border-color: var(--sand); box-shadow: 0 10px 20px rgba(15,92,99,.1); outline: none; transform: translateY(-2px); }
+.quick-service-content-card > span { color: #937137; font-size: .7rem; font-weight: 800; }.quick-service-content-card strong { color: var(--teal-dark); font-size: .91rem; }.quick-service-content-card small { color: #5f7774; line-height: 1.65; }.quick-service-content-card b, .quick-service-answer-more { display: inline-flex; align-items: center; gap: .28rem; color: var(--teal); font-size: .77rem; font-weight: 800; }
+.quick-service-navigation { padding-top: 1rem; border-top: 1px solid #dbe7e2; }.quick-service-navigation > div { display: flex; flex-wrap: wrap; gap: .45rem; }.quick-service-navigation a { display: inline-flex; align-items: center; gap: .25rem; padding: .44rem .6rem; border: 1px solid #d2e2dc; border-radius: 999px; background: #f6faf8; color: #17565a; font-size: .76rem; font-weight: 700; text-decoration: none; }.quick-service-navigation a:hover, .quick-service-navigation a:focus-visible { border-color: var(--sand); background: #fdf7e8; outline: none; }
+.quick-service-answer-more { justify-self: start; padding-top: .2rem; text-decoration: none; }
+@media (max-width: 520px) { .quick-service-answer-dialog { max-height: 82vh; padding: 1.25rem; }.quick-service-answer-dialog [data-slot="dialog-header"] { padding-left: 2rem; }.quick-service-content-cards { grid-template-columns: 1fr; }.quick-service-answer-reply { font-size: .94rem; line-height: 1.9; } }
 
 /* فلاتر المكتبة وملخص الزيارات: أدوات واضحة من دون أن تزاحم محتوى المقالات. */
 .article-search-controls { display: grid; grid-template-columns: minmax(0, 1fr) minmax(12rem, .35fr); gap: .8rem; align-items: end; margin-block: 1.7rem .75rem; }
