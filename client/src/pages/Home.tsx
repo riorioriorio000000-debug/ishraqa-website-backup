@@ -1,33 +1,58 @@
-import { ArrowLeft, BookOpen, MessageCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, Check, Home as HomeIcon, MessageCircle, ShieldCheck, Sparkles, Truck, Wrench } from "lucide-react";
+import { FormEvent, useState } from "react";
 import { Link } from "wouter";
 import SiteShell from "@/components/SiteShell";
-import { articles } from "@/content/articles";
+
+const services = [
+  { icon: HomeIcon, number: "01", title: "تنظيف المنازل", text: "تنظيف عميق ومنظم للشقق والمنازل والمساحات التي تحتاج إلى عناية دقيقة." },
+  { icon: Wrench, number: "02", title: "الصيانة المنزلية", text: "تنسيق واضح لخدمات الصيانة الأساسية والتفاصيل التي لا تحتمل التأجيل." },
+  { icon: Truck, number: "03", title: "نقل العفش", text: "ترتيب ونقل الأثاث بعناية وبخطة تناسب المكان والموعد الذي تقترحه." },
+];
+
+const guides = [
+  { href: "/articles/riyadh-service-guide", place: "الرياض", title: "تنظيف المنزل في الرياض: من أين تبدأ؟", text: "دليل قصير لترتيب الأولويات قبل طلب الخدمة." },
+  { href: "/articles/jeddah-service-guide", place: "جدة", title: "كيف تحافظ على خفة المكان بعد التنظيف؟", text: "عادات عملية تساعد على بقاء أثر العناية." },
+  { href: "/articles/makkah-service-guide", place: "مكة", title: "اختيار خدمة مناسبة للمساحة", text: "أسئلة بسيطة تجعل تنسيق الموعد أوضح." },
+];
+
+function QuickRequest() {
+  const [city, setCity] = useState("");
+  const [service, setService] = useState("");
+  const [details, setDetails] = useState("");
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    const message = encodeURIComponent(`السلام عليكم، أرغب في الاستفسار عن خدمة من الإشراقة.\nالمدينة أو الحي: ${city.trim() || "لم يحدد"}\nالخدمة المطلوبة: ${service.trim() || "لم تحدد"}\nتفاصيل إضافية: ${details.trim() || "لا توجد"}`);
+    window.open(`https://wa.me/966552610151?text=${message}`, "_blank", "noopener,noreferrer");
+  };
+
+  return <section className="classic-request" id="request"><div className="shell-inner classic-request-grid">
+    <div><span className="eyebrow">رسالة قصيرة تكفي</span><h2>اكتب احتياجك،<br /><em>ونرتّب الخطوة التالية.</em></h2><p>لا قوائم مفروضة ولا حقول اختيار. اكتب المدينة أو الحي والخدمة التي تحتاجها بالطريقة التي تناسبك.</p></div>
+    <form onSubmit={submit} className="classic-request-form">
+      <label>المدينة أو الحي<input value={city} onChange={(event) => setCity(event.target.value)} placeholder="مثال: حي النزهة، جدة" /></label>
+      <label>الخدمة المطلوبة<input value={service} onChange={(event) => setService(event.target.value)} placeholder="مثال: تنظيف شقة بعد انتقال" /></label>
+      <label>تفاصيل تساعدنا<textarea value={details} onChange={(event) => setDetails(event.target.value)} placeholder="المساحة، الوقت المناسب، أو أي تفاصيل تهمك" maxLength={700} /></label>
+      <button className="button" type="submit">إرسال عبر واتساب <MessageCircle size={17} /></button>
+    </form>
+  </div></section>;
+}
 
 export default function Home() {
-  const featured = articles.slice(0, 4);
-  return (
-    <SiteShell>
-      <main>
-        <section className="home-hero">
-          <div className="hero-orbit orbit-one" /><div className="hero-orbit orbit-two" />
-          <div className="shell-inner hero-grid">
-            <div>
-              <span className="eyebrow"><Sparkles size={15} /> دليل هادئ للعناية بالمنزل</span>
-              <h1>بيتك أنظف.<br /><em>يومك أخف.</em></h1>
-              <p>الإشراقة تجمع لك دليلاً واضحًا حول العناية بالتفاصيل اليومية، مع طرق للتواصل وشرح احتياجك بدون تعقيد.</p>
-              <div className="hero-actions"><Link href="/articles" className="primary-link">استكشف المقالات <ArrowLeft size={17} /></Link><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="secondary-link">تواصل عبر واتساب <MessageCircle size={17} /></a></div>
-            </div>
-            <div className="hero-panel"><span>مكتبة عملية</span><b>{articles.length}</b><small>مقالًا حول التنظيف<br />والصيانة المنزلية</small><div className="hero-panel-lines"><i /><i /><i /></div></div>
-          </div>
-        </section>
+  return <SiteShell><main className="classic-home" dir="rtl">
+      <section className="classic-hero" id="top"><div className="shell-inner classic-hero-grid">
+        <div className="classic-hero-copy"><span className="eyebrow"><Sparkles size={15} /> عناية تُرى، وراحة تُحس</span><h1>بيتك أنظف.<br /><em>يومك أخف.</em></h1><p>نساعدك على ترتيب احتياج المنزل بهدوء، من تنظيف المكان وصيانته إلى نقل العفش، مع تواصل مباشر وخطوات مفهومة.</p><div className="classic-hero-actions"><a href="#request" className="button">اكتب طلبك <ArrowLeft size={17} /></a><Link href="/services" className="text-link">تعرف إلى خدماتنا <ArrowLeft size={16} /></Link></div><div className="classic-hero-notes"><span><b>3</b> مسارات خدمة</span><span><b>12+</b> مدينة ومنطقة</span><span><b>واتساب</b> للتنسيق</span></div></div>
+        <div className="classic-hero-art" aria-label="تفاصيل خدمة الإشراقة"><div className="classic-orbit" /><div className="classic-art-card classic-art-card-main"><Sparkles size={25} /><strong>ترتيب هادئ<br />للتفاصيل اليومية</strong></div><div className="classic-art-card classic-art-card-small"><Check size={18} /><span>خطوة واضحة<br />من أول رسالة</span></div><span className="classic-art-label">الإشراقة<br /><i>للعناية المنزلية</i></span></div>
+      </div></section>
 
-        <section className="home-guides shell-inner">
-          <div className="section-heading"><div><span className="eyebrow"><BookOpen size={15} /> ابدأ من هنا</span><h2>أدلة مختارة بعناية</h2><p>موضوعات عملية تعالج أكثر النقاط التي تحتاج إليها الأسرة في المكان اليومي.</p></div><Link href="/articles">المكتبة كاملة <ArrowLeft size={16} /></Link></div>
-          <div className="home-card-grid">{featured.map((article) => <article className="home-card" key={article.slug}><span>{article.category}</span><h3>{article.title}</h3><p>{article.excerpt}</p><Link href={`/articles/${article.slug}`}>قراءة المقال <ArrowLeft size={15} /></Link></article>)}</div>
-        </section>
+      <section className="classic-services"><div className="shell-inner"><div className="classic-section-heading"><div><span className="eyebrow">خدماتنا</span><h2>نرتّب التفاصيل بهدوء،<br /><em>لتعود إلى يومك بخفة.</em></h2></div><p>خدمات عملية للمكان الذي تعيش فيه، مع مساحة كافية لشرح ما تحتاجه بطريقتك.</p></div><div className="classic-service-grid">{services.map(({ icon: Icon, number, title, text }) => <article className="classic-service-card" key={title}><span>{number}</span><Icon size={30} /><h3>{title}</h3><p>{text}</p><Link href="/services" className="card-link">استكشف التفاصيل <ArrowLeft size={15} /></Link></article>)}</div></div></section>
 
-        <section className="home-contact"><div className="shell-inner"><div><span className="eyebrow">خطوة واحدة كافية</span><h2>اكتب ما تحتاجه،<br />ونرتب البداية معك.</h2></div><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer">ابدأ محادثة <MessageCircle size={18} /></a></div></section>
-      </main>
-    </SiteShell>
-  );
+      <section className="classic-split"><div className="shell-inner classic-split-grid"><div className="classic-house-mark"><span /><span /><div><ShieldCheck size={44} /><b>وضوح<br />من البداية</b></div></div><div><span className="eyebrow">كيف نعمل؟</span><h2>الخدمة تبدأ<br /><em>برسالة واضحة.</em></h2><p>اكتب ما يهمك عن المكان والوقت، ثم نرتب معك المسار المناسب. نفضل الوضوح على الوعود الكبيرة والخطوات المعقدة.</p><div className="classic-check-list"><span><Check size={17} /> تحديد الأولوية قبل الوصول</span><span><Check size={17} /> تجهيز يناسب نوع الخدمة</span><span><Check size={17} /> تواصل مباشر لتأكيد التفاصيل</span></div><Link href="/about" className="text-link">اعرف أكثر عن طريقتنا <ArrowLeft size={16} /></Link></div></div></section>
+
+      <QuickRequest />
+
+      <section className="classic-guides"><div className="shell-inner"><div className="classic-section-heading"><div><span className="eyebrow">من دليل العناية</span><h2>ملاحظات صغيرة<br /><em>تجعل المكان ألطف.</em></h2></div><Link href="/articles" className="text-link">كل المقالات <ArrowLeft size={16} /></Link></div><div className="classic-guide-grid">{guides.map((guide, index) => <Link href={guide.href} className="classic-guide-card" key={guide.href}><span>0{index + 1} / {guide.place}</span><h3>{guide.title}</h3><p>{guide.text}</p><b>قراءة الدليل <ArrowLeft size={15} /></b></Link>)}</div></div></section>
+
+      <section className="classic-final"><div className="shell-inner"><div><span className="eyebrow">نقاء يومك</span><h2>جاهز ترتّب<br />الخطوة الأولى؟</h2></div><a href="#request" className="button button-light">ابدأ برسالة <ArrowLeft size={17} /></a></div></section>
+    </main>
+  </SiteShell>;
 }

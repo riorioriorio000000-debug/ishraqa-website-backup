@@ -1,4 +1,4 @@
-import { ArrowUpLeft, Menu, MessageCircle, Phone } from "lucide-react";
+import { ArrowUpLeft, Menu, MessageCircle } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { Link } from "wouter";
 
@@ -30,12 +30,6 @@ export default function SiteShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="header-actions">
-            <a className="outline-action" href={whatsappUrl} target="_blank" rel="noreferrer">
-              <MessageCircle size={16} /> واتساب
-            </a>
-            <a className="phone-action" href="tel:0552610151" aria-label="الاتصال بالإشراقة على الرقم 0552610151">
-              <Phone size={15} /> <span>0552610151</span>
-            </a>
             <button className="menu-toggle" type="button" onClick={() => setMenuOpen((open) => !open)} aria-label="إظهار روابط التنقل" aria-expanded={menuOpen}>
               <Menu size={21} />
             </button>
