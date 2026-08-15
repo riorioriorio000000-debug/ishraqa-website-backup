@@ -5,6 +5,8 @@ type PageMetaProps = {
   description: string;
   keywords: string[];
   path: string;
+  image?: string;
+  imageAlt?: string;
 };
 
 function setMeta(attribute: "name" | "property", key: string, content: string) {
@@ -17,7 +19,7 @@ function setMeta(attribute: "name" | "property", key: string, content: string) {
   element.content = content;
 }
 
-export default function PageMeta({ title, description, keywords, path }: PageMetaProps) {
+export default function PageMeta({ title, description, keywords, path, image, imageAlt }: PageMetaProps) {
   useEffect(() => {
     const fullTitle = `${title} | شركة الإشراقة`;
     const canonicalUrl = `https://al-eshraqa.co${path}`;
@@ -29,8 +31,11 @@ export default function PageMeta({ title, description, keywords, path }: PageMet
     setMeta("property", "og:url", canonicalUrl);
     setMeta("property", "og:type", "website");
     setMeta("property", "og:locale", "ar_SA");
-    setMeta("property", "og:image", "https://al-eshraqa.co/manus-storage/ishraqa-blue-mark_51e1bd1d.png");
-    setMeta("name", "twitter:card", "summary");
+    const shareImage = image ?? "https://al-eshraqa.co/manus-storage/ishraqa-blue-mark_51e1bd1d.png";
+    setMeta("property", "og:image", shareImage);
+    setMeta("property", "og:image:alt", imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش");
+    setMeta("name", "twitter:image", shareImage);
+    setMeta("name", "twitter:card", image ? "summary_large_image" : "summary");
     setMeta("name", "twitter:title", fullTitle);
     setMeta("name", "twitter:description", description);
     setMeta("name", "robots", "index, follow, max-image-preview:large");
@@ -41,7 +46,7 @@ export default function PageMeta({ title, description, keywords, path }: PageMet
       document.head.appendChild(canonical);
     }
     canonical.href = canonicalUrl;
-  }, [description, keywords, path, title]);
+  }, [description, image, imageAlt, keywords, path, title]);
 
   return null;
 }

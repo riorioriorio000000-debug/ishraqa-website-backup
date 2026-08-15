@@ -12,7 +12,7 @@ describe("ملفات SEO الثابتة", () => {
 
     expect(keywords).toHaveLength(5);
     expect(keywords).toEqual(["شركة تنظيف", "تنظيف منازل", "صيانة منزلية", "نقل عفش", "خدمات منزلية"]);
-    expect(indexHtml).toContain('"logo": "https://al-eshraqa.co/manus-storage/ishraqa-blue-mark_51e1bd1d.png"');
+    expect(indexHtml).toContain('"logo": "https://al-eshraqa.co/manus-storage/ishraqa-original-logo_5e61c480.png"');
     expect(indexHtml).toContain('property="og:image"');
   });
 

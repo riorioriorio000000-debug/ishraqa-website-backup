@@ -142,7 +142,7 @@ export default function ArticleComments({ pageKey }: { pageKey: string }) {
   };
 
   return <section className="article-comments" aria-labelledby="comments-heading">
-    <div className="article-comments-head"><span className="eyebrow"><i /> نقاش القرّاء</span><h2 id="comments-heading">تعليقات القرّاء</h2><p>تُفحص التعليقات آليًا للتحقق من سلامة الصياغة، ثم تظهر مباشرة. لا نضيف آراء أو تفاعلات مصطنعة.</p></div>
+    <div className="article-comments-head"><span className="eyebrow"><i /> بعد التقييم</span><h2 id="comments-heading">أضف تعليقك إن رغبت</h2><p>النجوم والتعليق في مساحة واحدة. تُفحص التعليقات آليًا ثم تظهر مباشرة، ولا نضيف آراء أو تفاعلات مصطنعة.</p></div>
     {ownComment ? <div className="comment-owner-panel"><p>لديك تعليق واحد منشور في هذا المقال. يمكنك تعديله أو حذفه قبل إضافة تعليق جديد.</p><div><button type="button" className="comment-owner-action" onClick={startEdit}><Pencil size={15} /> تعديل تعليقي</button><button type="button" className="comment-owner-action danger" disabled={remove.isPending || !visitorId} onClick={() => visitorId && remove.mutate({ commentId: ownComment.id, visitorId })}><Trash2 size={15} /> {remove.isPending ? "جارٍ الحذف…" : "حذف تعليقي"}</button></div></div> : <form className="comment-form" onSubmit={openProfile}><label>تعليقك<textarea value={body} onChange={event => setBody(event.target.value)} minLength={4} maxLength={800} placeholder="اكتب سؤالًا أو تجربة مرتبطة بالمقال…" required /></label><button className="button" type="submit" disabled={!visitorId || isWorking}><Send size={16} /> أضف تعليقًا</button></form>}
     {status && <p className="comment-status" role="status">{status}</p>}
     <div className="comment-list" aria-live="polite">
