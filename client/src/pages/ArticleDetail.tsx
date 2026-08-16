@@ -1,6 +1,6 @@
 import { ArrowLeft, ChevronUp, Link2, MessageCircle, Share2, Sparkles } from "lucide-react";
 import React from "react";
-import { Link, useRoute } from "wouter";
+import { Link, useLocation, useRoute } from "wouter";
 import SiteShell from "@/components/SiteShell";
 import ArticleRating from "@/components/ArticleRating";
 import ArticleComments from "@/components/ArticleComments";
@@ -76,7 +76,14 @@ const localCities = [
   ["الرياض", "riyadh"], ["جدة", "jeddah"], ["مكة المكرمة", "makkah"], ["المدينة المنورة", "madinah"], ["الدمام", "dammam"], ["الخبر", "khobar"], ["الطائف", "taif"], ["أبها", "abha"], ["تبوك", "tabuk"], ["بريدة", "buraydah"], ["عنيزة", "unaizah"], ["حائل", "hail"], ["جازان", "jazan"], ["نجران", "najran"], ["الأحساء", "al-ahsa"], ["الجبيل", "jubail"], ["ينبع", "yanbu"], ["سكاكا", "sakaka"], ["عرعر", "arar"], ["الباحة", "al-bahah"], ["خميس مشيط", "khamis-mushait"], ["القطيف", "qatif"], ["رأس تنورة", "ras-tanura"], ["الظهران", "dhahran"], ["الخرج", "al-kharj"], ["المجمعة", "al-majmaah"], ["الزلفي", "zulfi"], ["شقراء", "shaqra"], ["القنفذة", "qunfudhah"], ["رابغ", "rabigh"], ["الليث", "al-lith"], ["تربة", "turbah"], ["الوجه", "al-wajh"], ["أملج", "umlaj"], ["ضباء", "duba"], ["العلا", "al-ula"], ["الخفجي", "al-khafji"], ["حفر الباطن", "hafar-al-batin"], ["القريات", "qurayyat"], ["تيماء", "tayma"], ["الرس", "rass"], ["البكيرية", "bukayriyah"], ["المذنب", "mithnab"], ["عفيف", "afif"], ["الدوادمي", "dawadmi"], ["وادي الدواسر", "wadi-ad-dawasir"], ["الخرمة", "al-kharma"], ["رنية", "ranyah"], ["بيشة", "bisha"], ["محايل عسير", "muhayil"], ["صبيا", "sabya"], ["صامطة", "samtah"], ["أبو عريش", "abu-arish"], ["النماص", "al-namas"], ["بلجرشي", "baljurashi"], ["المندق", "al-mandaq"], ["العارضة", "al-ardah"], ["مدينة الملك عبدالله الاقتصادية", "kaec"],
 ] as const;
 
-const localFocuses = ["تنظيف المنزل", "صيانة التكييف", "نقل العفش", "تنظيف عميق للمطبخ", "ترتيب موعد خدمة منزلية"] as const;
+const localServices = [
+  { focus: "تنظيف المنزل", title: (city: string) => `شركة تنظيف في ${city}`, slugPrefix: "cleaning" },
+  { focus: "صيانة المكيفات", title: (city: string) => `شركة صيانة مكيفات ${city}`, slugPrefix: "ac-maintenance" },
+  { focus: "نقل العفش", title: (city: string) => `شركة نقل عفش ${city}`, slugPrefix: "moving" },
+  { focus: "تنظيف المطابخ", title: (city: string) => `شركة تنظيف مطابخ ${city}`, slugPrefix: "kitchen-cleaning" },
+  { focus: "الخدمات المنزلية", title: (city: string) => `شركة خدمات منزلية ${city}`, slugPrefix: "home-services" },
+] as const;
+const localServiceOverrides: Readonly<Record<string, number>> = { "al-kharj": 0 };
 const localArticleVisuals: Readonly<Record<string, { readonly src: string; readonly alt: string }>> = {
   riyadh: { src: "/manus-storage/article-visual-bathroom-care_9449151f.webp", alt: "حمام مرتب بأدوات عناية منزلية هادئة" },
   jeddah: { src: "/manus-storage/article-visual-ac-maintenance_e644ca83.webp", alt: "وحدة تكييف نظيفة وأدوات صيانة مرتبة" },
@@ -90,26 +97,38 @@ const localArticleVisuals: Readonly<Record<string, { readonly src: string; reado
 };
 
 const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index) => {
-  const focus = localFocuses[index % localFocuses.length];
+  const service = localServices[localServiceOverrides[slug] ?? index % localServices.length];
+  const focus = service.focus;
+  const legacySlug = `${slug}-service-guide`;
   const visual = localArticleVisuals[slug];
   return {
-    slug: `${slug}-service-guide`,
-    title: `دليل ${city}: كيف ترتب ${focus} بوضوح؟`,
-    intro: `دليل محلي عملي لسكان ${city} يشرح ما الذي يُكتب في طلب ${focus} وكيف تُراجع التفاصيل قبل تنسيق الموعد.`,
+    slug: `${service.slugPrefix}-${slug}`,
+    title: service.title(city),
+    intro: `مقال محلي مختصر لسكان ${city} يوضح ما الذي يُكتب في طلب ${focus} وكيف تراجع التفاصيل قبل تنسيق الموعد.`,
     category: "دليل محلي",
     image: visual?.src,
     imageAlt: visual?.alt,
-    shareImage: articleShareImages[`${slug}-service-guide`],
-    keywords: [`${focus} ${city}`, `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
+    shareImage: articleShareImages[legacySlug],
+    keywords: [`${focus} ${city}`, service.title(city), `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
     sections: longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`),
   };
 });
 
 export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...localArticleEntries];
+const legacyArticleSlugAliases = Object.fromEntries(localCities.map(([, citySlug], index) => {
+  const service = localServices[localServiceOverrides[citySlug] ?? index % localServices.length];
+  return [`${citySlug}-service-guide`, `${service.slugPrefix}-${citySlug}`];
+}));
 
 export default function ArticleDetailPage() {
   const [, params] = useRoute("/articles/:slug");
-  const article = articleEntries.find((entry) => entry.slug === params?.slug);
+  const [, navigate] = useLocation();
+  const requestedSlug = params?.slug;
+  const resolvedSlug = requestedSlug ? legacyArticleSlugAliases[requestedSlug] ?? requestedSlug : undefined;
+  const article = articleEntries.find((entry) => entry.slug === resolvedSlug);
+  React.useEffect(() => {
+    if (requestedSlug && requestedSlug !== resolvedSlug) navigate(`/articles/${resolvedSlug}`, { replace: true });
+  }, [navigate, requestedSlug, resolvedSlug]);
   if (!article) return <SiteShell><main className="article-detail" dir="rtl"><div className="shell"><h1>المقال غير متاح</h1><Link href="/articles" className="button">العودة إلى المقالات <ArrowLeft size={16} /></Link></div></main></SiteShell>;
   const shareArticle = () => {
     const url = window.location.href;

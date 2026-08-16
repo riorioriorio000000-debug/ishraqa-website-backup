@@ -12,6 +12,7 @@ vi.mock("@/components/ArticleComments", () => ({ default: () => <div>تعليق�
 vi.mock("wouter", () => ({
   Link: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => <a href={href} className={className}>{children}</a>,
   useRoute: () => [true, { slug: articleEntries[0].slug }],
+  useLocation: () => ["/articles/home-cleaning-guide", vi.fn()],
 }));
 
 afterEach(cleanup);

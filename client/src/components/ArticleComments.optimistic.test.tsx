@@ -20,7 +20,7 @@ vi.mock("@/lib/trpc", () => ({
     useUtils: () => ({ interactions: { listComments: { setData: setCommentsData } } }),
     interactions: {
       listComments: { useQuery: () => ({
-        data: [{ id: 24, displayName: "زائر", body: "تعليق صالح للاختبار", avatarKind: "wave", avatarUrl: null, rating: null, hearts: 2, broken: 0, viewerReaction: null, isOwner: false }],
+        data: [{ id: 24, displayName: "زائر", body: "تعليق صالح للاختبار", avatarKind: "wave", avatarUrl: null, rating: null, hearts: 2, broken: 0, viewerReaction: null, isOwner: false, createdAt: "2026-08-16T13:42:00.000Z" }],
         isLoading: false,
         refetch: vi.fn(),
       }) },
@@ -59,6 +59,15 @@ afterEach(() => {
 });
 
 describe("ArticleComments", () => {
+  it("يعرض وقت النشر الدقيق للتعليق في عنصر وقت قابل للقراءة", async () => {
+    const { container } = render(<ArticleComments pageKey="article-test" />);
+
+    const publishedAt = container.querySelector("time");
+    expect(publishedAt?.tagName).toBe("TIME");
+    expect(publishedAt?.getAttribute("dateTime")).toBe("2026-08-16T13:42:00.000Z");
+    expect(publishedAt?.textContent).not.toBe("—");
+  });
+
   it("يبدأ تفاعل القلب فور النقر ثم يرسل المزامنة في الخلفية", async () => {
     const user = userEvent.setup();
     render(<ArticleComments pageKey="article-test" />);

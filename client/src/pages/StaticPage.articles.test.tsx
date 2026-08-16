@@ -24,8 +24,8 @@ describe("بحث مكتبة المقالات", () => {
     const search = screen.getByRole("searchbox", { name: "البحث في المقالات" });
 
     fireEvent.change(search, { target: { value: "الرياض" } });
-    expect(screen.getByText(/دليل الرياض:/)).toBeTruthy();
-    expect(screen.queryByText(/دليل جدة:/)).toBeNull();
+    expect(screen.getByText("شركة تنظيف في الرياض")).toBeTruthy();
+    expect(screen.queryByText(/شركة صيانة مكيفات جدة/)).toBeNull();
     expect(screen.getByText("نتائج مفلترة: 1 مقالة")).toBeTruthy();
 
     fireEvent.change(search, { target: { value: "عبارة لا تطابق أي مقال" } });
@@ -41,7 +41,7 @@ describe("بحث مكتبة المقالات", () => {
     expect(serviceFilter.value).toBe("maintenance");
     expect(screen.getByText("يعرض الآن:")).toBeTruthy();
     expect(screen.getByText(/نتائج مفلترة:/)).toBeTruthy();
-    expect(screen.queryByText(/دليل نقل العفش في/)).toBeNull();
+    expect(screen.queryByText(/شركة نقل عفش مكة المكرمة/)).toBeNull();
   });
 
   it("يعرض أربعة أدلة رئيسية فقط مع صور معتمدة ويبقي المكتبة عند 62 مقالة", () => {
@@ -59,5 +59,13 @@ describe("بحث مكتبة المقالات", () => {
     expect(mainArticles.every((article) => article.image && article.imageAlt)).toBe(true);
     expect(mainArticles.flatMap((article) => article.sections).map(([, body]) => body).join(" ")).not.toContain("الخيال كلين");
     expect(mainArticles.find((article) => article.slug === "kitchen-care-guide")?.sections.map(([heading]) => heading)).toContain("الدهون المتراكمة تحتاج تدرجًا");
+  });
+
+  it("ينشئ للأدلة المحلية عنوانًا ومسارًا قصيرين يصفان الخدمة والمدينة", () => {
+    const alKharjCleaning = articleEntries.find((article) => article.slug === "cleaning-al-kharj");
+    const jeddahMaintenance = articleEntries.find((article) => article.slug === "ac-maintenance-jeddah");
+
+    expect(alKharjCleaning?.title).toBe("شركة تنظيف في الخرج");
+    expect(jeddahMaintenance?.title).toBe("شركة صيانة مكيفات جدة");
   });
 });
