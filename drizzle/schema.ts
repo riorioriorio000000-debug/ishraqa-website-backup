@@ -160,6 +160,7 @@ export const siteNotifications = mysqlTable("site_notifications", {
 export const visitorNotificationPreferences = mysqlTable("visitor_notification_preferences", {
   visitorId: varchar("visitorId", { length: 64 }).primaryKey(),
   reactionNotificationsEnabled: boolean("reactionNotificationsEnabled").notNull().default(true),
+  replySoundEnabled: boolean("replySoundEnabled").notNull().default(false),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 

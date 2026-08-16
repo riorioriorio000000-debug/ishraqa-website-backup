@@ -28,25 +28,32 @@ export async function getActiveVisitorRestriction(visitorId: string) {
 
 export async function getVisitorNotificationPreferences(visitorId: string) {
   const db = await getDb();
-  const defaults = { reactionNotificationsEnabled: true };
+  const defaults = { reactionNotificationsEnabled: true, replySoundEnabled: false };
   if (!db) return defaults;
-  const [preferences] = await db.select({ reactionNotificationsEnabled: visitorNotificationPreferences.reactionNotificationsEnabled })
+  const [preferences] = await db.select({
+    reactionNotificationsEnabled: visitorNotificationPreferences.reactionNotificationsEnabled,
+    replySoundEnabled: visitorNotificationPreferences.replySoundEnabled,
+  })
     .from(visitorNotificationPreferences)
     .where(eq(visitorNotificationPreferences.visitorId, visitorId))
     .limit(1);
   return preferences || defaults;
 }
 
-export async function updateVisitorNotificationPreferences(input: { visitorId: string; reactionNotificationsEnabled: boolean }) {
+export async function updateVisitorNotificationPreferences(input: { visitorId: string; reactionNotificationsEnabled?: boolean; replySoundEnabled?: boolean }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const current = await getVisitorNotificationPreferences(input.visitorId);
+  const reactionNotificationsEnabled = input.reactionNotificationsEnabled ?? current.reactionNotificationsEnabled;
+  const replySoundEnabled = input.replySoundEnabled ?? current.replySoundEnabled;
   await db.insert(visitorNotificationPreferences).values({
     visitorId: input.visitorId,
-    reactionNotificationsEnabled: input.reactionNotificationsEnabled,
+    reactionNotificationsEnabled,
+    replySoundEnabled,
   }).onDuplicateKeyUpdate({
-    set: { reactionNotificationsEnabled: input.reactionNotificationsEnabled, updatedAt: new Date() },
+    set: { reactionNotificationsEnabled, replySoundEnabled, updatedAt: new Date() },
   });
-  return { reactionNotificationsEnabled: input.reactionNotificationsEnabled };
+  return { reactionNotificationsEnabled, replySoundEnabled };
 }
 
 export async function createVisitorNotification(input: {
@@ -90,11 +97,16 @@ export async function getVisitorNotifications(visitorId: string) {
 
 export async function getUnreadNotificationCount(visitorId: string) {
   const db = await getDb();
-  if (!db) return { count: 0 };
+  if (!db) return { count: 0, latestUnreadReplyId: null as number | null };
   const [result] = await db.select({ count: sql<number>`count(*)` })
     .from(siteNotifications)
     .where(and(eq(siteNotifications.visitorId, visitorId), eq(siteNotifications.isRead, false)));
-  return { count: Number(result?.count || 0) };
+  const [latestUnreadReply] = await db.select({ id: siteNotifications.id })
+    .from(siteNotifications)
+    .where(and(eq(siteNotifications.visitorId, visitorId), eq(siteNotifications.isRead, false), eq(siteNotifications.type, "reply")))
+    .orderBy(desc(siteNotifications.createdAt), desc(siteNotifications.id))
+    .limit(1);
+  return { count: Number(result?.count || 0), latestUnreadReplyId: latestUnreadReply?.id ?? null };
 }
 
 export async function markVisitorNotificationsRead(visitorId: string, ids?: number[]) {

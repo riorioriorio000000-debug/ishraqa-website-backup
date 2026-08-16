@@ -1,10 +1,11 @@
-import { BellRing, Heart, MessageCircle, ShieldCheck } from "lucide-react";
+import { BellRing, Heart, MessageCircle, ShieldCheck, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import PageMeta from "@/components/PageMeta";
 import SiteShell from "@/components/SiteShell";
 import { trpc } from "@/lib/trpc";
 import { getAnonymousVisitorId } from "@/lib/visitor";
+import { playReplyNotificationSound, primeReplyNotificationSound } from "@/lib/notificationSound";
 import { toast } from "sonner";
 
 const EMPTY_VISITOR_ID = "00000000-0000-4000-8000-000000000000";
@@ -12,6 +13,7 @@ const EMPTY_VISITOR_ID = "00000000-0000-4000-8000-000000000000";
 export default function NotificationPreferencesPage() {
   const [visitorId, setVisitorId] = useState<string>();
   const [reactionNotificationsEnabled, setReactionNotificationsEnabled] = useState(true);
+  const [replySoundEnabled, setReplySoundEnabled] = useState(false);
   useEffect(() => setVisitorId(getAnonymousVisitorId()), []);
 
   const preferences = trpc.interactions.notificationPreferences.useQuery(
@@ -19,7 +21,10 @@ export default function NotificationPreferencesPage() {
     { enabled: Boolean(visitorId) },
   );
   useEffect(() => {
-    if (preferences.data) setReactionNotificationsEnabled(preferences.data.reactionNotificationsEnabled);
+    if (preferences.data) {
+      setReactionNotificationsEnabled(preferences.data.reactionNotificationsEnabled);
+      setReplySoundEnabled(preferences.data.replySoundEnabled);
+    }
   }, [preferences.data]);
   const updatePreferences = trpc.interactions.updateNotificationPreferences.useMutation({
     onSuccess: () => {
@@ -32,6 +37,19 @@ export default function NotificationPreferencesPage() {
     setReactionNotificationsEnabled(enabled);
     if (!visitorId) return;
     updatePreferences.mutate({ visitorId, reactionNotificationsEnabled: enabled });
+  };
+  const updateReplySoundPreference = async (enabled: boolean) => {
+    setReplySoundEnabled(enabled);
+    if (enabled) {
+      try {
+        await primeReplyNotificationSound();
+        await playReplyNotificationSound();
+      } catch {
+        toast.error("لم يتمكن المتصفح من تشغيل معاينة الصوت. سيبقى التفضيل محفوظًا.");
+      }
+    }
+    if (!visitorId) return;
+    updatePreferences.mutate({ visitorId, replySoundEnabled: enabled });
   };
 
   return <SiteShell>
@@ -61,6 +79,13 @@ export default function NotificationPreferencesPage() {
           <article className="notification-preferences-note">
             <MessageCircle size={21} aria-hidden="true" />
             <div><h2>تنبيهات الردود تبقى مفعّلة</h2><p>الردود على تعليقك ونتائج بلاغات المحتوى ورسائل النظام المهمة لا تتأثر بهذا الخيار.</p></div>
+          </article>
+          <article className="notification-preferences-card notification-sound-card">
+            <div className="notification-preferences-intro"><div className="notification-preferences-icon notification-sound-icon"><Volume2 size={23} aria-hidden="true" /></div><div><h2>صوت وصول رد جديد</h2><p>شغّل نغمة قصيرة على هذا المتصفح عند اكتشاف رد جديد على إحدى مساهماتك.</p></div></div>
+            <label className="notification-toggle-row">
+              <span><Volume2 size={19} aria-hidden="true" /><span><strong>التنبيه الصوتي للردود</strong><small>{replySoundEnabled ? "مفعّل — تُشغَّل معاينة قصيرة الآن" : "متوقف — ستظهر الردود دون صوت"}</small></span></span>
+              <input type="checkbox" checked={replySoundEnabled} disabled={!visitorId || preferences.isLoading || updatePreferences.isPending} onChange={event => void updateReplySoundPreference(event.target.checked)} />
+            </label>
           </article>
           <p className="notification-preferences-privacy"><ShieldCheck size={17} aria-hidden="true" /> ترتبط هذه الإعدادات بمعرّف زائر عشوائي محفوظ في متصفحك. <Link href="/privacy">اقرأ سياسة الخصوصية</Link>.</p>
           <Link href="/notifications" className="button button-ghost notification-preferences-back">العودة إلى مركز الإشعارات</Link>

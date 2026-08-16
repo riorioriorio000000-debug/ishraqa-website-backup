@@ -1,0 +1,1 @@
+ALTER TABLE `visitor_notification_preferences` ADD `replySoundEnabled` boolean DEFAULT false NOT NULL;

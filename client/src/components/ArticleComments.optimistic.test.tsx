@@ -5,9 +5,10 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ArticleComments from "./ArticleComments";
 
-const { reactMutate, submitMutate, undoMutate, reportMutate, setCommentsData, toastSuccess } = vi.hoisted(() => ({
+const { reactMutate, submitMutate, submitReplyMutate, undoMutate, reportMutate, setCommentsData, toastSuccess } = vi.hoisted(() => ({
   reactMutate: vi.fn(),
   submitMutate: vi.fn(),
+  submitReplyMutate: vi.fn(),
   undoMutate: vi.fn(),
   reportMutate: vi.fn(),
   setCommentsData: vi.fn(),
@@ -37,7 +38,7 @@ vi.mock("@/lib/trpc", () => ({
       }) },
       react: { useMutation: () => ({ mutate: reactMutate, isPending: false }) },
       reportContent: { useMutation: () => ({ mutate: reportMutate, isPending: false }) },
-      submitReply: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
+      submitReply: { useMutation: () => ({ mutate: submitReplyMutate, isPending: false }) },
       reactToReply: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
     },
   },
@@ -49,6 +50,7 @@ afterEach(() => {
   cleanup();
   reactMutate.mockClear();
   submitMutate.mockClear();
+  submitReplyMutate.mockClear();
   undoMutate.mockClear();
   reportMutate.mockClear();
   setCommentsData.mockClear();
@@ -99,6 +101,28 @@ describe("ArticleComments", () => {
       targetType: "comment",
       reason: "abuse",
       details: "هذا التعليق يحتوي على إساءة واضحة",
+    }));
+  });
+
+  it("يفتح محرر رد مضمّنًا تحت التعليق المختار بخلفية واضحة", async () => {
+    const user = userEvent.setup();
+    render(<ArticleComments pageKey="article-test" />);
+
+    await user.click(screen.getByRole("button", { name: "رد" }));
+    const replyInput = screen.getByRole("textbox", { name: "ردك" });
+    const replyForm = replyInput.closest("form");
+    expect(replyForm).not.toBeNull();
+    expect(replyForm?.className).toContain("comment-reply-form-inline");
+    expect(screen.getByText("رد على زائر")).toBeTruthy();
+
+    await user.type(screen.getByRole("textbox", { name: "اسم العرض" }), "زائر اختبار");
+    await user.type(replyInput, "رد مباشر واضح للاختبار");
+    await user.click(screen.getByRole("button", { name: "نشر الرد" }));
+
+    expect(submitReplyMutate).toHaveBeenCalledWith(expect.objectContaining({
+      commentId: 24,
+      parentReplyId: null,
+      body: "رد مباشر واضح للاختبار",
     }));
   });
 });

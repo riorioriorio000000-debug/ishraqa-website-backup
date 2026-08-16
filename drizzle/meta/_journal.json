@@ -71,6 +71,13 @@
       "when": 1786893566225,
       "tag": "0009_misty_banshee",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1786895011905,
+      "tag": "0010_fine_cammi",
+      "breakpoints": true
     }
   ]
 }
