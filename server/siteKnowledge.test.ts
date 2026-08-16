@@ -9,7 +9,7 @@ describe("recommendSiteContent", () => {
   it("يعرض دليلاً متخصصًا للخدمة ودليلاً محليًا للمدينة ذاتها", () => {
     const cards = recommendSiteContent("أريد نقل عفش في جدة");
     expect(cards.map((card) => card.id)).toEqual(["moving-service", "moving-guide", "moving-jeddah-guide"]);
-    expect(cards.at(-1)).toMatchObject({ title: "دليل جدة لتجهيز طلب الخدمة", href: "/articles/jeddah-service-guide" });
+    expect(cards.at(-1)).toMatchObject({ title: "دليل جدة لتجهيز طلب الخدمة", href: "/articles/moving-jeddah" });
   });
 
   it("يعيد توصيات عامة آمنة عندما لا يذكر السائل نوع خدمة", () => {

@@ -72,6 +72,12 @@ const mainArticles: readonly ArticleEntry[] = [
   { slug: "kitchen-care-guide", title: "دليل العناية بالمطبخ: ترتيب مستمر بلا إرهاق", intro: "منهج بسيط لتقسيم تنظيف المطبخ، حماية الأسطح، ومعرفة متى يكون طلب العناية المتخصصة هو الأنسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-kitchen-cleaning-guide_dbd0ccb9.jpg", imageAlt: "أدوات عناية بالمطبخ وليمون وقطعة قماش على سطح عاجي", shareImage: articleShareImages["kitchen-care-guide"], keywords: ["تنظيف مطبخ", "تنظيف أفران", "تنظيف عميق", "العناية بالمنزل"], sections: [...longGuideSections("مطبخك", "العناية بالمطبخ", "اذكر نوع السطح أو الجهاز إذا كانت هناك نقطة تحتاج اهتمامًا خاصًا."), ...editorialAdditions.kitchen] },
 ];
 
+const serviceFocusArticles: readonly ArticleEntry[] = [
+  { slug: "home-cleaning-service-saudi-arabia", title: "شركة تنظيف منازل في السعودية: كيف ترتب طلب الخدمة", intro: "دليل خدمة يوضح ما يساعد في ترتيب طلب تنظيف المنازل بحسب نوع المساحة والأولوية والمدينة، دون أسعار ثابتة أو وعود غير مؤكدة.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-home-cleaning-guide_b2ca9d9e.jpg", imageAlt: "أدوات تنظيف منزلية مرتبة لتجهيز طلب الخدمة", shareImage: articleShareImages["home-cleaning-guide"], keywords: ["شركة تنظيف منازل في السعودية", "تنظيف منازل", "خدمات تنظيف", "تنسيق تنظيف"], sections: longGuideSections("مدينتك", "تنظيف المنازل", "اذكر نوع المساحة وأولويات العناية والحي لتصل رسالة الطلب واضحة." ) },
+  { slug: "ac-maintenance-service-saudi-arabia", title: "شركة صيانة مكيفات في السعودية: دليل تنسيق الفحص", intro: "دليل خدمة لتجهيز وصف ملاحظة التكييف وتحديد المعلومات التي تساعد في تنسيق فحص مناسب في مدينتك.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-maintenance-guide_52abc686.jpg", imageAlt: "أدوات فحص وصيانة تكييف مرتبة", shareImage: articleShareImages["ac-maintenance-guide"], keywords: ["شركة صيانة مكيفات في السعودية", "صيانة مكيفات", "فحص تكييف", "خدمات صيانة"], sections: longGuideSections("موقعك", "صيانة المكيفات", "اكتب نوع المكيف والعرض الملحوظ والحي قبل إرسال تفاصيلك." ) },
+  { slug: "furniture-moving-service-saudi-arabia", title: "شركة نقل عفش في السعودية: دليل تجهيز النقل", intro: "دليل خدمة منظم لتجهيز طلب نقل العفش عبر توضيح القطع والمداخل والطوابق والمدينة قبل التواصل.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-moving-guide_b9d108ef.jpg", imageAlt: "صناديق وأدوات حماية لتجهيز نقل العفش", shareImage: articleShareImages["furniture-moving-guide"], keywords: ["شركة نقل عفش في السعودية", "نقل عفش", "تغليف أثاث", "تنسيق نقل"], sections: longGuideSections("عنواني النقل", "نقل العفش", "اذكر القطع الحساسة والطابق والمصعد ومواقف التحميل إن وجدت." ) },
+];
+
 const localCities = [
   ["الرياض", "riyadh"], ["جدة", "jeddah"], ["مكة المكرمة", "makkah"], ["المدينة المنورة", "madinah"], ["الدمام", "dammam"], ["الخبر", "khobar"], ["الطائف", "taif"], ["أبها", "abha"], ["تبوك", "tabuk"], ["بريدة", "buraydah"], ["عنيزة", "unaizah"], ["حائل", "hail"], ["جازان", "jazan"], ["نجران", "najran"], ["الأحساء", "al-ahsa"], ["الجبيل", "jubail"], ["ينبع", "yanbu"], ["سكاكا", "sakaka"], ["عرعر", "arar"], ["الباحة", "al-bahah"], ["خميس مشيط", "khamis-mushait"], ["القطيف", "qatif"], ["رأس تنورة", "ras-tanura"], ["الظهران", "dhahran"], ["الخرج", "al-kharj"], ["المجمعة", "al-majmaah"], ["الزلفي", "zulfi"], ["شقراء", "shaqra"], ["القنفذة", "qunfudhah"], ["رابغ", "rabigh"], ["الليث", "al-lith"], ["تربة", "turbah"], ["الوجه", "al-wajh"], ["أملج", "umlaj"], ["ضباء", "duba"], ["العلا", "al-ula"], ["الخفجي", "al-khafji"], ["حفر الباطن", "hafar-al-batin"], ["القريات", "qurayyat"], ["تيماء", "tayma"], ["الرس", "rass"], ["البكيرية", "bukayriyah"], ["المذنب", "mithnab"], ["عفيف", "afif"], ["الدوادمي", "dawadmi"], ["وادي الدواسر", "wadi-ad-dawasir"], ["الخرمة", "al-kharma"], ["رنية", "ranyah"], ["بيشة", "bisha"], ["محايل عسير", "muhayil"], ["صبيا", "sabya"], ["صامطة", "samtah"], ["أبو عريش", "abu-arish"], ["النماص", "al-namas"], ["بلجرشي", "baljurashi"], ["المندق", "al-mandaq"], ["العارضة", "al-ardah"], ["مدينة الملك عبدالله الاقتصادية", "kaec"],
 ] as const;
@@ -84,6 +90,15 @@ const localServices = [
   { focus: "الخدمات المنزلية", title: (city: string) => `شركة خدمات منزلية ${city}`, slugPrefix: "home-services" },
 ] as const;
 const localServiceOverrides: Readonly<Record<string, number>> = { "al-kharj": 0 };
+const priorityLocalTitles: Readonly<Record<string, string>> = {
+  riyadh: "شركة تنظيف في الرياض",
+  jeddah: "شركة صيانة مكيفات جدة",
+  makkah: "شركة نقل عفش مكة المكرمة",
+  madinah: "شركة تنظيف مطابخ المدينة المنورة",
+  dammam: "شركة خدمات منزلية الدمام",
+  khobar: "شركة تنظيف في الخبر",
+  "al-kharj": "شركة تنظيف في الخرج",
+};
 const localArticleVisuals: Readonly<Record<string, { readonly src: string; readonly alt: string }>> = {
   riyadh: { src: "/manus-storage/article-visual-bathroom-care_9449151f.webp", alt: "حمام مرتب بأدوات عناية منزلية هادئة" },
   jeddah: { src: "/manus-storage/article-visual-ac-maintenance_e644ca83.webp", alt: "وحدة تكييف نظيفة وأدوات صيانة مرتبة" },
@@ -99,22 +114,23 @@ const localArticleVisuals: Readonly<Record<string, { readonly src: string; reado
 const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index) => {
   const service = localServices[localServiceOverrides[slug] ?? index % localServices.length];
   const focus = service.focus;
+  const title = priorityLocalTitles[slug] ?? service.title(city);
   const legacySlug = `${slug}-service-guide`;
   const visual = localArticleVisuals[slug];
   return {
     slug: `${service.slugPrefix}-${slug}`,
-    title: service.title(city),
+    title,
     intro: `مقال محلي مختصر لسكان ${city} يوضح ما الذي يُكتب في طلب ${focus} وكيف تراجع التفاصيل قبل تنسيق الموعد.`,
     category: "دليل محلي",
     image: visual?.src,
     imageAlt: visual?.alt,
     shareImage: articleShareImages[legacySlug],
-    keywords: [`${focus} ${city}`, service.title(city), `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
+    keywords: [`${focus} ${city}`, title, `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
     sections: longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`),
   };
 });
 
-export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...localArticleEntries];
+export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...serviceFocusArticles, ...localArticleEntries];
 const legacyArticleSlugAliases = Object.fromEntries(localCities.map(([, citySlug], index) => {
   const service = localServices[localServiceOverrides[citySlug] ?? index % localServices.length];
   return [`${citySlug}-service-guide`, `${service.slugPrefix}-${citySlug}`];

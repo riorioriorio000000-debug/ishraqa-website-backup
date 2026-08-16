@@ -44,18 +44,18 @@ describe("بحث مكتبة المقالات", () => {
     expect(screen.queryByText(/شركة نقل عفش مكة المكرمة/)).toBeNull();
   });
 
-  it("يعرض أربعة أدلة رئيسية فقط مع صور معتمدة ويبقي المكتبة عند 62 مقالة", () => {
+  it("يعرض سبعة أدلة رئيسية مع صور معتمدة ويبقي المقالات المحلية داخل المكتبة", () => {
     const { container } = render(<ArticlesPage />);
 
-    expect(container.querySelectorAll(".featured-article-card")).toHaveLength(4);
-    expect(container.querySelectorAll(".featured-article-media img")).toHaveLength(4);
+    expect(container.querySelectorAll(".featured-article-card")).toHaveLength(7);
+    expect(container.querySelectorAll(".featured-article-media img")).toHaveLength(7);
     expect(container.querySelectorAll(".secondary-article-grid article")).toHaveLength(58);
   });
 
   it("يضم صورًا وملاحظات تحريرية مواءمة داخل الأدلة الرئيسية من دون الاسم السابق", () => {
     const mainArticles = articleEntries.filter((article) => article.category === "دليل رئيسي");
 
-    expect(mainArticles).toHaveLength(4);
+    expect(mainArticles).toHaveLength(7);
     expect(mainArticles.every((article) => article.image && article.imageAlt)).toBe(true);
     expect(mainArticles.flatMap((article) => article.sections).map(([, body]) => body).join(" ")).not.toContain("الخيال كلين");
     expect(mainArticles.find((article) => article.slug === "kitchen-care-guide")?.sections.map(([heading]) => heading)).toContain("الدهون المتراكمة تحتاج تدرجًا");

@@ -1,10 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { articleEntries } from "./ArticleDetail";
-import { getSsrHeadMeta } from "../ssr/meta";
+import { getSitemapPaths, getSsrHeadMeta } from "../ssr/meta";
 
 const indexHtml = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-const sitemap = readFileSync(new URL("../../public/sitemap.xml", import.meta.url), "utf8");
 
 describe("ملفات SEO وبصمة العرض الخادمي", () => {
   it("يولّد كلمات الصفحة الرئيسية محليًا ويربط الشعار ببيانات الموقع", () => {
@@ -17,9 +16,9 @@ describe("ملفات SEO وبصمة العرض الخادمي", () => {
     expect(indexHtml).toContain("<!--app-head-->");
   });
 
-  it("يتضمن رابط كل مقالة من المقالات الـ62 في خريطة الموقع", () => {
+  it("يتضمن رابط كل مقالة في مصدر خريطة الموقع الحية", () => {
     articleEntries.forEach((article) => {
-      expect(sitemap).toContain(`<loc>https://al-eshraqa.co/articles/${article.slug}</loc>`);
+      expect(getSitemapPaths()).toContain(`/articles/${article.slug}`);
     });
   });
 });

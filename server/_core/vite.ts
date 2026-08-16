@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, type Request, type Response } from "express";
 import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
@@ -7,7 +7,7 @@ import { pathToFileURL } from "url";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 import superjson from "superjson";
-import type { SsrHeadMeta } from "../../client/src/ssr/meta";
+import { getSitemapPaths, type SsrHeadMeta } from "../../client/src/ssr/meta";
 
 const canonicalOrigin = "https://al-eshraqa.co";
 
@@ -19,6 +19,19 @@ function escapeHtml(value: string) {
 
 function absoluteUrl(value: string) {
   return value.startsWith("http") ? value : `${canonicalOrigin}${value}`;
+}
+
+function escapeXml(value: string) {
+  return escapeHtml(value);
+}
+
+export function buildSitemapXml(paths = getSitemapPaths()) {
+  const urls = Array.from(new Set(paths)).map((entry) => `  <url><loc>${escapeXml(`${canonicalOrigin}${entry}`)}</loc></url>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
+}
+
+function sendDynamicSitemap(_req: Request, res: Response) {
+  res.status(200).set({ "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "no-cache" }).end(buildSitemapXml());
 }
 
 function buildHead(meta: SsrHeadMeta) {
@@ -48,6 +61,7 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
+  app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
@@ -86,6 +100,7 @@ export function serveStatic(app: Express) {
   }
 
   app.get("/index.html", (_req, res) => res.redirect(301, "/"));
+  app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(express.static(distPath, { index: false, redirect: false }));
   app.use("*", async (req, res, next) => {
     try {

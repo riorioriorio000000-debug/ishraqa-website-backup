@@ -154,7 +154,7 @@ export function recommendSiteContent(question: string): SiteContentCard[] {
 export function recommendSiteContentByContext(context: RecommendationContext): SiteContentCard[] {
   if (context.service === "general") {
     return context.city
-      ? [siteContentCards.booking, { id: `city-${context.city}`, kind: "article", title: `دليل الخدمات المنزلية في ${context.city}`, description: `مرجع محلي يساعدك على ترتيب تفاصيل الموقع قبل اختيار الخدمة المناسبة في ${context.city}.`, href: `/articles/${supportedCities.find(([name]) => name === context.city)?.[1]}-service-guide` }, siteContentCards["cleaning-guide"]]
+      ? [siteContentCards.booking, { id: `city-${context.city}`, kind: "article", title: `مقالات الخدمات المنزلية في ${context.city}`, description: `افتح مكتبة المقالات ثم ابحث باسم ${context.city} لاختيار الدليل المحلي الأقرب لاحتياجك.`, href: "/articles" }, siteContentCards["cleaning-guide"]]
       : [siteContentCards["cleaning-service"], siteContentCards["maintenance-service"], siteContentCards.booking];
   }
 
@@ -171,7 +171,7 @@ export function recommendSiteContentByContext(context: RecommendationContext): S
       kind: "article",
       title: `دليل ${context.city} لتجهيز طلب الخدمة`,
       description: `مرجع محلي يكمل دليل ${serviceLabels[context.service]} ويساعدك على ترتيب العنوان والتفاصيل في ${context.city}.`,
-      href: `/articles/${citySlug}-service-guide`,
+      href: `/articles/${context.service === "cleaning" ? "cleaning" : context.service === "maintenance" ? "ac-maintenance" : "moving"}-${citySlug}`,
     },
   ];
 }

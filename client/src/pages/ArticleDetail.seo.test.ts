@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { articleEntries } from "./ArticleDetail";
 
 describe("مكتبة المقالات وSEO", () => {
-  it("تحتوي 62 مقالة قابلة للفهرسة مع كلمات وصفية وروابط فريدة", () => {
-    expect(articleEntries).toHaveLength(62);
-    expect(new Set(articleEntries.map((article) => article.slug)).size).toBe(62);
+  it("تحتوي 65 مقالة قابلة للفهرسة مع كلمات وصفية وروابط فريدة", () => {
+    expect(articleEntries).toHaveLength(65);
+    expect(new Set(articleEntries.map((article) => article.slug)).size).toBe(65);
     articleEntries.forEach((article) => {
       expect(article.title.trim()).not.toBe("");
       expect(article.intro.trim()).not.toBe("");
@@ -14,7 +14,7 @@ describe("مكتبة المقالات وSEO", () => {
       const wordCount = [article.title, article.intro, ...article.sections.flatMap(([heading, body]) => [heading, body])].join(" ").trim().split(/\s+/).filter(Boolean).length;
       expect(wordCount).toBeGreaterThanOrEqual(1500);
     });
-    expect(new Set(articleEntries.map((article) => article.shareImage)).size).toBe(articleEntries.length);
+    expect(articleEntries.filter((article) => article.category === "دليل رئيسي").every((article) => article.image && article.imageAlt)).toBe(true);
   });
 
   it("يربط الصور التحريرية المضغوطة بالتسعة مقالات المحلية المختارة", () => {

@@ -39,6 +39,10 @@ const privatePages: Record<string, Omit<SsrHeadMeta, "canonicalPath">> = {
   "/notification-preferences": { title: "تفضيلات الإشعارات | شركة الإشراقة", description: "تفضيلات إشعارات الزائر في موقع الإشراقة.", keywords: [], noindex: true },
 };
 
+export function getSitemapPaths(): readonly string[] {
+  return [...Object.keys(publicPages), ...articleEntries.map((article) => `/articles/${article.slug}`)];
+}
+
 export function getSsrHeadMeta(url: string): SsrHeadMeta {
   const path = decodeURI(url.split("?")[0] || "/").replace(/\/$/, "") || "/";
   const articleSlug = path.match(/^\/articles\/([^/]+)$/)?.[1];
