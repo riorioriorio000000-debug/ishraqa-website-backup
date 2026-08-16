@@ -120,7 +120,7 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
   return {
     slug: `${service.slugPrefix}-${slug}`,
     title,
-    intro: `مقال محلي مختصر لسكان ${city} يوضح ما الذي يُكتب في طلب ${focus} وكيف تراجع التفاصيل قبل تنسيق الموعد.`,
+    intro: `دليل محلي لسكان ${city} يوضح المعلومات المفيدة عند طلب ${focus}، من الحي إلى تفاصيل المكان، لتسهيل بدء التواصل عبر واتساب.`,
     category: "دليل محلي",
     image: visual?.src,
     imageAlt: visual?.alt,
@@ -131,16 +131,25 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
 });
 
 export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...serviceFocusArticles, ...localArticleEntries];
-const legacyArticleSlugAliases = Object.fromEntries(localCities.map(([, citySlug], index) => {
+export const legacyArticleSlugAliases: Readonly<Record<string, string>> = Object.fromEntries(localCities.flatMap(([, citySlug], index) => {
   const service = localServices[localServiceOverrides[citySlug] ?? index % localServices.length];
-  return [`${citySlug}-service-guide`, `${service.slugPrefix}-${citySlug}`];
+  const canonicalSlug = `${service.slugPrefix}-${citySlug}`;
+  return [
+    [`${citySlug}-service-guide`, canonicalSlug],
+    [citySlug, canonicalSlug],
+    [`${canonicalSlug}-service-guide`, canonicalSlug],
+  ];
 }));
+
+export function resolveLegacyArticleSlug(slug: string) {
+  return legacyArticleSlugAliases[slug] ?? slug;
+}
 
 export default function ArticleDetailPage() {
   const [, params] = useRoute("/articles/:slug");
   const [, navigate] = useLocation();
   const requestedSlug = params?.slug;
-  const resolvedSlug = requestedSlug ? legacyArticleSlugAliases[requestedSlug] ?? requestedSlug : undefined;
+  const resolvedSlug = requestedSlug ? resolveLegacyArticleSlug(requestedSlug) : undefined;
   const article = articleEntries.find((entry) => entry.slug === resolvedSlug);
   React.useEffect(() => {
     if (requestedSlug && requestedSlug !== resolvedSlug) navigate(`/articles/${resolvedSlug}`, { replace: true });

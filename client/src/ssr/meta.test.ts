@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getSsrHeadMeta } from "./meta";
+import { getLegacyArticleRedirectPath, getSsrHeadMeta } from "./meta";
 
 describe("البيانات الوصفية للعرض الخادمي", () => {
   it("ينشئ للصفحة الرئيسية عنوانًا ووصفًا وcanonical محليًا دون حشو أو وعود ترتيب", () => {
@@ -19,6 +19,25 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
     expect(meta.ogType).toBe("article");
     expect(meta.title).toContain("الخرج");
     expect(meta.description.length).toBeGreaterThan(30);
+  });
+
+  it("يطبع وصفًا عربيًا واضحًا ودون عبارة التنسيق القديمة للدليل المحلي", () => {
+    const meta = getSsrHeadMeta("/articles/cleaning-riyadh");
+
+    expect(meta.description).toContain("دليل محلي لسكان الرياض");
+    expect(meta.description).toContain("بدء التواصل عبر واتساب");
+    expect(meta.description).not.toContain("قبل تنسيق الموعد");
+    expect(meta.description.length).toBeLessThanOrEqual(160);
+  });
+
+  it("يوحّد المسارات القديمة للمقالات إلى الرابط القانوني القابل للفهرسة", () => {
+    expect(getLegacyArticleRedirectPath("riyadh")).toBe("/articles/cleaning-riyadh");
+    expect(getLegacyArticleRedirectPath("riyadh-service-guide")).toBe("/articles/cleaning-riyadh");
+    expect(getLegacyArticleRedirectPath("cleaning-riyadh")).toBeUndefined();
+    expect(getSsrHeadMeta("/articles/riyadh-service-guide")).toMatchObject({
+      canonicalPath: "/articles/cleaning-riyadh",
+      ogType: "article",
+    });
   });
 
   it("يحجب صفحات الإشعارات عن الفهرسة ويعيد حالة not-found للمسارات غير المعروفة", () => {

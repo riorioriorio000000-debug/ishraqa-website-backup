@@ -1,4 +1,4 @@
-import { articleEntries } from "@/pages/ArticleDetail";
+import { articleEntries, resolveLegacyArticleSlug } from "@/pages/ArticleDetail";
 
 export type SsrHeadMeta = {
   title: string;
@@ -43,11 +43,17 @@ export function getSitemapPaths(): readonly string[] {
   return [...Object.keys(publicPages), ...articleEntries.map((article) => `/articles/${article.slug}`)];
 }
 
+export function getLegacyArticleRedirectPath(articleSlug: string) {
+  const canonicalSlug = resolveLegacyArticleSlug(articleSlug);
+  const article = articleEntries.find((entry) => entry.slug === canonicalSlug);
+  return article && article.slug !== articleSlug ? `/articles/${article.slug}` : undefined;
+}
+
 export function getSsrHeadMeta(url: string): SsrHeadMeta {
   const path = decodeURI(url.split("?")[0] || "/").replace(/\/$/, "") || "/";
   const articleSlug = path.match(/^\/articles\/([^/]+)$/)?.[1];
   if (articleSlug) {
-    const article = articleEntries.find((entry) => entry.slug === articleSlug);
+    const article = articleEntries.find((entry) => entry.slug === resolveLegacyArticleSlug(articleSlug));
     if (article) {
       return {
         title: `${article.title} | شركة الإشراقة`,

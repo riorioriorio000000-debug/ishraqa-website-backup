@@ -1,4 +1,4 @@
-import express, { type Express, type Request, type Response } from "express";
+import express, { type Express, type NextFunction, type Request, type Response } from "express";
 import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
@@ -7,7 +7,7 @@ import { pathToFileURL } from "url";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 import superjson from "superjson";
-import { getSitemapPaths, type SsrHeadMeta } from "../../client/src/ssr/meta";
+import { getLegacyArticleRedirectPath, getSitemapPaths, type SsrHeadMeta } from "../../client/src/ssr/meta";
 
 const canonicalOrigin = "https://al-eshraqa.co";
 
@@ -34,7 +34,7 @@ function sendDynamicSitemap(_req: Request, res: Response) {
   res.status(200).set({ "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "no-cache" }).end(buildSitemapXml());
 }
 
-function buildHead(meta: SsrHeadMeta) {
+export function buildHead(meta: SsrHeadMeta) {
   const canonical = `${canonicalOrigin}${meta.canonicalPath}`;
   const image = absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png");
   const robots = meta.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large";
@@ -42,9 +42,22 @@ function buildHead(meta: SsrHeadMeta) {
   return `<title>${escapeHtml(meta.title)}</title><meta name="description" content="${escapeHtml(meta.description)}" />${keywords ? `<meta name="keywords" content="${escapeHtml(keywords)}" />` : ""}<meta name="robots" content="${robots}" /><link rel="canonical" href="${escapeHtml(canonical)}" /><meta property="og:locale" content="ar_SA" /><meta property="og:type" content="${meta.ogType ?? "website"}" /><meta property="og:title" content="${escapeHtml(meta.title)}" /><meta property="og:description" content="${escapeHtml(meta.description)}" /><meta property="og:url" content="${escapeHtml(canonical)}" /><meta property="og:site_name" content="الإشراقة" /><meta property="og:image" content="${escapeHtml(image)}" /><meta property="og:image:alt" content="${escapeHtml(meta.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش")}" /><meta name="twitter:card" content="${meta.image ? "summary_large_image" : "summary"}" /><meta name="twitter:title" content="${escapeHtml(meta.title)}" /><meta name="twitter:description" content="${escapeHtml(meta.description)}" /><meta name="twitter:image" content="${escapeHtml(image)}" />`;
 }
 
-function composeHtml(template: string, rendered: { html: string; dehydratedState: unknown; head: SsrHeadMeta }) {
+export function composeHtml(template: string, rendered: { html: string; dehydratedState: unknown; head: SsrHeadMeta }) {
   const state = JSON.stringify(superjson.serialize(rendered.dehydratedState)).replace(/</g, "\\u003c");
   return template.replace("<!--app-head-->", () => `${buildHead(rendered.head)}<script>window.__RQ_STATE__=${state}</script>`).replace("<!--app-html-->", () => rendered.html);
+}
+
+export function getLegacyArticleRedirectTarget(pathname: string) {
+  const legacySlug = pathname.match(/^\/articles\/([^/]+)$/)?.[1];
+  return legacySlug ? getLegacyArticleRedirectPath(legacySlug) : undefined;
+}
+
+function redirectLegacyArticle(req: Request, res: Response, next: NextFunction) {
+  const redirectTarget = getLegacyArticleRedirectTarget(req.path);
+  if (!redirectTarget) return next();
+  const queryStart = req.originalUrl.indexOf("?");
+  const query = queryStart >= 0 ? req.originalUrl.slice(queryStart) : "";
+  return res.redirect(301, `${redirectTarget}${query}`);
 }
 
 export async function setupVite(app: Express, server: Server) {
@@ -61,6 +74,7 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
+  app.get("/articles/:legacySlug", redirectLegacyArticle);
   app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
@@ -100,6 +114,7 @@ export function serveStatic(app: Express) {
   }
 
   app.get("/index.html", (_req, res) => res.redirect(301, "/"));
+  app.get("/articles/:legacySlug", redirectLegacyArticle);
   app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(express.static(distPath, { index: false, redirect: false }));
   app.use("*", async (req, res, next) => {
