@@ -5,10 +5,11 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ArticleComments from "./ArticleComments";
 
-const { reactMutate, submitMutate, undoMutate, setCommentsData, toastSuccess } = vi.hoisted(() => ({
+const { reactMutate, submitMutate, undoMutate, reportMutate, setCommentsData, toastSuccess } = vi.hoisted(() => ({
   reactMutate: vi.fn(),
   submitMutate: vi.fn(),
   undoMutate: vi.fn(),
+  reportMutate: vi.fn(),
   setCommentsData: vi.fn(),
   toastSuccess: vi.fn(),
 }));
@@ -35,7 +36,7 @@ vi.mock("@/lib/trpc", () => ({
         isPending: false,
       }) },
       react: { useMutation: () => ({ mutate: reactMutate, isPending: false }) },
-      reportContent: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
+      reportContent: { useMutation: () => ({ mutate: reportMutate, isPending: false }) },
       submitReply: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       reactToReply: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
     },
@@ -49,6 +50,7 @@ afterEach(() => {
   reactMutate.mockClear();
   submitMutate.mockClear();
   undoMutate.mockClear();
+  reportMutate.mockClear();
   setCommentsData.mockClear();
   toastSuccess.mockClear();
   localStorage.clear();
@@ -82,5 +84,21 @@ describe("ArticleComments", () => {
     const notificationOptions = toastSuccess.mock.calls[0][1] as { action: { onClick: () => void } };
     notificationOptions.action.onClick();
     expect(undoMutate).toHaveBeenCalledWith(expect.objectContaining({ commentId: 61 }));
+  });
+
+  it("يفتح الإبلاغ بحقل سبب مباشر ويصنفه قبل الإرسال", async () => {
+    const user = userEvent.setup();
+    render(<ArticleComments pageKey="article-test" />);
+
+    await user.click(screen.getByRole("button", { name: "إبلاغ" }));
+    expect(screen.queryByRole("combobox")).toBeNull();
+    await user.type(screen.getByRole("textbox", { name: "سبب الإبلاغ" }), "هذا التعليق يحتوي على إساءة واضحة");
+    await user.click(screen.getByRole("button", { name: "إرسال البلاغ" }));
+
+    expect(reportMutate).toHaveBeenCalledWith(expect.objectContaining({
+      targetType: "comment",
+      reason: "abuse",
+      details: "هذا التعليق يحتوي على إساءة واضحة",
+    }));
   });
 });

@@ -64,6 +64,13 @@
       "when": 1786891083463,
       "tag": "0008_peaceful_cannonball",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1786893566225,
+      "tag": "0009_misty_banshee",
+      "breakpoints": true
     }
   ]
 }

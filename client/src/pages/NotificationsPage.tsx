@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, BellRing, CheckCheck, FileSearch, ShieldAlert } from "lucide-react";
+import { ArrowLeft, BellRing, CheckCheck, FileSearch, Settings2, ShieldAlert } from "lucide-react";
 import { Link } from "wouter";
 import SiteShell from "@/components/SiteShell";
 import PageMeta from "@/components/PageMeta";
@@ -43,7 +43,7 @@ export default function NotificationsPage() {
     <main className="notifications-page" dir="rtl">
       <section className="inner-hero notification-hero"><div className="shell inner-hero-grid"><div><span className="eyebrow"><i /> متابعة التفاعل</span><h1>مركز <em>الإشعارات.</em></h1><p>تابع الردود والتفاعلات ونتائج مراجعة البلاغات من مكان واحد، دون إنشاء حساب أو إدخال بيانات شخصية.</p></div><div className="inner-hero-mark" aria-hidden="true"><BellRing size={54} /></div></div><div className="inner-wave" /></section>
       <section className="section section-paper"><div className="shell notifications-shell">
-        <div className="notifications-head"><div><span className="eyebrow"><i /> تحديثاتك</span><h2>آخر ما وصل إليك.</h2></div>{notifications.data?.length ? <button type="button" className="notification-mark-all" disabled={markRead.isPending} onClick={() => visitorId && markRead.mutate({ visitorId })}><CheckCheck size={17} /> تعليم الكل كمقروء</button> : null}</div>
+        <div className="notifications-head"><div><span className="eyebrow"><i /> تحديثاتك</span><h2>آخر ما وصل إليك.</h2></div><div className="notifications-head-actions"><Link href="/notification-preferences" className="notification-preferences-link"><Settings2 size={16} /> تفضيلات الإشعارات</Link>{notifications.data?.length ? <button type="button" className="notification-mark-all" disabled={markRead.isPending} onClick={() => visitorId && markRead.mutate({ visitorId })}><CheckCheck size={17} /> تعليم الكل كمقروء</button> : null}</div></div>
         {notifications.isLoading && <p className="notification-state">جارٍ تجهيز إشعاراتك…</p>}
         {notifications.isError && <div className="notification-state notification-error"><ShieldAlert size={22} /><p>تعذر تحميل الإشعارات الآن. حدّث الصفحة أو أعد المحاولة بعد قليل.</p></div>}
         {!notifications.isLoading && !notifications.isError && !notifications.data?.length && <div className="notification-empty"><BellRing size={33} /><h2>لا توجد إشعارات بعد.</h2><p>عند وصول رد أو تفاعل على تعليقك، أو ظهور نتيجة لبلاغ أرسلته، ستجده هنا.</p><Link href="/articles" className="button button-ghost">استكشف المقالات <ArrowLeft size={16} /></Link></div>}

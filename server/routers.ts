@@ -94,6 +94,8 @@ export const appRouter = router({
     listNotifications: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).query(({ input }) => db.getVisitorNotifications(input.visitorId)),
     unreadNotificationCount: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).query(({ input }) => db.getUnreadNotificationCount(input.visitorId)),
     markNotificationsRead: publicProcedure.input(z.object({ visitorId: z.string().uuid(), ids: z.array(z.number().int().positive()).max(100).optional() })).mutation(({ input }) => db.markVisitorNotificationsRead(input.visitorId, input.ids)),
+    notificationPreferences: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).query(({ input }) => db.getVisitorNotificationPreferences(input.visitorId)),
+    updateNotificationPreferences: publicProcedure.input(z.object({ visitorId: z.string().uuid(), reactionNotificationsEnabled: z.boolean() })).mutation(({ input }) => db.updateVisitorNotificationPreferences(input)),
     reportContent: publicProcedure.input(z.object({ reporterVisitorId: z.string().uuid(), targetType: z.enum(["comment", "reply"]), targetId: z.number().int().positive(), reason: z.enum(["abuse", "illegal", "profile", "name", "other"]), details: z.string().trim().max(700).optional() })).mutation(async ({ input }) => {
       const report = await db.submitContentReport(input);
       if (!report.created) return report;

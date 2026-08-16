@@ -19,13 +19,15 @@ const CoveragePage = lazy(() => import("@/pages/StaticPage").then((module) => ({
 const AboutPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.AboutPage })));
 const FaqPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.FaqPage })));
 const NotificationsPage = lazy(() => import("@/pages/NotificationsPage"));
+const NotificationPreferencesPage = lazy(() => import("@/pages/NotificationPreferencesPage"));
+const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
 
 function PageLoader() {
   return <main className="route-loading" role="status" aria-live="polite"><video className="route-loading-video" src="/manus-storage/loader-reference_77ede9ac.webm" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" /><span>جارٍ تجهيز الصفحة...</span></main>;
 }
 
 function Router() {
-  return <Suspense fallback={<PageLoader />}><Switch><Route path="/" component={Home} /><Route path="/services" component={ServicesPage} /><Route path="/booking" component={BookingPage} /><Route path="/calculator" component={ServiceCalculator} /><Route path="/articles" component={ArticlesPage} /><Route path="/articles/:slug" component={ArticleDetailPage} /><Route path="/where-we-work" component={CoveragePage} /><Route path="/about" component={AboutPage} /><Route path="/faq" component={FaqPage} /><Route path="/customer-service" component={CustomerService} /><Route path="/notifications" component={NotificationsPage} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch></Suspense>;
+  return <Suspense fallback={<PageLoader />}><Switch><Route path="/" component={Home} /><Route path="/services" component={ServicesPage} /><Route path="/booking" component={BookingPage} /><Route path="/calculator" component={ServiceCalculator} /><Route path="/articles" component={ArticlesPage} /><Route path="/articles/:slug" component={ArticleDetailPage} /><Route path="/where-we-work" component={CoveragePage} /><Route path="/about" component={AboutPage} /><Route path="/faq" component={FaqPage} /><Route path="/customer-service" component={CustomerService} /><Route path="/notifications" component={NotificationsPage} /><Route path="/notification-preferences" component={NotificationPreferencesPage} /><Route path="/privacy" component={PrivacyPage} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch></Suspense>;
 }
 
 // NOTE: About Theme

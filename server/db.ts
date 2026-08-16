@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, contentReports, contentRestrictions, servicePageMetrics, siteComments, siteMetrics, siteNotifications, siteVisitors, users, visitorFeedback } from "../drizzle/schema";
+import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, contentReports, contentRestrictions, servicePageMetrics, siteComments, siteMetrics, siteNotifications, siteVisitors, users, visitorFeedback, visitorNotificationPreferences } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -26,6 +26,29 @@ export async function getActiveVisitorRestriction(visitorId: string) {
   return restriction;
 }
 
+export async function getVisitorNotificationPreferences(visitorId: string) {
+  const db = await getDb();
+  const defaults = { reactionNotificationsEnabled: true };
+  if (!db) return defaults;
+  const [preferences] = await db.select({ reactionNotificationsEnabled: visitorNotificationPreferences.reactionNotificationsEnabled })
+    .from(visitorNotificationPreferences)
+    .where(eq(visitorNotificationPreferences.visitorId, visitorId))
+    .limit(1);
+  return preferences || defaults;
+}
+
+export async function updateVisitorNotificationPreferences(input: { visitorId: string; reactionNotificationsEnabled: boolean }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  await db.insert(visitorNotificationPreferences).values({
+    visitorId: input.visitorId,
+    reactionNotificationsEnabled: input.reactionNotificationsEnabled,
+  }).onDuplicateKeyUpdate({
+    set: { reactionNotificationsEnabled: input.reactionNotificationsEnabled, updatedAt: new Date() },
+  });
+  return { reactionNotificationsEnabled: input.reactionNotificationsEnabled };
+}
+
 export async function createVisitorNotification(input: {
   visitorId: string;
   type: NotificationType;
@@ -37,6 +60,10 @@ export async function createVisitorNotification(input: {
 }) {
   const db = await getDb();
   if (!db) return null;
+  if (input.type === "reaction") {
+    const preferences = await getVisitorNotificationPreferences(input.visitorId);
+    if (!preferences.reactionNotificationsEnabled) return null;
+  }
   await db.insert(siteNotifications).values({
     visitorId: input.visitorId,
     type: input.type,

@@ -2,10 +2,11 @@ import React from "react";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { SiteHeader } from "./SiteShell";
+import { SiteFooter, SiteHeader } from "./SiteShell";
 
 vi.mock("./BrandMark", () => ({ default: () => <span>شعار الإشراقة</span> }));
 vi.mock("./NotificationBell", () => ({ default: () => <a href="/notifications" aria-label="الإشعارات">الإشعارات</a> }));
+vi.mock("./SiteVisitorCount", () => ({ default: () => <span>عدد زوار الموقع</span> }));
 vi.mock("wouter", () => ({
   Link: ({ href, children, className, onClick, ...props }: { href: string; children: React.ReactNode; className?: string; onClick?: () => void }) => <a href={href} className={className} onClick={onClick} {...props}>{children}</a>,
   useLocation: () => ["/", vi.fn()],
@@ -31,5 +32,23 @@ describe("SiteHeader", () => {
 
     await user.click(screen.getByRole("button", { name: /المزيد/ }));
     expect(screen.getByRole("menuitem", { name: "أين نعمل" }).getAttribute("href")).toBe("/where-we-work");
+  });
+
+  it("لا يضع رابط الإشعارات في الترويسة", () => {
+    render(<SiteHeader />);
+
+    expect(within(document.querySelector(".header-actions")!).queryByRole("link", { name: "الإشعارات" })).toBeNull();
+  });
+});
+
+describe("SiteFooter", () => {
+  it("يجمع الخصوصية والإشعارات مع عداد الزوار في التذييل السفلي", () => {
+    render(<SiteFooter />);
+
+    const footerBottom = document.querySelector<HTMLElement>(".footer-bottom");
+    if (!footerBottom) throw new Error("لم يُعرض التذييل السفلي");
+    expect(within(footerBottom).getByText("عدد زوار الموقع")).toBeTruthy();
+    expect(within(footerBottom).getByRole("link", { name: "سياسة الخصوصية" }).getAttribute("href")).toBe("/privacy");
+    expect(within(footerBottom).getAllByRole("link", { name: "الإشعارات" })[0].getAttribute("href")).toBe("/notifications");
   });
 });

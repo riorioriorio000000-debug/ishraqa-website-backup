@@ -156,6 +156,13 @@ export const siteNotifications = mysqlTable("site_notifications", {
   visitorCreatedIndex: index("site_notifications_visitor_created_idx").on(table.visitorId, table.createdAt),
 }));
 
+/** Anonymous visitors may silence reaction alerts without hiding replies or required system/moderation notices. */
+export const visitorNotificationPreferences = mysqlTable("visitor_notification_preferences", {
+  visitorId: varchar("visitorId", { length: 64 }).primaryKey(),
+  reactionNotificationsEnabled: boolean("reactionNotificationsEnabled").notNull().default(true),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const contentReports = mysqlTable("content_reports", {
   id: int("id").autoincrement().primaryKey(),
   reporterVisitorId: varchar("reporterVisitorId", { length: 64 }).notNull(),
