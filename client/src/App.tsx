@@ -7,20 +7,15 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import RouteScrollTop from "./components/RouteScrollTop";
+import ArticleDetailPage from "./pages/ArticleDetail";
+import PrivacyPage from "./pages/PrivacyPage";
+import { AboutPage, ArticlesPage, BookingPage, CoveragePage, FaqPage, ServicesPage } from "./pages/StaticPage";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const CustomerService = lazy(() => import("@/pages/CustomerService"));
-const ArticleDetailPage = lazy(() => import("@/pages/ArticleDetail"));
 const ServiceCalculator = lazy(() => import("@/pages/ServiceCalculator"));
-const ServicesPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.ServicesPage })));
-const BookingPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.BookingPage })));
-const ArticlesPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.ArticlesPage })));
-const CoveragePage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.CoveragePage })));
-const AboutPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.AboutPage })));
-const FaqPage = lazy(() => import("@/pages/StaticPage").then((module) => ({ default: module.FaqPage })));
 const NotificationsPage = lazy(() => import("@/pages/NotificationsPage"));
 const NotificationPreferencesPage = lazy(() => import("@/pages/NotificationPreferencesPage"));
-const PrivacyPage = lazy(() => import("@/pages/PrivacyPage"));
 
 function PageLoader() {
   return <main className="route-loading" role="status" aria-live="polite"><video className="route-loading-video" src="/manus-storage/loader-reference_77ede9ac.webm" autoPlay muted loop playsInline preload="metadata" aria-hidden="true" /><span>جارٍ تجهيز الصفحة...</span></main>;

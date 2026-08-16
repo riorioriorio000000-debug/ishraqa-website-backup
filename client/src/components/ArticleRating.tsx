@@ -14,7 +14,7 @@ function getVisitorId() {
 export default function ArticleRating({ articleTitle, pageKey }: { articleTitle: string; pageKey?: string }) {
   const [visitorId, setVisitorId] = useState<string>();
   const [rating, setRating] = useState(0);
-  const effectivePageKey = pageKey || window.location.pathname.split("/").filter(Boolean).pop() || articleTitle;
+  const effectivePageKey = pageKey || articleTitle;
   const feedback = trpc.interactions.articleFeedback.useQuery({ pageKey: effectivePageKey, visitorId });
   const submit = trpc.interactions.submitArticleFeedback.useMutation({ onSuccess: () => void feedback.refetch() });
 

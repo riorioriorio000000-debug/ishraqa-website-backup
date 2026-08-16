@@ -130,13 +130,14 @@ export default function ArticleDetailPage() {
     if (requestedSlug && requestedSlug !== resolvedSlug) navigate(`/articles/${resolvedSlug}`, { replace: true });
   }, [navigate, requestedSlug, resolvedSlug]);
   if (!article) return <SiteShell><main className="article-detail" dir="rtl"><div className="shell"><h1>المقال غير متاح</h1><Link href="/articles" className="button">العودة إلى المقالات <ArrowLeft size={16} /></Link></div></main></SiteShell>;
+  const articleUrl = `https://al-eshraqa.co/articles/${article.slug}`;
   const shareArticle = () => {
-    const url = window.location.href;
+    const url = articleUrl;
     const shareData = { title: article.title, text: `مقال من الإشراقة: ${article.title}`, url };
     if (navigator.share) { void navigator.share(shareData).catch(() => undefined); return; }
     window.open(`https://wa.me/?text=${encodeURIComponent(`${shareData.text}\n${url}`)}`, "_blank", "noopener,noreferrer");
   };
-  const copyArticleLink = () => { void navigator.clipboard?.writeText(window.location.href); };
+  const copyArticleLink = () => { void navigator.clipboard?.writeText(articleUrl); };
   const relatedArticles = articleEntries.filter((entry) => entry.slug !== article.slug && (entry.category === article.category || entry.keywords.some((keyword) => article.keywords.includes(keyword)))).slice(0, 3);
   const articleTone = (articleEntries.indexOf(article) % 5) + 1;
   return <SiteShell>
@@ -149,7 +150,7 @@ export default function ArticleDetailPage() {
         {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
         <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
         <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>
-        <div className="article-actions"><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="article-share-button" aria-label="مشاركة المقال عبر واتساب"><MessageCircle size={18} /><span>واتساب</span></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" className="article-share-button article-share-facebook" aria-label="مشاركة المقال عبر فيسبوك"><span aria-hidden="true" className="article-facebook-mark">f</span><span>فيسبوك</span></a><button className="article-share-button" type="button" onClick={copyArticleLink} aria-label="نسخ رابط المقال"><Link2 size={18} /><span>نسخ الرابط</span></button><button className="article-share-button article-share-more" type="button" onClick={shareArticle} aria-label="خيارات مشاركة إضافية"><Share2 size={18} /><span>مشاركة</span></button></div>
+        <div className="article-actions"><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="article-share-button" aria-label="مشاركة المقال عبر واتساب"><MessageCircle size={18} /><span>واتساب</span></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(articleUrl)}`} target="_blank" rel="noreferrer" className="article-share-button article-share-facebook" aria-label="مشاركة المقال عبر فيسبوك"><span aria-hidden="true" className="article-facebook-mark">f</span><span>فيسبوك</span></a><button className="article-share-button" type="button" onClick={copyArticleLink} aria-label="نسخ رابط المقال"><Link2 size={18} /><span>نسخ الرابط</span></button><button className="article-share-button article-share-more" type="button" onClick={shareArticle} aria-label="خيارات مشاركة إضافية"><Share2 size={18} /><span>مشاركة</span></button></div>
         <section className="article-feedback-hub" aria-label="تقييم وتعليقات القرّاء"><ArticleRating articleTitle={article.title} pageKey={article.slug} /><ArticleComments pageKey={article.slug} /></section>
         <button className="article-scroll-top" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="العودة إلى أعلى المقال"><ChevronUp size={20} /> العودة إلى أعلى المقال</button>
       </div></article>
