@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ArticleComments from "./ArticleComments";
@@ -20,7 +20,7 @@ vi.mock("@/lib/trpc", () => ({
     useUtils: () => ({ interactions: { listComments: { setData: setCommentsData } } }),
     interactions: {
       listComments: { useQuery: () => ({
-        data: [{ id: 24, displayName: "زائر", body: "تعليق صالح للاختبار", avatarKind: "wave", avatarUrl: null, rating: null, hearts: 2, broken: 0, viewerReaction: null, isOwner: false, createdAt: "2026-08-16T13:42:00.000Z" }],
+        data: [{ id: 24, displayName: "زائر", body: "تعليق صالح للاختبار", avatarKind: "wave", avatarUrl: null, rating: null, hearts: 2, broken: 0, viewerReaction: null, isOwner: false, createdAt: "2026-08-16T13:42:00.000Z", replies: [{ id: 25, parentReplyId: null, displayName: "زائر آخر", body: "رد سابق ملتصق بالتعليق", avatarKind: "leaf", avatarUrl: null, hearts: 1, broken: 0, viewerReaction: null, createdAt: "2026-08-16T13:44:00.000Z" }] }],
         isLoading: false,
         refetch: vi.fn(),
       }) },
@@ -130,21 +130,39 @@ describe("ArticleComments", () => {
     const user = userEvent.setup();
     render(<ArticleComments pageKey="article-test" />);
 
-    await user.click(screen.getByRole("button", { name: "رد" }));
+    const commentCard = screen.getByText("تعليق صالح للاختبار").closest("article");
+    expect(commentCard).not.toBeNull();
+    await user.click(within(commentCard!).getByRole("button", { name: "رد" }));
     const replyInput = screen.getByRole("textbox", { name: "ردك" });
     const replyForm = replyInput.closest("form");
     expect(replyForm).not.toBeNull();
     expect(replyForm?.className).toContain("comment-reply-form-inline");
     expect(screen.getByText("رد على زائر")).toBeTruthy();
 
-    await user.type(screen.getByRole("textbox", { name: "اسم العرض" }), "زائر اختبار");
     await user.type(replyInput, "رد مباشر واضح للاختبار");
     await user.click(screen.getByRole("button", { name: "نشر الرد" }));
+    const profileDialog = await screen.findByRole("dialog");
+    expect(within(profileDialog).getByText("قبل نشر ردك")).toBeTruthy();
+    await user.type(within(profileDialog).getByRole("textbox", { name: "اسم العرض" }), "زائر اختبار");
+    await user.click(within(profileDialog).getByRole("button", { name: "نشر الرد" }));
 
     expect(submitReplyMutate).toHaveBeenCalledWith(expect.objectContaining({
       commentId: 24,
       parentReplyId: null,
+      displayName: "زائر اختبار",
       body: "رد مباشر واضح للاختبار",
     }));
+  });
+
+  it("يبقي الردود داخل بطاقة التعليق التي تتبع لها", async () => {
+    const user = userEvent.setup();
+    render(<ArticleComments pageKey="article-test" />);
+
+    const commentCard = screen.getByText("تعليق صالح للاختبار").closest("article");
+    expect(commentCard).not.toBeNull();
+    await user.click(within(commentCard!).getByRole("button", { name: "عرض الردود (1)" }));
+
+    expect(within(commentCard!).getByText("رد سابق ملتصق بالتعليق")).toBeTruthy();
+    expect(document.querySelector(".comment-reply-threads")).toBeNull();
   });
 });

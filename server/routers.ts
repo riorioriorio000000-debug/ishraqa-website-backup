@@ -62,12 +62,11 @@ export const appRouter = router({
       details: z.string().trim().max(700).optional(),
       dateDetail: z.string().trim().max(160).optional(),
       timeDetail: z.string().trim().max(160).optional(),
-      phone: z.string().trim().max(40).optional(),
     })).mutation(async ({ input }) => {
       const value = (item?: string) => item?.trim() || "لم يُحدَّد";
       const notificationSent = await notifyOwner({
         title: "طلب خدمة جديد من موقع الإشراقة",
-        content: `الخدمة: ${value(input.serviceDetail)}\nالمدينة أو الحي: ${value(input.cityDetail)}\nالموعد: ${value(input.dateDetail)} — ${value(input.timeDetail)}\nرقم التواصل: ${value(input.phone)}\nالتفاصيل: ${value(input.details)}`,
+        content: `الخدمة: ${value(input.serviceDetail)}\nالمدينة أو الحي: ${value(input.cityDetail)}\nالموعد: ${value(input.dateDetail)} — ${value(input.timeDetail)}\nالتفاصيل: ${value(input.details)}\nمتابعة الزائر: عبر رسالة واتساب جاهزة من نموذج الموقع`,
       });
       return { accepted: true as const, notificationSent };
     }),

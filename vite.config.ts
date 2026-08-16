@@ -171,9 +171,13 @@ export default defineConfig({
     reportCompressedSize: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          react: ["react", "react-dom", "wouter"],
-          ui: ["lucide-react", "sonner"],
+        manualChunks(id) {
+          const normalizedId = id.replace(/\\/g, "/");
+          if (!normalizedId.includes("/node_modules/")) return;
+          if (normalizedId.includes("/streamdown/") || normalizedId.includes("/streamdown@")) return "streamdown";
+          if (normalizedId.includes("/mermaid/") || normalizedId.includes("/mermaid@") || normalizedId.includes("/@mermaid-js/")) return "mermaid";
+          if (normalizedId.includes("/react/") || normalizedId.includes("/react-dom/") || normalizedId.includes("/wouter/")) return "react";
+          if (normalizedId.includes("/lucide-react/") || normalizedId.includes("/sonner/")) return "ui";
         },
       },
     },

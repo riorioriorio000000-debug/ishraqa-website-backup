@@ -798,6 +798,8 @@ img { -webkit-user-drag: none; user-drag: none; }
 .notification-badge { position: absolute; top: -.22rem; left: -.22rem; display: grid; min-width: 1.2rem; height: 1.2rem; place-items: center; padding-inline: .17rem; border: 2px solid #f7f5ef; border-radius: 999px; background: #b9772d; color: #fff; font-size: .64rem; font-weight: 900; line-height: 1; }
 .comment-reply-threads { display: grid; gap: .75rem; margin-top: .8rem; }
 .comment-reply-thread { overflow: visible; border: 0; background: transparent; box-shadow: none; }
+.comment-reply-thread-inline { margin-top: .65rem; padding-top: .42rem; border-top: 1px solid rgba(15,92,99,.1); }
+.comment-reply-thread-inline > div { margin-top: .34rem; }
 .comment-reply-toggle { display: inline-flex; align-items: center; min-height: 1.9rem; padding: .18rem 0; border: 0; background: transparent; color: #52706d; font: inherit; font-size: .72rem; font-weight: 800; cursor: pointer; transition: color .16s var(--ease-out), transform .16s var(--ease-out); }
 .comment-reply-toggle:hover, .comment-reply-toggle:focus-visible { color: #0f5c63; outline: none; }.comment-reply-toggle:active { transform: scale(.97); }
 .comment-reply-thread > div { overflow: hidden; margin-top: .18rem; border: 1px solid rgba(15,92,99,.16); border-radius: .9rem; background: #fffdfa; box-shadow: 0 8px 22px rgba(15,92,99,.045); }

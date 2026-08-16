@@ -35,7 +35,7 @@ describe("نموذج الحجز", () => {
     vi.restoreAllMocks();
   });
 
-  it("يرسل الطلب ويعرض رسالة نجاح واضحة تؤكد تنبيه الإدارة", async () => {
+  it("يحفظ الطلب دون رقم هاتف ويعرض رابط واتساب جاهزًا بالتفاصيل", async () => {
     const user = userEvent.setup();
 
     render(<Home />);
@@ -49,12 +49,14 @@ describe("نموذج الحجز", () => {
     await user.click(screen.getByRole("button", { name: /التالي/ }));
     await user.type(screen.getByLabelText("اكتب الموعد المفضل"), "الخميس");
     await user.type(screen.getByLabelText("اكتب الوقت المفضل"), "بعد المغرب");
-    await user.type(screen.getByLabelText(/رقم التواصل/), "0552610151");
-    await user.click(screen.getByRole("button", { name: /إرسال الطلب/ }));
+    expect(screen.queryByLabelText(/رقم التواصل/)).toBeNull();
+    await user.click(screen.getByRole("button", { name: /حفظ الطلب وفتح واتساب/ }));
 
-    expect(screen.getByRole("status").textContent).toContain("تم استلام طلبك بنجاح.");
-    expect(screen.getByText("وصل إشعار فوري إلى إدارة الإشراقة لمراجعة تفاصيلك.")).toBeTruthy();
-    expect(screen.getByRole("link", { name: /متابعة عبر واتساب/ }).getAttribute("href")).toContain("https://wa.me/966552610151?text=");
+    expect(screen.getByRole("status").textContent).toContain("تم حفظ تفاصيل طلبك.");
+    expect(screen.getByText("وصل إشعار فوري إلى إدارة الإشراقة. افتح واتساب لإرسال التفاصيل وبدء التنسيق مباشرة.")).toBeTruthy();
+    const whatsappLink = screen.getByRole("link", { name: /فتح واتساب بالتفاصيل/ });
+    expect(whatsappLink.getAttribute("href")).toContain("https://wa.me/966552610151?text=");
+    expect(decodeURIComponent(whatsappLink.getAttribute("href") ?? "")).toContain("حي النزهة، جدة");
   });
 
   it("يعرض كل صور الصفحة الرئيسية بنص بديل وصفي بعد التصيير", () => {
