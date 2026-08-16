@@ -1,6 +1,17 @@
 import React from "react";
 import type { ArticleEntry } from "@/pages/ArticleDetail";
 
+function articleVisual(article: ArticleEntry) {
+  const subject = `${article.slug} ${article.title}`.toLowerCase();
+  if (/(ac-|maintenance|تكييف|صيانة)/.test(subject)) {
+    return { src: "/manus-storage/maintenance-tools-720w_14b5c2ac.png", srcSet: "/manus-storage/maintenance-tools-360w_0405e169.png 360w, /manus-storage/maintenance-tools-720w_14b5c2ac.png 720w", alt: `رسم أدوات الصيانة المنزلية المصاحب لمقال ${article.title}` };
+  }
+  if (/(furniture|moving|نقل|عفش)/.test(subject)) {
+    return { src: "/manus-storage/moving-box-720w_8c727804.png", srcSet: "/manus-storage/moving-box-360w_f82108eb.png 360w, /manus-storage/moving-box-720w_8c727804.png 720w", alt: `رسم توضيحي لنقل العفش المصاحب لمقال ${article.title}` };
+  }
+  return { src: "/manus-storage/cleaning-caddy-720w_1d6eb6fe.png", srcSet: "/manus-storage/cleaning-caddy-360w_e0c8e5c3.png 360w, /manus-storage/cleaning-caddy-720w_1d6eb6fe.png 720w", alt: `رسم أدوات تنظيف منزلية مصاحب لمقال ${article.title}` };
+}
+
 export default function ArticleStructuredData({ article }: { article: ArticleEntry }) {
   const canonicalUrl = `https://al-eshraqa.co/articles/${article.slug}`;
   const payload = {
@@ -13,8 +24,8 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
     image: article.shareImage,
     inLanguage: "ar-SA",
     keywords: article.keywords.join(", "),
-    datePublished: article.publishedAt ?? "2026-08-14T00:00:00+03:00",
-    dateModified: article.updatedAt ?? article.publishedAt ?? "2026-08-14T00:00:00+03:00",
+    datePublished: "2026-08-14T00:00:00+03:00",
+    dateModified: "2026-08-14T00:00:00+03:00",
     author: {
       "@type": "Organization",
       name: "شركة الإشراقة للتنظيف والصيانة ونقل العفش",
@@ -31,5 +42,6 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
     },
   };
 
-  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }} />;
+  const visual = articleVisual(article);
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }} /><figure className="article-visual"><img src={visual.src} srcSet={visual.srcSet} sizes="(max-width: 640px) 76vw, 420px" alt={visual.alt} loading="lazy" decoding="async" /><figcaption>مرئي توضيحي من خدمات الإشراقة</figcaption></figure></>;
 }

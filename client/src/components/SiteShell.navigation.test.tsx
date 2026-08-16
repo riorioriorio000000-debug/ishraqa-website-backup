@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { SiteHeader } from "./SiteShell";
 
 vi.mock("./BrandMark", () => ({ default: () => <span>شعار الإشراقة</span> }));
+vi.mock("./NotificationBell", () => ({ default: () => <a href="/notifications" aria-label="الإشعارات">الإشعارات</a> }));
 vi.mock("wouter", () => ({
   Link: ({ href, children, className, onClick, ...props }: { href: string; children: React.ReactNode; className?: string; onClick?: () => void }) => <a href={href} className={className} onClick={onClick} {...props}>{children}</a>,
   useLocation: () => ["/", vi.fn()],

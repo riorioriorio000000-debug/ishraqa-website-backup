@@ -35,6 +35,7 @@ vi.mock("@/lib/trpc", () => ({
         isPending: false,
       }) },
       react: { useMutation: () => ({ mutate: reactMutate, isPending: false }) },
+      reportContent: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       submitReply: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
       reactToReply: { useMutation: () => ({ mutate: vi.fn(), isPending: false }) },
     },

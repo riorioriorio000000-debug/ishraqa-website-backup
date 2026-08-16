@@ -82,9 +82,9 @@ describe("نموذج الحجز", () => {
   it("يعرض أسئلة شائعة محلية واضحة عن التنظيف والصيانة ونقل العفش", () => {
     render(<Home />);
 
-    expect(screen.getByRole("heading", { name: /إجابات سريعة.*مساحة أهدأ/ })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: /إجابات سريعة.*في مساحة أهدأ/ })).toBeTruthy();
     expect(document.querySelectorAll(".home-faq-grid details")).toHaveLength(6);
     expect(screen.getByText("هل يمكن ترتيب تنظيف شقة بعد الانتقال أو قبل التسليم؟")).toBeTruthy();
-    expect(screen.getByRole("link", { name: /كل الأسئلة الشائعة/ }).getAttribute("href")).toBe("/faq");
+    expect(screen.getByText("ما المعلومات التي تساعد على تنسيق نقل العفش؟")).toBeTruthy();
   });
 });

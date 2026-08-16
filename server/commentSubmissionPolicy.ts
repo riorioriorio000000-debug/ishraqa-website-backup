@@ -33,9 +33,3 @@ export function passesAutomaticCommentScreening(input: Pick<CommentSubmission, "
   const text = `${input.displayName}\n${input.body}`.trim();
   return text.length > 0 && !blockedCommentPatterns.some((pattern) => pattern.test(text));
 }
-
-/** تسمح الرسالة الواحدة برد واحد لكل زائر خلال ساعة، ثم تفتح نافذة رد جديدة. */
-export function replyCooldownRemainingSeconds(latestReplyAt: Date | undefined, now = Date.now()) {
-  if (!latestReplyAt) return 0;
-  return Math.max(0, Math.ceil((latestReplyAt.getTime() + 60 * 60 * 1000 - now) / 1000));
-}

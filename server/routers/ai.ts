@@ -2,7 +2,6 @@ import { z } from "zod";
 import { TRPCError } from "@trpc/server";
 import { invokeLLM } from "../_core/llm";
 import { publicProcedure, router } from "../_core/trpc";
-import * as db from "../db";
 import { classifySiteQuestion, internalNavigation, recommendSiteContent, recommendSiteContentByContext, siteKnowledge } from "../siteKnowledge";
 import { fetchPublicPageText } from "../webPage";
 import { storageGetSignedUrl, storagePut } from "../storage";
@@ -134,11 +133,7 @@ ${siteKnowledge}
 export const aiRouter = router({
   recommendContent: publicProcedure
     .input(z.object({ service: z.enum(["cleaning", "maintenance", "moving", "general"]), city: z.string().trim().min(2).max(96).optional() }))
-    .query(async ({ input }) => {
-      await db.recordRecommendationFilterUse(input);
-      return recommendSiteContentByContext({ service: input.service, city: input.city });
-    }),
-  recommendationFilterStats: publicProcedure.query(() => db.getPopularRecommendationFilters()),
+    .query(({ input }) => recommendSiteContentByContext({ service: input.service, city: input.city })),
   chat: publicProcedure
     .input(z.object({
       messages: z.array(messageSchema).min(1).max(12),

@@ -61,15 +61,8 @@
     {
       "idx": 8,
       "version": "5",
-      "when": 1786821190679,
-      "tag": "0008_shallow_callisto",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "5",
-      "when": 1786829282096,
-      "tag": "0009_smiling_nighthawk",
+      "when": 1786891083463,
+      "tag": "0008_peaceful_cannonball",
       "breakpoints": true
     }
   ]

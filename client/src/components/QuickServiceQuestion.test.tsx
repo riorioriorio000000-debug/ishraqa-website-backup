@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import QuickServiceQuestion from "./QuickServiceQuestion";
 
-const { chatMutate, feedbackMutate, recommendUseQuery, filterStatsUseQuery } = vi.hoisted(() => ({ chatMutate: vi.fn(), feedbackMutate: vi.fn(), recommendUseQuery: vi.fn(), filterStatsUseQuery: vi.fn() }));
+const { chatMutate, feedbackMutate, recommendUseQuery } = vi.hoisted(() => ({ chatMutate: vi.fn(), feedbackMutate: vi.fn(), recommendUseQuery: vi.fn() }));
 
 vi.mock("@/lib/trpc", () => ({
   trpc: {
@@ -29,12 +29,6 @@ vi.mock("@/lib/trpc", () => ({
         useQuery: (input: unknown) => {
           recommendUseQuery(input);
           return { data: undefined, isLoading: false };
-        },
-      },
-      recommendationFilterStats: {
-        useQuery: (input: unknown) => {
-          filterStatsUseQuery(input);
-          return { data: [{ service: "maintenance", city: "الرياض", uses: 9 }], isLoading: false };
         },
       },
     },
@@ -62,7 +56,6 @@ afterEach(() => {
   chatMutate.mockClear();
   feedbackMutate.mockClear();
   recommendUseQuery.mockClear();
-  filterStatsUseQuery.mockClear();
 });
 
 describe("QuickServiceQuestion", () => {
@@ -119,11 +112,8 @@ describe("QuickServiceQuestion", () => {
     await user.selectOptions(screen.getByLabelText("نوع الخدمة"), "cleaning");
     await user.clear(screen.getByLabelText("المدينة أو الحي"));
     await user.type(screen.getByLabelText("المدينة أو الحي"), "جدة");
-    await user.click(screen.getByRole("button", { name: "تحديث المقترحات" }));
 
     expect(recommendUseQuery).toHaveBeenLastCalledWith(expect.objectContaining({ service: "cleaning", city: "جدة" }));
-    expect(screen.getByRole("heading", { name: "أكثر المرشحات استخدامًا" })).toBeTruthy();
-    expect(screen.getByText("9")).toBeTruthy();
     const summary = screen.getByText("عرض ملخص ملاحظات التقييمات");
     await user.click(summary);
     expect(screen.getByText(/متوسط التقييم 4.3 من 5/)).toBeTruthy();

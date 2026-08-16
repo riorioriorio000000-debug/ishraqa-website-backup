@@ -22,16 +22,10 @@ describe("PageMeta", () => {
     expect(document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toContain("index");
   });
 
-  it("يصوغ عنوان الأسئلة الشائعة محليًا ويذكر اسم الشركة مرة واحدة", () => {
+  it("يختصر عنوان الأسئلة الشائعة ويذكر اسم الشركة مرة واحدة", () => {
     render(<PageMeta title="أسئلة شائعة | الإشراقة" description="وصف تجريبي" keywords={["أسئلة شائعة"]} path="/faq" />);
 
-    expect(document.title).toBe("أسئلة شائعة عن خدمات المنزل | شركة الإشراقة");
-    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe("أسئلة شائعة عن خدمات المنزل | شركة الإشراقة");
-  });
-
-  it("يستخدم عنوانًا وصفيًا مختصرًا لمكتبة الأدلة", () => {
-    render(<PageMeta title="مكتبة الإشراقة" description="وصف تجريبي" keywords={["تنظيف"]} path="/articles" />);
-
-    expect(document.title).toBe("دليل التنظيف والصيانة ونقل العفش | شركة الإشراقة");
+    expect(document.title).toBe("الأسئلة الشائعة | شركة الإشراقة");
+    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe("الأسئلة الشائعة | شركة الإشراقة");
   });
 });

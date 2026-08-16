@@ -17,15 +17,14 @@ vi.mock("wouter", () => ({
 afterEach(cleanup);
 
 describe("قارئ المقالات", () => {
-  it("ينقل الدليل الإرشادي إلى الإطار الختامي ويُبقي عنوانًا تقنيًا واحدًا فقط", () => {
+  it("يعرض العنوان والتمهيد في الترويسة مرة واحدة ولا يعيد دليل البداية", () => {
     const article = articleEntries[0];
     render(<ArticleDetailPage />);
 
-    expect(screen.getAllByRole("heading", { level: 1, name: article.title })).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 1, name: article.title })).toBeTruthy();
     expect(screen.getAllByText(article.intro)).toHaveLength(1);
-    expect(document.querySelector(".article-hero-compact")).toBeTruthy();
+    expect(screen.queryByText("تمهيد المقال")).toBeNull();
     expect(document.querySelector(".article-reading-intro")).toBeNull();
-    expect(document.querySelector(".article-primary-guide")?.textContent).toContain("قراءة إرشادية من الإشراقة");
     expect(document.querySelector(".article-detail")?.className).toMatch(/article-tone-[1-5]/);
   });
 });

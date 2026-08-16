@@ -1,4 +1,4 @@
-import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
+import { boolean, index, int, mysqlEnum, mysqlTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/mysql-core";
 
 /**
  * Core user table backing auth flow.
@@ -62,15 +62,6 @@ export const assistantAnswerFeedback = mysqlTable("assistant_answer_feedback", {
 
 export type AssistantAnswerFeedback = typeof assistantAnswerFeedback.$inferSelect;
 
-/** Aggregated manual recommendation-filter usage. No question, IP address, or visitor profile is stored. */
-export const recommendationFilterMetrics = mysqlTable("recommendation_filter_metrics", {
-  id: varchar("id", { length: 196 }).primaryKey(),
-  service: mysqlEnum("service", ["cleaning", "maintenance", "moving", "general"]).notNull(),
-  city: varchar("city", { length: 96 }),
-  uses: int("uses").notNull().default(0),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-});
-
 /** A per-article score owned by one anonymous browser. The composite ID prevents duplicate ratings. */
 export const articleFeedback = mysqlTable("article_feedback", {
   id: varchar("id", { length: 240 }).primaryKey(),
@@ -120,7 +111,7 @@ export const commentReactions = mysqlTable("comment_reactions", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
-/** Replies may target a top-level comment or another published reply on that comment. */
+/** Nested replies are attached to their root comment and optionally to a preceding reply. */
 export const commentReplies = mysqlTable("comment_replies", {
   id: int("id").autoincrement().primaryKey(),
   pageKey: varchar("pageKey", { length: 160 }).notNull(),
@@ -135,9 +126,12 @@ export const commentReplies = mysqlTable("comment_replies", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   deletedAt: timestamp("deletedAt"),
-});
+}, (table) => ({
+  commentCreatedIndex: index("comment_replies_comment_created_idx").on(table.commentId, table.createdAt),
+  parentReplyIndex: index("comment_replies_parent_idx").on(table.parentReplyId),
+}));
 
-/** Each visitor can choose one reaction per reply, independently from parent-comment reactions. */
+/** One selectable reaction per anonymous visitor and reply. */
 export const commentReplyReactions = mysqlTable("comment_reply_reactions", {
   id: varchar("id", { length: 160 }).primaryKey(),
   replyId: int("replyId").notNull(),
@@ -146,5 +140,52 @@ export const commentReplyReactions = mysqlTable("comment_reply_reactions", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
+
+export const siteNotifications = mysqlTable("site_notifications", {
+  id: int("id").autoincrement().primaryKey(),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  type: mysqlEnum("type", ["reply", "reaction", "comment_published", "comment_deleted", "comment_reverted", "comment_restricted", "report_review"]).notNull(),
+  title: varchar("title", { length: 160 }).notNull(),
+  message: varchar("message", { length: 900 }).notNull(),
+  targetPath: varchar("targetPath", { length: 280 }),
+  entityType: mysqlEnum("entityType", ["comment", "reply", "report", "system"]),
+  entityId: int("entityId"),
+  isRead: boolean("isRead").notNull().default(false),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  visitorCreatedIndex: index("site_notifications_visitor_created_idx").on(table.visitorId, table.createdAt),
+}));
+
+export const contentReports = mysqlTable("content_reports", {
+  id: int("id").autoincrement().primaryKey(),
+  reporterVisitorId: varchar("reporterVisitorId", { length: 64 }).notNull(),
+  targetType: mysqlEnum("targetType", ["comment", "reply"]).notNull(),
+  targetId: int("targetId").notNull(),
+  reason: mysqlEnum("reason", ["abuse", "illegal", "profile", "name", "other"]).notNull(),
+  details: varchar("details", { length: 700 }),
+  status: mysqlEnum("status", ["pending", "actioned", "dismissed", "recheck_requested"]).notNull().default("pending"),
+  aiVerdict: mysqlEnum("aiVerdict", ["remove_and_restrict", "no_violation", "needs_review"]),
+  aiSummary: varchar("aiSummary", { length: 900 }),
+  recheckCount: int("recheckCount").notNull().default(0),
+  reviewedAt: timestamp("reviewedAt"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  reporterTargetUnique: uniqueIndex("content_reports_reporter_target_unique").on(table.reporterVisitorId, table.targetType, table.targetId),
+  statusCreatedIndex: index("content_reports_status_created_idx").on(table.status, table.createdAt),
+}));
+
+/** A restriction is only active after a confirmed decision and can be lifted during recheck. */
+export const contentRestrictions = mysqlTable("content_restrictions", {
+  visitorId: varchar("visitorId", { length: 64 }).primaryKey(),
+  sourceReportId: int("sourceReportId").notNull(),
+  reason: varchar("reason", { length: 900 }).notNull(),
+  isActive: boolean("isActive").notNull().default(true),
+  restrictedAt: timestamp("restrictedAt").defaultNow().notNull(),
+  liftedAt: timestamp("liftedAt"),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  sourceReportIndex: index("content_restrictions_report_idx").on(table.sourceReportId),
+}));
 
 export type SiteComment = typeof siteComments.$inferSelect;

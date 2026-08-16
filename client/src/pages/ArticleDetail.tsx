@@ -14,8 +14,6 @@ export type ArticleEntry = {
   title: string;
   intro: string;
   category: "دليل رئيسي" | "دليل محلي";
-  publishedAt?: string;
-  updatedAt?: string;
   image?: string;
   imageAlt?: string;
   shareImage: string;
@@ -68,10 +66,10 @@ const editorialAdditions = {
 } satisfies Record<string, readonly ArticleSection[]>;
 
 const mainArticles: readonly ArticleEntry[] = [
-  { slug: "home-cleaning-guide", title: "شركة تنظيف منازل: دليل ترتيب طلب الخدمة", intro: "دليل طويل وعملي لتحديد احتياج التنظيف المنزلي، ترتيب الأولويات، وكتابة رسالة حجز واضحة بلا أسعار ثابتة أو وعود مبالغ فيها.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-home-cleaning-guide_b2ca9d9e.jpg", imageAlt: "أدوات تنظيف منزلية هادئة على سطح مطبخ بلون عاجي", shareImage: articleShareImages["home-cleaning-guide"], keywords: ["تنظيف منازل", "تنظيف عميق", "خدمات تنظيف", "حجز تنظيف"], sections: [...longGuideSections("منزلك", "تنظيف المنزل", "إذا كنت في مدينة أخرى، اكتب اسمها وحيّك في الرسالة."), ...editorialAdditions.home] },
-  { slug: "ac-maintenance-guide", title: "شركة صيانة تكييف: دليل ترتيب الفحص", intro: "كيف تصف ملاحظة التكييف بوضوح، ومتى تتجنب الحلول الارتجالية، وما الذي يسهّل ترتيب فحص مناسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-maintenance-guide_52abc686.jpg", imageAlt: "عدة صيانة منزلية مرتبة بدرجات تركوازية وعاجية", shareImage: articleShareImages["ac-maintenance-guide"], keywords: ["صيانة تكييف", "فحص مكيف", "ضعف تبريد", "خدمة صيانة"], sections: [...longGuideSections("موقعك", "فحص وصيانة التكييف", "اذكر إن كانت المشكلة في تدفق الهواء أو التبريد أو الصوت أو الرائحة."), ...editorialAdditions.ac] },
-  { slug: "furniture-moving-guide", title: "شركة نقل عفش: دليل تجهيز النقل", intro: "خطوات عملية تسبق نقل الأثاث، من القطع الحساسة والمداخل إلى إعداد رسالة واضحة لفريق التنسيق.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-moving-guide_b9d108ef.jpg", imageAlt: "صناديق نقل وتجهيزات حماية مرتبة في مساحة منزلية هادئة", shareImage: articleShareImages["furniture-moving-guide"], keywords: ["نقل عفش", "تغليف أثاث", "شركة نقل", "نقل أثاث"], sections: [...longGuideSections("العنوانين", "نقل العفش", "اذكر الطابق والمصعد ومواقف التحميل والقطع الحساسة قبل تثبيت التفاصيل."), ...editorialAdditions.furniture] },
-  { slug: "kitchen-care-guide", title: "شركة تنظيف مطابخ: دليل العناية العميقة", intro: "منهج بسيط لتقسيم تنظيف المطبخ، حماية الأسطح، ومعرفة متى يكون طلب العناية المتخصصة هو الأنسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-kitchen-cleaning-guide_dbd0ccb9.jpg", imageAlt: "أدوات عناية بالمطبخ وليمون وقطعة قماش على سطح عاجي", shareImage: articleShareImages["kitchen-care-guide"], keywords: ["تنظيف مطبخ", "تنظيف أفران", "تنظيف عميق", "العناية بالمنزل"], sections: [...longGuideSections("مطبخك", "العناية بالمطبخ", "اذكر نوع السطح أو الجهاز إذا كانت هناك نقطة تحتاج اهتمامًا خاصًا."), ...editorialAdditions.kitchen] },
+  { slug: "home-cleaning-guide", title: "دليل تنظيف المنزل: من أول رسالة إلى ترتيب النتيجة", intro: "دليل طويل وعملي لتحديد احتياج التنظيف المنزلي، ترتيب الأولويات، وكتابة رسالة حجز واضحة بلا أسعار ثابتة أو وعود مبالغ فيها.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-home-cleaning-guide_b2ca9d9e.jpg", imageAlt: "أدوات تنظيف منزلية هادئة على سطح مطبخ بلون عاجي", shareImage: articleShareImages["home-cleaning-guide"], keywords: ["تنظيف منازل", "تنظيف عميق", "خدمات تنظيف", "حجز تنظيف"], sections: [...longGuideSections("منزلك", "تنظيف المنزل", "إذا كنت في مدينة أخرى، اكتب اسمها وحيّك في الرسالة."), ...editorialAdditions.home] },
+  { slug: "ac-maintenance-guide", title: "دليل صيانة التكييف: الإشارات المبكرة وخطوات التنسيق", intro: "كيف تصف ملاحظة التكييف بوضوح، ومتى تتجنب الحلول الارتجالية، وما الذي يسهّل ترتيب فحص مناسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-maintenance-guide_52abc686.jpg", imageAlt: "عدة صيانة منزلية مرتبة بدرجات تركوازية وعاجية", shareImage: articleShareImages["ac-maintenance-guide"], keywords: ["صيانة تكييف", "فحص مكيف", "ضعف تبريد", "خدمة صيانة"], sections: [...longGuideSections("موقعك", "فحص وصيانة التكييف", "اذكر إن كانت المشكلة في تدفق الهواء أو التبريد أو الصوت أو الرائحة."), ...editorialAdditions.ac] },
+  { slug: "furniture-moving-guide", title: "دليل نقل العفش: تجهيز هادئ من باب إلى باب", intro: "خطوات عملية تسبق نقل الأثاث، من القطع الحساسة والمداخل إلى إعداد رسالة واضحة لفريق التنسيق.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-moving-guide_b9d108ef.jpg", imageAlt: "صناديق نقل وتجهيزات حماية مرتبة في مساحة منزلية هادئة", shareImage: articleShareImages["furniture-moving-guide"], keywords: ["نقل عفش", "تغليف أثاث", "شركة نقل", "نقل أثاث"], sections: [...longGuideSections("العنوانين", "نقل العفش", "اذكر الطابق والمصعد ومواقف التحميل والقطع الحساسة قبل تثبيت التفاصيل."), ...editorialAdditions.furniture] },
+  { slug: "kitchen-care-guide", title: "دليل العناية بالمطبخ: ترتيب مستمر بلا إرهاق", intro: "منهج بسيط لتقسيم تنظيف المطبخ، حماية الأسطح، ومعرفة متى يكون طلب العناية المتخصصة هو الأنسب.", category: "دليل رئيسي", image: "/manus-storage/ishraqa-kitchen-cleaning-guide_dbd0ccb9.jpg", imageAlt: "أدوات عناية بالمطبخ وليمون وقطعة قماش على سطح عاجي", shareImage: articleShareImages["kitchen-care-guide"], keywords: ["تنظيف مطبخ", "تنظيف أفران", "تنظيف عميق", "العناية بالمنزل"], sections: [...longGuideSections("مطبخك", "العناية بالمطبخ", "اذكر نوع السطح أو الجهاز إذا كانت هناك نقطة تحتاج اهتمامًا خاصًا."), ...editorialAdditions.kitchen] },
 ];
 
 const localCities = [
@@ -79,13 +77,6 @@ const localCities = [
 ] as const;
 
 const localFocuses = ["تنظيف المنزل", "صيانة التكييف", "نقل العفش", "تنظيف عميق للمطبخ", "ترتيب موعد خدمة منزلية"] as const;
-const localTitleByFocus = (city: string, focus: typeof localFocuses[number]) => {
-  if (focus === "تنظيف المنزل") return `شركة تنظيف منازل ${city}: ترتيب طلب الخدمة`;
-  if (focus === "صيانة التكييف") return `شركة صيانة تكييف ${city}: ترتيب الفحص`;
-  if (focus === "نقل العفش") return `شركة نقل عفش ${city}: تجهيز الطلب`;
-  if (focus === "تنظيف عميق للمطبخ") return `شركة تنظيف مطابخ ${city}: ترتيب العناية العميقة`;
-  return `شركة خدمات منزلية ${city}: ترتيب موعد الخدمة`;
-};
 const localArticleVisuals: Readonly<Record<string, { readonly src: string; readonly alt: string }>> = {
   riyadh: { src: "/manus-storage/article-visual-bathroom-care_9449151f.webp", alt: "حمام مرتب بأدوات عناية منزلية هادئة" },
   jeddah: { src: "/manus-storage/article-visual-ac-maintenance_e644ca83.webp", alt: "وحدة تكييف نظيفة وأدوات صيانة مرتبة" },
@@ -103,7 +94,7 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
   const visual = localArticleVisuals[slug];
   return {
     slug: `${slug}-service-guide`,
-    title: localTitleByFocus(city, focus),
+    title: `دليل ${city}: كيف ترتب ${focus} بوضوح؟`,
     intro: `دليل محلي عملي لسكان ${city} يشرح ما الذي يُكتب في طلب ${focus} وكيف تُراجع التفاصيل قبل تنسيق الموعد.`,
     category: "دليل محلي",
     image: visual?.src,
@@ -114,13 +105,7 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
   };
 });
 
-// يمثل تاريخ الإتاحة الفعلي للنسخة المنشورة من هذه الأدلة؛ يستهلكه العرض والبيانات المنظمة معًا.
-const publishedArticleAt = "2026-08-14T00:00:00+03:00";
-export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...localArticleEntries].map((article) => ({
-  ...article,
-  publishedAt: publishedArticleAt,
-  updatedAt: publishedArticleAt,
-}));
+export const articleEntries: readonly ArticleEntry[] = [...mainArticles, ...localArticleEntries];
 
 export default function ArticleDetailPage() {
   const [, params] = useRoute("/articles/:slug");
@@ -139,11 +124,10 @@ export default function ArticleDetailPage() {
     <PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} />
     <ArticleStructuredData article={article} />
     <main className={`article-detail article-tone-${articleTone}`} dir="rtl">
-      <header className="article-hero article-hero-compact"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><h1 className="sr-only">{article.title}</h1></div></header>
+      <header className="article-hero"><div className="shell article-hero-copy"><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> قراءة إرشادية من الإشراقة</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header>
       <article className="section article-reading-section"><div className="shell article-prose">
         {article.image ? <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure> : <figure className="article-feature-image article-tone-visual" role="img" aria-label={`تكوين تجريدي هادئ لمقال ${article.title}`}><span aria-hidden="true" /><figcaption>تكوين بصري تجريدي بدرجات هوية الإشراقة.</figcaption></figure>}
         {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
-        <section className="article-primary-guide" aria-label="الدليل الإرشادي للمقال"><span>قراءة إرشادية من الإشراقة</span><h2>{article.title}</h2><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></section>
         <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
         <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>
         <div className="article-actions"><a href="https://wa.me/966552610151" target="_blank" rel="noreferrer" className="article-share-button" aria-label="مشاركة المقال عبر واتساب"><MessageCircle size={18} /><span>واتساب</span></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`} target="_blank" rel="noreferrer" className="article-share-button article-share-facebook" aria-label="مشاركة المقال عبر فيسبوك"><span aria-hidden="true" className="article-facebook-mark">f</span><span>فيسبوك</span></a><button className="article-share-button" type="button" onClick={copyArticleLink} aria-label="نسخ رابط المقال"><Link2 size={18} /><span>نسخ الرابط</span></button><button className="article-share-button article-share-more" type="button" onClick={shareArticle} aria-label="خيارات مشاركة إضافية"><Share2 size={18} /><span>مشاركة</span></button></div>

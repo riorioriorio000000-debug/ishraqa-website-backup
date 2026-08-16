@@ -15,6 +15,8 @@ describe("بيانات المقال المنظمة", () => {
     expect(data.keywords).toContain(articleEntries[0].keywords[0]);
     expect(data.publisher.logo.url).toContain("ishraqa-user-logo");
     expect(data.image).toBe(articleEntries[0].shareImage);
-    expect(container.querySelector("img")).toBeNull();
+    expect(container.querySelector("img")?.getAttribute("alt")).toContain(articleEntries[0].title);
+    expect(container.querySelector("img")?.getAttribute("src")).toContain("cleaning-caddy-720w");
+    expect(container.querySelector("img")?.getAttribute("srcset")).toContain("cleaning-caddy-360w");
   });
 });

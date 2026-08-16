@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { notifyOwner } from "./_core/notification";
 import { aiRouter } from "./routers/ai";
+import { moderationRouter, reviewContentReport } from "./routers/moderation";
 import * as db from "./db";
 import { storagePut } from "./storage";
 import { z } from "zod";
@@ -43,6 +44,7 @@ export const appRouter = router({
     }),
   }),
   ai: aiRouter,
+  moderation: moderationRouter,
   metrics: router({
     get: publicProcedure.query(() => db.getSiteVisitCount()),
     recordVisit: publicProcedure.mutation(() => db.recordSiteVisit()),
@@ -89,6 +91,15 @@ export const appRouter = router({
     react: publicProcedure.input(z.object({ commentId: z.number().int().positive(), visitorId: z.string().uuid(), reaction: z.enum(["heart", "broken"]).nullable() })).mutation(({ input }) => db.setCommentReaction(input)),
     submitReply: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), commentId: z.number().int().positive(), parentReplyId: z.number().int().positive().nullable().optional(), visitorId: z.string().uuid(), displayName: z.string().trim().min(2).max(64), body: z.string().trim().min(4).max(800), avatarKind: z.enum(["wave", "spark", "leaf", "star"]).default("wave"), avatarUrl: z.string().trim().max(1024).regex(/^\/manus-storage\//).nullable().optional() })).mutation(({ input }) => db.submitCommentReply(input)),
     reactToReply: publicProcedure.input(z.object({ replyId: z.number().int().positive(), visitorId: z.string().uuid(), reaction: z.enum(["heart", "broken"]).nullable() })).mutation(({ input }) => db.setCommentReplyReaction(input)),
+    listNotifications: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).query(({ input }) => db.getVisitorNotifications(input.visitorId)),
+    unreadNotificationCount: publicProcedure.input(z.object({ visitorId: z.string().uuid() })).query(({ input }) => db.getUnreadNotificationCount(input.visitorId)),
+    markNotificationsRead: publicProcedure.input(z.object({ visitorId: z.string().uuid(), ids: z.array(z.number().int().positive()).max(100).optional() })).mutation(({ input }) => db.markVisitorNotificationsRead(input.visitorId, input.ids)),
+    reportContent: publicProcedure.input(z.object({ reporterVisitorId: z.string().uuid(), targetType: z.enum(["comment", "reply"]), targetId: z.number().int().positive(), reason: z.enum(["abuse", "illegal", "profile", "name", "other"]), details: z.string().trim().max(700).optional() })).mutation(async ({ input }) => {
+      const report = await db.submitContentReport(input);
+      if (!report.created) return report;
+      const review = await reviewContentReport(report.reportId);
+      return { ...report, review };
+    }),
   }),
 
   // TODO: add feature routers here, e.g.
