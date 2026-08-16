@@ -34,21 +34,21 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("menuitem", { name: "أين نعمل" }).getAttribute("href")).toBe("/where-we-work");
   });
 
-  it("لا يضع رابط الإشعارات في الترويسة", () => {
+  it("يضع رابط الإشعارات داخل إجراءات الترويسة", () => {
     render(<SiteHeader />);
 
-    expect(within(document.querySelector(".header-actions")!).queryByRole("link", { name: "الإشعارات" })).toBeNull();
+    expect(within(document.querySelector(".header-actions")!).getByRole("link", { name: "الإشعارات" }).getAttribute("href")).toBe("/notifications");
   });
 });
 
 describe("SiteFooter", () => {
-  it("يجمع الخصوصية والإشعارات مع عداد الزوار في التذييل السفلي", () => {
+  it("يبقي الخصوصية وعداد الزوار في التذييل السفلي دون تكرار الإشعارات", () => {
     render(<SiteFooter />);
 
     const footerBottom = document.querySelector<HTMLElement>(".footer-bottom");
     if (!footerBottom) throw new Error("لم يُعرض التذييل السفلي");
     expect(within(footerBottom).getByText("عدد زوار الموقع")).toBeTruthy();
     expect(within(footerBottom).getByRole("link", { name: "سياسة الخصوصية" }).getAttribute("href")).toBe("/privacy");
-    expect(within(footerBottom).getAllByRole("link", { name: "الإشعارات" })[0].getAttribute("href")).toBe("/notifications");
+    expect(within(footerBottom).queryByRole("link", { name: "الإشعارات" })).toBeNull();
   });
 });

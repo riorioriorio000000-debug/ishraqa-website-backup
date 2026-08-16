@@ -82,10 +82,23 @@ describe("ArticleComments", () => {
     await user.click(screen.getByRole("button", { name: "نشر التعليق" }));
 
     expect(submitMutate).toHaveBeenCalledWith(expect.objectContaining({ pageKey: "article-test", displayName: "زائر اختبار" }));
+    expect(JSON.parse(localStorage.getItem("ishraqa-comment-profile") ?? "{}")).toMatchObject({ displayName: "زائر اختبار" });
     expect(toastSuccess).toHaveBeenCalledWith("تم نشر تعليقك.", expect.objectContaining({ action: expect.objectContaining({ label: "تراجع" }) }));
     const notificationOptions = toastSuccess.mock.calls[0][1] as { action: { onClick: () => void } };
     notificationOptions.action.onClick();
     expect(undoMutate).toHaveBeenCalledWith(expect.objectContaining({ commentId: 61 }));
+  });
+
+  it("يستعيد اسم الزائر وصورته المحفوظين عند فتح نموذج تعليق جديد", async () => {
+    const user = userEvent.setup();
+    localStorage.setItem("ishraqa-comment-profile", JSON.stringify({ displayName: "زائر محفوظ", avatarUrl: "/manus-storage/avatar-test.png" }));
+    render(<ArticleComments pageKey="article-test" />);
+
+    await user.type(screen.getByRole("textbox", { name: "تعليقك" }), "تعليق لاستعادة الملف المحفوظ");
+    await user.click(screen.getByRole("button", { name: /أضف تعليقًا/ }));
+
+    expect((await screen.findByRole("textbox", { name: "اسم العرض" }) as HTMLInputElement).value).toBe("زائر محفوظ");
+    expect(screen.getByAltText("معاينة صورة الملف الشخصي").getAttribute("src")).toBe("/manus-storage/avatar-test.png");
   });
 
   it("يفتح الإبلاغ بحقل سبب مباشر ويصنفه قبل الإرسال", async () => {

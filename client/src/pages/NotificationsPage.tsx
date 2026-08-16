@@ -23,7 +23,7 @@ function formatNotificationDate(value: Date | string) {
 export default function NotificationsPage() {
   const [visitorId, setVisitorId] = useState<string>();
   const [filter, setFilter] = useState<NotificationFilter>("all");
-  const [openNotificationId, setOpenNotificationId] = useState<number>();
+  const [openNotificationKey, setOpenNotificationKey] = useState<string>();
   useEffect(() => setVisitorId(getAnonymousVisitorId()), []);
   const utils = trpc.useUtils();
   const notifications = trpc.interactions.listNotifications.useQuery(
@@ -45,9 +45,20 @@ export default function NotificationsPage() {
   });
   const filteredNotifications = useMemo(() => notifications.data?.filter(item => filter === "all" || (filter === "read" ? item.isRead : !item.isRead)) ?? [], [filter, notifications.data]);
   const filterCounts = useMemo(() => ({ all: notifications.data?.length ?? 0, unread: notifications.data?.filter(item => !item.isRead).length ?? 0, read: notifications.data?.filter(item => item.isRead).length ?? 0 }), [notifications.data]);
-  const openNotification = (id: number, isRead: boolean) => {
-    setOpenNotificationId(current => current === id ? undefined : id);
-    if (visitorId && !isRead && !markRead.isPending) markRead.mutate({ visitorId, ids: [id] });
+  const notificationGroups = useMemo(() => {
+    const groups = new Map<string, typeof filteredNotifications>();
+    for (const item of filteredNotifications) {
+      const key = item.type === "reply" && item.targetPath ? `reply:${item.targetPath}` : `single:${item.id}`;
+      const group = groups.get(key) ?? [];
+      group.push(item);
+      groups.set(key, group);
+    }
+    return Array.from(groups.entries()).map(([key, items]) => ({ key, items, latest: items[0] }));
+  }, [filteredNotifications]);
+  const openNotification = (key: string, items: typeof filteredNotifications) => {
+    setOpenNotificationKey(current => current === key ? undefined : key);
+    const unreadIds = items.filter(item => !item.isRead).map(item => item.id);
+    if (visitorId && unreadIds.length && !markRead.isPending) markRead.mutate({ visitorId, ids: unreadIds });
   };
 
   return <SiteShell><PageMeta title="الإشعارات" description="اطلع على تحديثات تعليقاتك وقرارات مراجعة البلاغات داخل موقع الإشراقة." keywords={["إشعارات الإشراقة", "بلاغات التعليقات", "ردود التعليقات"]} path="/notifications" />
@@ -60,7 +71,7 @@ export default function NotificationsPage() {
         {notifications.isError && <div className="notification-state notification-error"><ShieldAlert size={22} /><p>تعذر تحميل الإشعارات الآن. حدّث الصفحة أو أعد المحاولة بعد قليل.</p></div>}
         {!notifications.isLoading && !notifications.isError && !notifications.data?.length && <div className="notification-empty"><BellRing size={33} /><h2>لا توجد إشعارات بعد.</h2><p>عند وصول رد أو تفاعل على تعليقك، أو ظهور نتيجة لبلاغ أرسلته، ستجده هنا.</p><Link href="/articles" className="button button-ghost">استكشف المقالات <ArrowLeft size={16} /></Link></div>}
         {!notifications.isLoading && !notifications.isError && Boolean(notifications.data?.length) && !filteredNotifications.length && <div className="notification-filter-empty">لا توجد إشعارات ضمن هذا الفلتر.</div>}
-        <div className="notification-list">{filteredNotifications.map(item => { const isOpen = openNotificationId === item.id; return <article className={`notification-item ${item.isRead ? "is-read" : "is-unread"} ${isOpen ? "is-open" : ""}`} key={item.id}><NotificationAvatar type={item.type} /><div className="notification-copy"><div><div><h2>{item.title}</h2><span className="notification-source">{item.type === "report_review" ? "مساعد المراجعة الذكي" : item.type === "reply" || item.type === "reaction" ? "تفاعل من زائر" : "نظام الإشراقة"}</span></div><time dateTime={new Date(item.createdAt).toISOString()}>{formatNotificationDate(item.createdAt)}</time></div><p>{isOpen ? item.message : `${item.message.slice(0, 125)}${item.message.length > 125 ? "…" : ""}`}</p><div className="notification-links"><button type="button" className="notification-open" aria-expanded={isOpen} onClick={() => openNotification(item.id, item.isRead)}>{isOpen ? "إخفاء التفاصيل" : "فتح الإشعار"} <ArrowLeft size={15} /></button>{isOpen && item.targetPath && <Link href={item.targetPath}>عرض السياق <ArrowLeft size={15} /></Link>}{isOpen && item.type === "report_review" && item.entityType === "report" && item.entityId && <button type="button" className="notification-recheck" disabled={!visitorId || recheck.isPending} onClick={() => visitorId && recheck.mutate({ reportId: item.entityId!, visitorId })}>{recheck.isPending ? "جارٍ المراجعة…" : "طلب إعادة التحقق"}</button>}</div></div></article>; })}</div>
+        <div className="notification-list">{notificationGroups.map(group => { const { items, latest } = group; const isGroupedReply = latest.type === "reply" && items.length > 1; const isOpen = openNotificationKey === group.key; const hasUnread = items.some(item => !item.isRead); const itemTitle = isGroupedReply ? `${latest.title} · ${items.length} ردود` : latest.title; const compactMessage = `${latest.message.slice(0, 125)}${latest.message.length > 125 ? "…" : ""}`; return <article className={`notification-item ${hasUnread ? "is-unread" : "is-read"} ${isOpen ? "is-open" : ""} ${isGroupedReply ? "is-grouped" : ""}`} key={group.key}><NotificationAvatar type={latest.type} /><div className="notification-copy"><div><div><h2>{itemTitle}</h2><span className="notification-source">{isGroupedReply ? `${items.length} ردود على نفس التعليق` : latest.type === "report_review" ? "مساعد المراجعة الذكي" : latest.type === "reply" || latest.type === "reaction" ? "تفاعل من زائر" : "نظام الإشراقة"}</span></div><time dateTime={new Date(latest.createdAt).toISOString()}>{formatNotificationDate(latest.createdAt)}</time></div><p>{isOpen && !isGroupedReply ? latest.message : compactMessage}</p>{isOpen && isGroupedReply && <div className="notification-group-details" aria-label="تفاصيل الردود المجمعة">{items.map(item => <article key={item.id}><time dateTime={new Date(item.createdAt).toISOString()}>{formatNotificationDate(item.createdAt)}</time><p>{item.message}</p></article>)}</div>}<div className="notification-links"><button type="button" className="notification-open" aria-expanded={isOpen} onClick={() => openNotification(group.key, items)}>{isOpen ? "إخفاء التفاصيل" : isGroupedReply ? "عرض الردود" : "فتح الإشعار"} <ArrowLeft size={15} /></button>{isOpen && latest.targetPath && <Link href={latest.targetPath}>عرض السياق <ArrowLeft size={15} /></Link>}{isOpen && latest.type === "report_review" && latest.entityType === "report" && latest.entityId && <button type="button" className="notification-recheck" disabled={!visitorId || recheck.isPending} onClick={() => visitorId && recheck.mutate({ reportId: latest.entityId!, visitorId })}>{recheck.isPending ? "جارٍ المراجعة…" : "طلب إعادة التحقق"}</button>}</div></div></article>; })}</div>
       </div></section>
     </main>
   </SiteShell>;
