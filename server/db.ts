@@ -488,6 +488,37 @@ export async function deleteVisitorReply(replyId: number, visitorId: string) {
   return { deleted: true as const };
 }
 
+export async function restoreVisitorReply(replyId: number, visitorId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const [existing] = await db.select({ id: commentReplies.id, deletedAt: commentReplies.deletedAt })
+    .from(commentReplies)
+    .where(and(eq(commentReplies.id, replyId), eq(commentReplies.visitorId, visitorId)))
+    .limit(1);
+  if (!existing?.deletedAt || Date.now() - existing.deletedAt.getTime() > 5_000) return { restored: false as const, reason: "undo-window-expired" as const };
+
+  await db.update(commentReplies).set({ deletedAt: null, updatedAt: new Date() }).where(eq(commentReplies.id, replyId));
+  return { restored: true as const };
+}
+
+export async function updateVisitorReply(input: { replyId: number; visitorId: string; body: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  if (await getActiveVisitorRestriction(input.visitorId)) return { updated: false as const, reason: "comment-restricted" as const };
+
+  const [existing] = await db.select({ id: commentReplies.id, displayName: commentReplies.displayName, createdAt: commentReplies.createdAt })
+    .from(commentReplies)
+    .where(and(eq(commentReplies.id, input.replyId), eq(commentReplies.visitorId, input.visitorId), isNull(commentReplies.deletedAt)))
+    .limit(1);
+  if (!existing) return { updated: false as const, reason: "reply-not-found" as const };
+  if (Date.now() - existing.createdAt.getTime() > 15 * 60 * 1_000) return { updated: false as const, reason: "edit-window-expired" as const };
+
+  const body = input.body.trim();
+  if (!passesAutomaticCommentScreening({ displayName: existing.displayName, body })) return { updated: false as const, reason: "content-not-allowed" as const };
+  await db.update(commentReplies).set({ body, updatedAt: new Date() }).where(eq(commentReplies.id, input.replyId));
+  return { updated: true as const };
+}
+
 export async function submitCommentReply(input: VisitorOwnedCommentInput & { commentId: number; parentReplyId?: number | null }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");

@@ -5,11 +5,13 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ArticleComments from "./ArticleComments";
 
-const { reactMutate, submitMutate, submitReplyMutate, deleteReplyMutate, undoMutate, reportMutate, setCommentsData, toastSuccess } = vi.hoisted(() => ({
+const { reactMutate, submitMutate, submitReplyMutate, deleteReplyMutate, restoreReplyMutate, updateReplyMutate, undoMutate, reportMutate, setCommentsData, toastSuccess } = vi.hoisted(() => ({
   reactMutate: vi.fn(),
   submitMutate: vi.fn(),
   submitReplyMutate: vi.fn(),
   deleteReplyMutate: vi.fn(),
+  restoreReplyMutate: vi.fn(),
+  updateReplyMutate: vi.fn(),
   undoMutate: vi.fn(),
   reportMutate: vi.fn(),
   setCommentsData: vi.fn(),
@@ -21,7 +23,7 @@ vi.mock("@/lib/trpc", () => ({
     useUtils: () => ({ interactions: { listComments: { setData: setCommentsData } } }),
     interactions: {
       listComments: { useQuery: () => ({
-        data: [{ id: 24, displayName: "زائر", body: "تعليق صالح للاختبار", avatarKind: "wave", avatarUrl: null, rating: null, hearts: 2, broken: 0, viewerReaction: null, isOwner: false, createdAt: "2026-08-16T13:42:00.000Z", replies: [{ id: 25, parentReplyId: null, displayName: "زائر آخر", body: "رد سابق ملتصق بالتعليق", avatarKind: "leaf", avatarUrl: null, hearts: 1, broken: 0, viewerReaction: null, isOwner: true, createdAt: "2026-08-16T13:44:00.000Z" }] }],
+        data: [{ id: 24, displayName: "زائر", body: "تعليق صالح للاختبار", avatarKind: "wave", avatarUrl: null, rating: null, hearts: 2, broken: 0, viewerReaction: null, isOwner: false, createdAt: "2026-08-16T13:42:00.000Z", replies: [{ id: 25, parentReplyId: null, displayName: "زائر آخر", body: "رد سابق ملتصق بالتعليق", avatarKind: "leaf", avatarUrl: null, hearts: 1, broken: 0, viewerReaction: null, isOwner: true, createdAt: new Date().toISOString() }] }],
         isLoading: false,
         refetch: vi.fn(),
       }) },
@@ -37,8 +39,16 @@ vi.mock("@/lib/trpc", () => ({
         mutate: (input: unknown) => undoMutate(input),
         isPending: false,
       }) },
-      deleteReply: { useMutation: (options: { onSuccess?: (value: { deleted: boolean }) => void }) => ({
-        mutate: (input: unknown) => { deleteReplyMutate(input); options.onSuccess?.({ deleted: true }); },
+      deleteReply: { useMutation: (options: { onSuccess?: (value: { deleted: boolean }, variables: { replyId: number; visitorId: string }) => void }) => ({
+        mutate: (input: { replyId: number; visitorId: string }) => { deleteReplyMutate(input); options.onSuccess?.({ deleted: true }, input); },
+        isPending: false,
+      }) },
+      restoreReply: { useMutation: (options: { onSuccess?: (value: { restored: boolean }) => void }) => ({
+        mutate: (input: unknown) => { restoreReplyMutate(input); options.onSuccess?.({ restored: true }); },
+        isPending: false,
+      }) },
+      updateReply: { useMutation: (options: { onSuccess?: (value: { updated: boolean }) => void }) => ({
+        mutate: (input: unknown) => { updateReplyMutate(input); options.onSuccess?.({ updated: true }); },
         isPending: false,
       }) },
       react: { useMutation: () => ({ mutate: reactMutate, isPending: false }) },
@@ -57,6 +67,8 @@ afterEach(() => {
   submitMutate.mockClear();
   submitReplyMutate.mockClear();
   deleteReplyMutate.mockClear();
+  restoreReplyMutate.mockClear();
+  updateReplyMutate.mockClear();
   undoMutate.mockClear();
   reportMutate.mockClear();
   setCommentsData.mockClear();
@@ -184,17 +196,39 @@ describe("ArticleComments", () => {
     expect(screen.queryByRole("textbox", { name: "ردك" })).toBeNull();
   });
 
-  it("يعرض حذف الرد للمالك ويطلب التأكيد قبل تنفيذ الحذف", async () => {
+  it("يعرض أدوات تحرير وحذف الرد للمالك فقط ويطلب التأكيد قبل تنفيذ الحذف", async () => {
     const user = userEvent.setup();
     render(<ArticleComments pageKey="article-test" />);
 
     const commentCard = screen.getByText("تعليق صالح للاختبار").closest("article");
     await user.click(within(commentCard!).getByRole("button", { name: "عرض الردود (1)" }));
+    expect(screen.getByRole("button", { name: "تعديل الرد" })).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "حذف الرد" }));
     const deleteDialog = await screen.findByRole("alertdialog");
     expect(within(deleteDialog).getByText("حذف ردك؟")).toBeTruthy();
     await user.click(within(deleteDialog).getByRole("button", { name: "حذف الرد" }));
 
     expect(deleteReplyMutate).toHaveBeenCalledWith(expect.objectContaining({ replyId: 25 }));
+    expect(toastSuccess).toHaveBeenCalledWith("تم حذف ردك.", expect.objectContaining({ action: expect.objectContaining({ label: "تراجع" }), duration: 5_000 }));
+    const notificationOptions = toastSuccess.mock.calls.at(-1)?.[1] as { action: { onClick: () => void } };
+    notificationOptions.action.onClick();
+    expect(restoreReplyMutate).toHaveBeenCalledWith(expect.objectContaining({ replyId: 25 }));
+  });
+
+  it("يفتح محرر تعديل مضمّنًا ويحفظ التعديل لصاحب الرد ضمن المهلة", async () => {
+    const user = userEvent.setup();
+    render(<ArticleComments pageKey="article-test" />);
+
+    const commentCard = screen.getByText("تعليق صالح للاختبار").closest("article");
+    await user.click(within(commentCard!).getByRole("button", { name: "عرض الردود (1)" }));
+    await user.click(screen.getByRole("button", { name: "تعديل الرد" }));
+
+    const editor = screen.getByRole("textbox", { name: "نص الرد" });
+    expect((editor as HTMLTextAreaElement).value).toBe("رد سابق ملتصق بالتعليق");
+    await user.clear(editor);
+    await user.type(editor, "رد جرى تعديله داخل المهلة");
+    await user.click(screen.getByRole("button", { name: "حفظ التعديل" }));
+
+    expect(updateReplyMutate).toHaveBeenCalledWith(expect.objectContaining({ replyId: 25, body: "رد جرى تعديله داخل المهلة" }));
   });
 });

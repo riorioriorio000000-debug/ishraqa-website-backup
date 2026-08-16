@@ -71,6 +71,9 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   const [editingCommentId, setEditingCommentId] = useState<number>();
   const [commentPendingDeletion, setCommentPendingDeletion] = useState<number>();
   const [replyPendingDeletion, setReplyPendingDeletion] = useState<number>();
+  const [replyUndoTarget, setReplyUndoTarget] = useState<number>();
+  const [editingReplyId, setEditingReplyId] = useState<number>();
+  const [editReplyBody, setEditReplyBody] = useState("");
   const [reactingTo, setReactingTo] = useState<Array<number | string>>([]);
   const [undoingCommentId, setUndoingCommentId] = useState<number>();
   const [status, setStatus] = useState<string>();
@@ -115,10 +118,63 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     setStatus(result.deleted ? "حُذف تعليقك. يمكنك إضافة تعليق جديد متى أردت." : "تعذر حذف التعليق لأنه لم يعد متاحًا ضمن ملكيتك.");
     void comments.refetch();
   } });
-  const removeReply = trpc.interactions.deleteReply.useMutation({
+  const restoreReply = trpc.interactions.restoreReply.useMutation({
     onSuccess: result => {
+      setReplyUndoTarget(undefined);
+      if (result.restored) {
+        setStatus("تمت استعادة ردك.");
+        toast.success("تمت استعادة ردك.");
+      } else {
+        const message = result.reason === "undo-window-expired" ? "انتهت مهلة التراجع عن حذف الرد." : "تعذر استعادة الرد الآن.";
+        setStatus(message);
+        toast.error(message);
+      }
+      void comments.refetch();
+    },
+    onError: () => {
+      setReplyUndoTarget(undefined);
+      setStatus("تعذر استعادة الرد الآن. يرجى المحاولة لاحقًا.");
+      toast.error("تعذر استعادة الرد الآن. يرجى المحاولة لاحقًا.");
+    },
+  });
+  const updateReply = trpc.interactions.updateReply.useMutation({
+    onSuccess: result => {
+      if (result.updated) {
+        setEditingReplyId(undefined);
+        setEditReplyBody("");
+        setStatus("تم حفظ تعديل ردك.");
+        toast.success("تم حفظ تعديل ردك.");
+        void comments.refetch();
+        return;
+      }
+      const message = result.reason === "edit-window-expired" ? "انتهت مهلة تعديل الرد." : result.reason === "content-not-allowed" ? "تعذر حفظ التعديل لأن الصياغة تحتاج تعديلًا بسيطًا." : "تعذر العثور على ردك لتعديله.";
+      setStatus(message);
+      toast.error(message);
+    },
+    onError: () => {
+      setStatus("تعذر حفظ تعديل الرد الآن. يرجى المحاولة لاحقًا.");
+      toast.error("تعذر حفظ تعديل الرد الآن. يرجى المحاولة لاحقًا.");
+    },
+  });
+  const removeReply = trpc.interactions.deleteReply.useMutation({
+    onSuccess: (result, variables) => {
       setReplyPendingDeletion(undefined);
-      setStatus(result.deleted ? "حُذف ردك." : "تعذر حذف الرد لأنه لم يعد متاحًا ضمن ملكيتك.");
+      if (result.deleted) {
+        setStatus("حُذف ردك.");
+        setReplyUndoTarget(variables.replyId);
+        toast.success("تم حذف ردك.", {
+          description: "يمكنك التراجع خلال 5 ثوانٍ.",
+          duration: 5_000,
+          action: {
+            label: "تراجع",
+            onClick: () => {
+              if (visitorId) restoreReply.mutate({ replyId: variables.replyId, visitorId });
+            },
+          },
+        });
+      } else {
+        setStatus("تعذر حذف الرد لأنه لم يعد متاحًا ضمن ملكيتك.");
+      }
       void comments.refetch();
     },
     onError: () => {
@@ -177,6 +233,11 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     }
   }, []);
   useEffect(() => { if (feedback.data) setRatingPrivate(!feedback.data.ownIsPublic); }, [feedback.data]);
+  useEffect(() => {
+    if (!replyUndoTarget) return;
+    const timeout = window.setTimeout(() => setReplyUndoTarget(undefined), 5_000);
+    return () => window.clearTimeout(timeout);
+  }, [replyUndoTarget]);
   const ownComment = comments.data?.find(comment => comment.isOwner);
   const isWorking = submit.isPending || update.isPending || updateFeedback.isPending || submitReply.isPending;
 
@@ -242,6 +303,25 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     setReplyTarget(undefined);
     setReplyBody("");
   }
+  function isReplyEditable(createdAt: Date | string | number) {
+    const publishedAt = new Date(createdAt).getTime();
+    return !Number.isNaN(publishedAt) && Date.now() - publishedAt <= 15 * 60 * 1_000;
+  }
+  function startReplyEdit(replyId: number, currentBody: string) {
+    setReplyTarget(undefined);
+    setReplyBody("");
+    setEditingReplyId(replyId);
+    setEditReplyBody(currentBody);
+  }
+  function cancelReplyEdit() {
+    setEditingReplyId(undefined);
+    setEditReplyBody("");
+  }
+  function submitReplyEdit(event: FormEvent<HTMLFormElement>, replyId: number) {
+    event.preventDefault();
+    if (!visitorId || editReplyBody.trim().length < 4) return;
+    updateReply.mutate({ replyId, visitorId, body: editReplyBody.trim() });
+  }
   function toggleReplyReaction(replyId: number, current: "heart" | "broken" | null, requested: "heart" | "broken") {
     const reactionKey = `reply:${replyId}`;
     if (!visitorId || reactingTo.includes(reactionKey)) return;
@@ -268,8 +348,8 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
       {isExpanded && <div id={`replies-${comment.id}`}>
         {comment.replies?.map(reply => <article className={`comment-reply-card ${reply.parentReplyId ? "is-nested" : ""}`} key={reply.id}>
           <div className="comment-avatar comment-reply-avatar" aria-hidden="true">{reply.avatarUrl ? <img src={reply.avatarUrl} alt="" loading="lazy" /> : <AvatarArt kind={avatarKinds.includes(reply.avatarKind as AvatarKind) ? reply.avatarKind as AvatarKind : "wave"} />}</div>
-          <div className="comment-copy"><strong>{reply.displayName}</strong><time className="comment-date" dateTime={contributionDateTime(reply.createdAt)}>{formatContributionDate(reply.createdAt)}</time><p>{reply.body}</p>
-            <div className="comment-reactions"><button type="button" className={`${reply.viewerReaction === "heart" ? "active " : ""}heart ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "heart")} aria-pressed={reply.viewerReaction === "heart"} aria-label="أعجبني الرد"><Heart size={16} fill="currentColor" /> <span>{reply.hearts}</span></button><button type="button" className={`${reply.viewerReaction === "broken" ? "active " : ""}broken ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "broken")} aria-pressed={reply.viewerReaction === "broken"} aria-label="لم يعجبني الرد"><HeartCrack size={16} /> <span>{reply.broken}</span></button><button type="button" className="comment-reply-action" disabled={!visitorId} onClick={() => openReply(comment.id, reply.id, reply.displayName)}><MessageCircle size={14} /> رد</button><button type="button" className="comment-report-action" disabled={!visitorId} onClick={() => { setReportDetails(""); setReportTarget({ type: "reply", id: reply.id }); }}><Flag size={15} /> إبلاغ</button>{reply.isOwner && <button type="button" className="comment-reply-delete-action" disabled={removeReply.isPending || !visitorId} onClick={() => setReplyPendingDeletion(reply.id)} aria-label="حذف الرد"><Trash2 size={14} /> حذف</button>}</div>
+          <div className="comment-copy"><strong>{reply.displayName}</strong><time className="comment-date" dateTime={contributionDateTime(reply.createdAt)}>{formatContributionDate(reply.createdAt)}</time>{editingReplyId === reply.id ? <form className="comment-reply-form comment-reply-edit-form" onSubmit={event => submitReplyEdit(event, reply.id)}><div><strong>تعديل ردك</strong><button type="button" onClick={cancelReplyEdit}>إلغاء</button></div><label>نص الرد<textarea value={editReplyBody} onChange={event => setEditReplyBody(event.target.value)} minLength={4} maxLength={800} required autoFocus /></label><div className="comment-reply-form-actions"><button className="button" type="submit" disabled={updateReply.isPending || editReplyBody.trim().length < 4}>{updateReply.isPending ? "جارٍ الحفظ…" : "حفظ التعديل"}</button></div></form> : <><p>{reply.body}</p>
+            <div className="comment-reactions"><button type="button" className={`${reply.viewerReaction === "heart" ? "active " : ""}heart ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "heart")} aria-pressed={reply.viewerReaction === "heart"} aria-label="أعجبني الرد"><Heart size={16} fill="currentColor" /> <span>{reply.hearts}</span></button><button type="button" className={`${reply.viewerReaction === "broken" ? "active " : ""}broken ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "broken")} aria-pressed={reply.viewerReaction === "broken"} aria-label="لم يعجبني الرد"><HeartCrack size={16} /> <span>{reply.broken}</span></button><button type="button" className="comment-reply-action" disabled={!visitorId} onClick={() => openReply(comment.id, reply.id, reply.displayName)}><MessageCircle size={14} /> رد</button><button type="button" className="comment-report-action" disabled={!visitorId} onClick={() => { setReportDetails(""); setReportTarget({ type: "reply", id: reply.id }); }}><Flag size={15} /> إبلاغ</button>{reply.isOwner && isReplyEditable(reply.createdAt) && <button type="button" className="comment-reply-edit-action" disabled={updateReply.isPending || !visitorId} onClick={() => startReplyEdit(reply.id, reply.body)} aria-label="تعديل الرد"><Pencil size={14} /> تعديل</button>}{reply.isOwner && <button type="button" className="comment-reply-delete-action" disabled={removeReply.isPending || !visitorId} onClick={() => setReplyPendingDeletion(reply.id)} aria-label="حذف الرد"><Trash2 size={14} /> حذف</button>}</div></>}
             {replyComposer(comment.id, reply.id)}</div>
         </article>)}
       </div>}
@@ -291,7 +371,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     </div>
     <Dialog open={profileOpen} onOpenChange={setProfileOpen}><DialogContent className="comment-profile-dialog" dir="rtl"><DialogHeader><DialogTitle>{dialogTitle}</DialogTitle><DialogDescription>{profileDescription}</DialogDescription></DialogHeader>{profileMode === "rating-settings" ? <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي للعامة.</label> : <div className="comment-profile-fields"><label>اسم العرض<input value={displayName} onChange={event => setDisplayName(event.target.value)} minLength={2} maxLength={64} placeholder="اسمك" required /></label><div className="profile-avatar-picker"><span>صورة الملف الشخصي <small>اختيارية</small></span><div className="profile-avatar-preview">{avatarPreview ? <img src={avatarPreview} alt="معاينة صورة الملف الشخصي" /> : <AvatarArt kind={avatarKind} />}</div><div className="ready-avatar-options"><span>اختر صورة جاهزة</span><div>{readyAvatarOptions.map(avatar => <button type="button" key={avatar.url} className={avatarPreview === avatar.url ? "active" : ""} onClick={() => setAvatarPreview(avatar.url)} aria-label={avatar.label}><img src={avatar.url} alt="" /></button>)}</div></div></div>{profileMode === "comment" && showLinkedRating && feedback.data?.ownRating && <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي بجانب تعليقي.</label>}</div>}<DialogFooter><button type="button" className="button ghost" onClick={() => setProfileOpen(false)}>إلغاء</button><button type="button" className="button" disabled={profileActionDisabled} onClick={publishWithProfile}>{profileActionLabel}</button></DialogFooter></DialogContent></Dialog>
     <AlertDialog open={Boolean(commentPendingDeletion)} onOpenChange={open => { if (!open && !remove.isPending) setCommentPendingDeletion(undefined); }}><AlertDialogContent dir="rtl"><AlertDialogHeader><AlertDialogTitle>حذف تعليقك؟</AlertDialogTitle><AlertDialogDescription>سيُحذف تعليقك من الصفحة، وستتمكن من كتابة تعليق جديد بعد الحذف.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction className="bg-red-700 text-white hover:bg-red-800" disabled={remove.isPending || !visitorId} onClick={event => { event.preventDefault(); if (commentPendingDeletion && visitorId) remove.mutate({ commentId: commentPendingDeletion, visitorId }); }}>{remove.isPending ? "جارٍ الحذف…" : "حذف التعليق"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
-    <AlertDialog open={Boolean(replyPendingDeletion)} onOpenChange={open => { if (!open && !removeReply.isPending) setReplyPendingDeletion(undefined); }}><AlertDialogContent dir="rtl"><AlertDialogHeader><AlertDialogTitle>حذف ردك؟</AlertDialogTitle><AlertDialogDescription>سيُحذف ردك من الصفحة بعد التأكيد، ولا يمكن استعادته من الواجهة.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction className="bg-red-700 text-white hover:bg-red-800" disabled={removeReply.isPending || !visitorId} onClick={event => { event.preventDefault(); if (replyPendingDeletion && visitorId) removeReply.mutate({ replyId: replyPendingDeletion, visitorId }); }}>{removeReply.isPending ? "جارٍ الحذف…" : "حذف الرد"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+    <AlertDialog open={Boolean(replyPendingDeletion)} onOpenChange={open => { if (!open && !removeReply.isPending) setReplyPendingDeletion(undefined); }}><AlertDialogContent dir="rtl"><AlertDialogHeader><AlertDialogTitle>حذف ردك؟</AlertDialogTitle><AlertDialogDescription>سيُحذف ردك من الصفحة بعد التأكيد، ويمكنك التراجع من الإشعار لمدة خمس ثوانٍ.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction className="bg-red-700 text-white hover:bg-red-800" disabled={removeReply.isPending || !visitorId} onClick={event => { event.preventDefault(); if (replyPendingDeletion && visitorId) removeReply.mutate({ replyId: replyPendingDeletion, visitorId }); }}>{removeReply.isPending ? "جارٍ الحذف…" : "حذف الرد"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
     <Dialog open={Boolean(reportTarget)} onOpenChange={open => { if (!open && !report.isPending) setReportTarget(undefined); }}><DialogContent className="comment-report-dialog" dir="rtl"><DialogHeader><DialogTitle>الإبلاغ عن محتوى</DialogTitle><DialogDescription>اكتب سبب الإبلاغ بإيجاز. يراجع النظام النص والاسم وصورة الملف الشخصي عند وجودها، ولا يُحذف المحتوى أو يُقيّد صاحبه إلا عند تأكيد مخالفة فعلية.</DialogDescription></DialogHeader><div className="comment-report-fields"><label>سبب الإبلاغ<textarea value={reportDetails} onChange={event => setReportDetails(event.target.value)} minLength={4} maxLength={700} placeholder="مثال: إساءة، محتوى غير لائق، أو صورة ملف غير مناسبة…" required autoFocus /></label></div><DialogFooter><button type="button" className="button ghost" disabled={report.isPending} onClick={() => setReportTarget(undefined)}>إلغاء</button><button type="button" className="button" disabled={!visitorId || !reportTarget || report.isPending || reportDetails.trim().length < 4} onClick={() => visitorId && reportTarget && report.mutate({ reporterVisitorId: visitorId, targetType: reportTarget.type, targetId: reportTarget.id, reason: inferReportReason(reportDetails), details: reportDetails.trim() })}>{report.isPending ? "جارٍ الإرسال…" : "إرسال البلاغ"}</button></DialogFooter></DialogContent></Dialog>
   </section>;
 }
