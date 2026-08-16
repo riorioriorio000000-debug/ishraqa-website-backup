@@ -1,6 +1,7 @@
 import { BellRing, Heart, MessageCircle, ShieldCheck, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
+import BrandMark from "@/components/BrandMark";
 import PageMeta from "@/components/PageMeta";
 import SiteShell from "@/components/SiteShell";
 import { trpc } from "@/lib/trpc";
@@ -62,6 +63,7 @@ export default function NotificationPreferencesPage() {
     <main className="inner-page notification-preferences-page" dir="rtl">
       <section className="inner-hero notification-preferences-hero">
         <div className="shell">
+          <div className="notification-preferences-brand" aria-label="شركة الإشراقة"><BrandMark size={92} /></div>
           <span className="eyebrow"><i /> تحكم بسيط</span>
           <h1>تفضيلات الإشعارات</h1>
           <p>اختر ما تريد تلقيه على هذا المتصفح، من دون إنشاء حساب أو إدخال بيانات اتصال.</p>
