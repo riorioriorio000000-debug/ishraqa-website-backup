@@ -1,4 +1,5 @@
 import { articleEntries, resolveLegacyArticleSlug } from "@/pages/ArticleDetail";
+import { getLocalServicePage, getLocalServicePagePath, localServicePages, resolveLocalServiceSlug } from "@/data/localServicePages";
 
 export type SsrHeadMeta = {
   title: string;
@@ -40,13 +41,22 @@ const privatePages: Record<string, Omit<SsrHeadMeta, "canonicalPath">> = {
 };
 
 export function getSitemapPaths(): readonly string[] {
-  return [...Object.keys(publicPages), ...articleEntries.map((article) => `/articles/${article.slug}`)];
+  return [...Object.keys(publicPages), ...articleEntries.map((article) => `/articles/${article.slug}`), ...localServicePages.map((page) => getLocalServicePagePath(page.serviceSlug, page.citySlug))];
 }
 
 export function getLegacyArticleRedirectPath(articleSlug: string) {
   const canonicalSlug = resolveLegacyArticleSlug(articleSlug);
   const article = articleEntries.find((entry) => entry.slug === canonicalSlug);
   return article && article.slug !== articleSlug ? `/articles/${article.slug}` : undefined;
+}
+
+export function getLegacyLocalServiceRedirectPath(pathname: string) {
+  const match = pathname.match(/^\/services\/([^/]+)\/([^/]+)$/);
+  if (!match) return undefined;
+  const [, serviceSlug, citySlug] = match;
+  const canonicalServiceSlug = resolveLocalServiceSlug(serviceSlug);
+  const page = getLocalServicePage(canonicalServiceSlug, citySlug);
+  return page && canonicalServiceSlug !== serviceSlug ? getLocalServicePagePath(page.serviceSlug, page.citySlug) : undefined;
 }
 
 export function getSsrHeadMeta(url: string): SsrHeadMeta {
@@ -65,6 +75,11 @@ export function getSsrHeadMeta(url: string): SsrHeadMeta {
         ogType: "article",
       };
     }
+  }
+  const serviceMatch = path.match(/^\/services\/([^/]+)\/([^/]+)$/);
+  if (serviceMatch) {
+    const page = getLocalServicePage(serviceMatch[1], serviceMatch[2]);
+    if (page) return { title: page.title, description: page.description, keywords: page.keywords, canonicalPath: getLocalServicePagePath(page.serviceSlug, page.citySlug), image: page.image, imageAlt: `صورة مشاركة لخدمة ${page.serviceName} في ${page.cityName}`, ogType: "article" };
   }
   const page = publicPages[path] ?? privatePages[path];
   if (page) return { ...page, canonicalPath: path, image: page.image ?? defaultImage, imageAlt: page.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش" };

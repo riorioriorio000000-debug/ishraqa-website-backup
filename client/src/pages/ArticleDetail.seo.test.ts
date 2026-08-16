@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { articleEntries } from "./ArticleDetail";
 
 describe("مكتبة المقالات وSEO", () => {
-  it("تحتوي 65 مقالة قابلة للفهرسة مع كلمات وصفية وروابط فريدة", () => {
-    expect(articleEntries).toHaveLength(65);
-    expect(new Set(articleEntries.map((article) => article.slug)).size).toBe(65);
+  it("تحتوي 70 مقالة قابلة للفهرسة مع كلمات وصفية وروابط فريدة", () => {
+    expect(articleEntries).toHaveLength(70);
+    expect(new Set(articleEntries.map((article) => article.slug)).size).toBe(70);
     articleEntries.forEach((article) => {
       expect(article.title.trim()).not.toBe("");
       expect(article.intro.trim()).not.toBe("");

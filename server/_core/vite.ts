@@ -7,7 +7,7 @@ import { pathToFileURL } from "url";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 import superjson from "superjson";
-import { getLegacyArticleRedirectPath, getSitemapPaths, type SsrHeadMeta } from "../../client/src/ssr/meta";
+import { getLegacyArticleRedirectPath, getLegacyLocalServiceRedirectPath, getSitemapPaths, type SsrHeadMeta } from "../../client/src/ssr/meta";
 
 const canonicalOrigin = "https://al-eshraqa.co";
 
@@ -52,8 +52,12 @@ export function getLegacyArticleRedirectTarget(pathname: string) {
   return legacySlug ? getLegacyArticleRedirectPath(legacySlug) : undefined;
 }
 
-function redirectLegacyArticle(req: Request, res: Response, next: NextFunction) {
-  const redirectTarget = getLegacyArticleRedirectTarget(req.path);
+export function getLegacyRedirectTarget(pathname: string) {
+  return getLegacyArticleRedirectTarget(pathname) ?? getLegacyLocalServiceRedirectPath(pathname);
+}
+
+function redirectLegacyPath(req: Request, res: Response, next: NextFunction) {
+  const redirectTarget = getLegacyRedirectTarget(req.path);
   if (!redirectTarget) return next();
   const queryStart = req.originalUrl.indexOf("?");
   const query = queryStart >= 0 ? req.originalUrl.slice(queryStart) : "";
@@ -74,7 +78,8 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.get("/articles/:legacySlug", redirectLegacyArticle);
+  app.get("/articles/:legacySlug", redirectLegacyPath);
+  app.get("/services/:serviceSlug/:citySlug", redirectLegacyPath);
   app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {
@@ -114,7 +119,8 @@ export function serveStatic(app: Express) {
   }
 
   app.get("/index.html", (_req, res) => res.redirect(301, "/"));
-  app.get("/articles/:legacySlug", redirectLegacyArticle);
+  app.get("/articles/:legacySlug", redirectLegacyPath);
+  app.get("/services/:serviceSlug/:citySlug", redirectLegacyPath);
   app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(express.static(distPath, { index: false, redirect: false }));
   app.use("*", async (req, res, next) => {

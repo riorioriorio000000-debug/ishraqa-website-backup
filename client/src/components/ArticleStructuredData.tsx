@@ -41,7 +41,16 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
       },
     },
   };
+  const breadcrumbPayload = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "الرئيسية", item: "https://al-eshraqa.co/" },
+      { "@type": "ListItem", position: 2, name: "المقالات", item: "https://al-eshraqa.co/articles" },
+      { "@type": "ListItem", position: 3, name: article.title, item: canonicalUrl },
+    ],
+  };
 
   const visual = articleVisual(article);
-  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }} /><figure className="article-visual"><img src={visual.src} srcSet={visual.srcSet} sizes="(max-width: 640px) 76vw, 420px" alt={visual.alt} loading="lazy" decoding="async" /><figcaption>مرئي توضيحي من خدمات الإشراقة</figcaption></figure></>;
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbPayload) }} /><figure className="article-visual"><img src={visual.src} srcSet={visual.srcSet} sizes="(max-width: 640px) 76vw, 420px" alt={visual.alt} loading="lazy" decoding="async" /><figcaption>مرئي توضيحي من خدمات الإشراقة</figcaption></figure></>;
 }

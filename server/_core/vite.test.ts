@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { getSsrHeadMeta } from "../../client/src/ssr/meta";
-import { composeHtml, getLegacyArticleRedirectTarget } from "./vite";
+import { composeHtml, getLegacyArticleRedirectTarget, getLegacyRedirectTarget } from "./vite";
 
 describe("التحويلات الدائمة وعرض SEO الخادمي", () => {
   it("يحدد وجهة الرابط المفهرس القديم فقط دون إعادة تحويل الرابط القانوني", () => {
     expect(getLegacyArticleRedirectTarget("/articles/riyadh")).toBe("/articles/cleaning-riyadh");
     expect(getLegacyArticleRedirectTarget("/articles/riyadh-service-guide")).toBe("/articles/cleaning-riyadh");
     expect(getLegacyArticleRedirectTarget("/articles/cleaning-riyadh")).toBeUndefined();
+  });
+
+  it("يوحّد مسار خدمة التنظيف البديل مع المسار القانوني الدائم", () => {
+    expect(getLegacyRedirectTarget("/services/cleaning/riyadh")).toBe("/services/home-cleaning/riyadh");
+    expect(getLegacyRedirectTarget("/services/home-cleaning/riyadh")).toBeUndefined();
   });
 
   it("يدمج الوصف العربي للمقال داخل HTML الأولي قبل تشغيل JavaScript", () => {

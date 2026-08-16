@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getLegacyArticleRedirectPath, getSsrHeadMeta } from "./meta";
+import { getLegacyArticleRedirectPath, getSitemapPaths, getSsrHeadMeta } from "./meta";
 
 describe("البيانات الوصفية للعرض الخادمي", () => {
   it("ينشئ للصفحة الرئيسية عنوانًا ووصفًا وcanonical محليًا دون حشو أو وعود ترتيب", () => {
@@ -38,6 +38,19 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
       canonicalPath: "/articles/cleaning-riyadh",
       ogType: "article",
     });
+  });
+
+  it("ينشئ صفحة خدمة ومدينة مستقلة بعنوان ووصف وصورة وسجل sitemap", () => {
+    const path = "/services/home-cleaning/riyadh";
+    const meta = getSsrHeadMeta(path);
+
+    expect(meta.canonicalPath).toBe(path);
+    expect(meta.title).toContain("تنظيف منازل");
+    expect(meta.title).toContain("الرياض");
+    expect(meta.description).toContain("واتساب");
+    expect(meta.image).toContain("/manus-storage/");
+    expect(meta.ogType).toBe("article");
+    expect(getSitemapPaths()).toContain(path);
   });
 
   it("يحجب صفحات الإشعارات عن الفهرسة ويعيد حالة not-found للمسارات غير المعروفة", () => {
