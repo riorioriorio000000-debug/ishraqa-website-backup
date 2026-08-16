@@ -1,4 +1,5 @@
 import { ArrowLeft, CheckCircle2, MapPin, MessageCircle } from "lucide-react";
+import React from "react";
 import { Link, useRoute } from "wouter";
 import SiteShell from "@/components/SiteShell";
 import PageMeta from "@/components/PageMeta";
@@ -15,6 +16,18 @@ function LocalServiceSchema({ page }: { page: NonNullable<ReturnType<typeof getL
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "الرئيسية", item: "https://al-eshraqa.co/" }, { "@type": "ListItem", position: 2, name: "الخدمات", item: "https://al-eshraqa.co/services" }, { "@type": "ListItem", position: 3, name: page.serviceName }, { "@type": "ListItem", position: 4, name: page.cityName, item: canonical }] },
   ];
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(graph) }} />;
+}
+
+function QuickWhatsappForm({ serviceName, cityName }: { serviceName: string; cityName: string }) {
+  return <section className="quick-whatsapp-form" aria-labelledby="quick-whatsapp-title">
+    <div><span className="eyebrow">استفسار سريع</span><h2 id="quick-whatsapp-title">اكتب التفاصيل وسنفتح واتساب برسالة جاهزة</h2><p>يكفي أن تذكر الحي ونوع المكان وما تحتاجه؛ لن نطلب منك إدخال رقم التواصل.</p></div>
+    <form onSubmit={(event) => { event.preventDefault(); const data = new FormData(event.currentTarget); const message = `مرحبًا، أرغب في ${serviceName} في ${cityName}.\nالحي: ${data.get("neighbourhood") || "غير محدد"}\nنوع المكان: ${data.get("place") || "غير محدد"}\nالتفاصيل: ${data.get("details") || "لا توجد تفاصيل إضافية"}`; window.open(`https://wa.me/966552610151?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer"); }}>
+      <label>الحي<input name="neighbourhood" required placeholder={`مثال: حي في ${cityName}`} autoComplete="address-level3" /></label>
+      <label>نوع المكان<input name="place" required placeholder="منزل، شقة، مكتب…" /></label>
+      <label className="quick-whatsapp-details">التفاصيل<textarea name="details" required rows={3} placeholder="صف احتياجك باختصار" /></label>
+      <button className="button" type="submit"><MessageCircle size={18} />إرسال الاستفسار عبر واتساب</button>
+    </form>
+  </section>;
 }
 
 export default function ServiceCityPage() {
@@ -35,6 +48,7 @@ export default function ServiceCityPage() {
         <section className="service-city-copy"><h2>كيف نرتب {page.serviceName} في {page.cityName}؟</h2><p>{page.serviceDetail}</p><p>{page.cityDetail}</p><p>تظهر في نتائج البحث عبارات مثل «أرخص شركة» أو «خدمة فورية»، لكن الاختيار المسؤول لا يقوم على وعد مختصر. اشرح حالتك وما تريد الوصول إليه، ثم راجع ملاءمة الخدمة للمكان قبل تثبيت أي توقعات عن السعر أو الموعد أو النتيجة.</p></section>
         <section className="service-city-neighbourhoods" aria-label={`أحياء ${page.cityName} المذكورة في الدليل`}><div><span className="eyebrow">مناطق يكثر السؤال عنها</span><h2>ابدأ بذكر الحي وطبيعة الوصول</h2><p>هذه أمثلة لمناطق داخل {page.cityName} تساعد على ترتيب وصف الموقع، ولا تعني وحدها توافرًا مؤكدًا للخدمة.</p></div><ul>{page.neighbourhoods.map((neighbourhood) => <li key={neighbourhood}><MapPin size={16} /> {neighbourhood}</li>)}</ul></section>
         <section className="service-city-preparation"><CheckCircle2 size={24} /><div><h2>تجهيز بسيط قبل التواصل</h2><p>{page.preparation}</p></div></section>
+        <QuickWhatsappForm serviceName={page.serviceName} cityName={page.cityName} />
         <section className="service-city-faq" aria-label={`أسئلة شائعة عن ${page.serviceName} في ${page.cityName}`}><span className="eyebrow">أسئلة شائعة</span><h2>إجابات مختصرة قبل إرسال الطلب</h2>{page.faq.map((item) => <details key={item.question}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}</section>
         <section className="service-city-related"><div><span className="eyebrow">مقالات ذات صلة</span><h2>خمسة أدلة تساعدك قبل ترتيب الخطوة التالية</h2></div><div className="service-city-related-grid">{related.map((article) => <Link href={`/articles/${article.slug}`} key={article.slug}><strong>{article.title}</strong><span>فتح الدليل <ArrowLeft size={14} /></span></Link>)}</div></section>
         <section className="service-city-nearby"><h2>خدمات أخرى في {page.cityName}</h2><div>{nearby.map((entry) => <Link href={getLocalServicePagePath(entry.serviceSlug, entry.citySlug)} key={entry.serviceSlug}>{entry.serviceName} <ArrowLeft size={14} /></Link>)}</div></section>

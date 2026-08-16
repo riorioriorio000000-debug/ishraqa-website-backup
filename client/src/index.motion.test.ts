@@ -15,4 +15,10 @@ describe("الحركة المخففة", () => {
     expect(css).toContain(".service-card:focus-within .service-art");
     expect(css).toContain(".hero-caddy-art:hover img");
   });
+
+  it("يمنح بطاقات الخدمات حركة تحويم هادئة ويوقفها عند تفضيل تقليل الحركة", () => {
+    expect(css).toContain(".inner-service-card:hover,.inner-service-card:focus-within");
+    expect(css).toContain("@media (hover:hover)");
+    expect(css).toMatch(/\.inner-service-card[^}]*transition:none!important/);
+  });
 });
