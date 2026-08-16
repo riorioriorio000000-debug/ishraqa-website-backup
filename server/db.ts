@@ -64,6 +64,9 @@ export async function createVisitorNotification(input: {
   targetPath?: string | null;
   entityType?: NotificationEntityType | null;
   entityId?: number | null;
+  actorDisplayName?: string | null;
+  actorAvatarKind?: string | null;
+  actorAvatarUrl?: string | null;
 }) {
   const db = await getDb();
   if (!db) return null;
@@ -79,6 +82,9 @@ export async function createVisitorNotification(input: {
     targetPath: input.targetPath?.slice(0, 280) || null,
     entityType: input.entityType || null,
     entityId: input.entityId ?? null,
+    actorDisplayName: input.actorDisplayName?.trim().slice(0, 64) || null,
+    actorAvatarKind: input.actorAvatarKind?.trim().slice(0, 32) || null,
+    actorAvatarUrl: input.actorAvatarUrl?.trim().slice(0, 1024) || null,
   });
   const [created] = await db.select({ id: siteNotifications.id }).from(siteNotifications)
     .where(and(eq(siteNotifications.visitorId, input.visitorId), eq(siteNotifications.title, input.title.slice(0, 160))))
@@ -93,6 +99,23 @@ export async function getVisitorNotifications(visitorId: string) {
     .where(eq(siteNotifications.visitorId, visitorId))
     .orderBy(desc(siteNotifications.createdAt), desc(siteNotifications.id))
     .limit(80);
+}
+
+async function getVisitorNotificationActor(visitorId: string) {
+  const db = await getDb();
+  if (!db) return null;
+  const [comment] = await db.select({ displayName: siteComments.displayName, avatarKind: siteComments.avatarKind, avatarUrl: siteComments.avatarUrl })
+    .from(siteComments)
+    .where(and(eq(siteComments.visitorId, visitorId), isNull(siteComments.deletedAt)))
+    .orderBy(desc(siteComments.updatedAt), desc(siteComments.id))
+    .limit(1);
+  if (comment) return comment;
+  const [reply] = await db.select({ displayName: commentReplies.displayName, avatarKind: commentReplies.avatarKind, avatarUrl: commentReplies.avatarUrl })
+    .from(commentReplies)
+    .where(and(eq(commentReplies.visitorId, visitorId), isNull(commentReplies.deletedAt)))
+    .orderBy(desc(commentReplies.updatedAt), desc(commentReplies.id))
+    .limit(1);
+  return reply ?? null;
 }
 
 export async function getUnreadNotificationCount(visitorId: string) {
@@ -589,6 +612,9 @@ export async function submitCommentReply(input: VisitorOwnedCommentInput & { com
       targetPath: notificationTargetPath(normalized.pageKey),
       entityType: "reply",
       entityId: created.id,
+      actorDisplayName: normalized.displayName,
+      actorAvatarKind: normalized.avatarKind,
+      actorAvatarUrl: normalized.avatarUrl,
     });
   }
   return { accepted: true as const, replyId: created?.id ?? null };
@@ -652,14 +678,18 @@ export async function setCommentReaction(input: { commentId: number; visitorId: 
   }
   await db.insert(commentReactions).values({ id, commentId: input.commentId, visitorId: input.visitorId, reaction: input.reaction }).onDuplicateKeyUpdate({ set: { reaction: input.reaction, updatedAt: new Date() } });
   if (comment.visitorId && comment.visitorId !== input.visitorId && existingReaction?.reaction !== input.reaction) {
+    const actor = await getVisitorNotificationActor(input.visitorId);
     void createVisitorNotification({
       visitorId: comment.visitorId,
       type: "reaction",
       title: "تفاعل جديد على تعليقك",
-      message: input.reaction === "heart" ? "أبدى أحد الزوار إعجابه بتعليقك." : "أضاف أحد الزوار تفاعلًا إلى تعليقك.",
+      message: input.reaction === "heart" ? `${actor?.displayName ?? "أحد الزوار"} أبدى إعجابه بتعليقك.` : `${actor?.displayName ?? "أحد الزوار"} أضاف تفاعلًا إلى تعليقك.`,
       targetPath: notificationTargetPath(comment.pageKey),
       entityType: "comment",
       entityId: input.commentId,
+      actorDisplayName: actor?.displayName,
+      actorAvatarKind: actor?.avatarKind,
+      actorAvatarUrl: actor?.avatarUrl,
     });
   }
   return { reaction: input.reaction };
@@ -679,14 +709,18 @@ export async function setCommentReplyReaction(input: { replyId: number; visitorI
   }
   await db.insert(commentReplyReactions).values({ id, replyId: input.replyId, visitorId: input.visitorId, reaction: input.reaction }).onDuplicateKeyUpdate({ set: { reaction: input.reaction, updatedAt: new Date() } });
   if (reply.visitorId !== input.visitorId && existingReaction?.reaction !== input.reaction) {
+    const actor = await getVisitorNotificationActor(input.visitorId);
     void createVisitorNotification({
       visitorId: reply.visitorId,
       type: "reaction",
       title: "تفاعل جديد على ردك",
-      message: input.reaction === "heart" ? "أبدى أحد الزوار إعجابه بردك." : "أضاف أحد الزوار تفاعلًا إلى ردك.",
+      message: input.reaction === "heart" ? `${actor?.displayName ?? "أحد الزوار"} أبدى إعجابه بردك.` : `${actor?.displayName ?? "أحد الزوار"} أضاف تفاعلًا إلى ردك.`,
       targetPath: notificationTargetPath(reply.pageKey),
       entityType: "reply",
       entityId: input.replyId,
+      actorDisplayName: actor?.displayName,
+      actorAvatarKind: actor?.avatarKind,
+      actorAvatarUrl: actor?.avatarUrl,
     });
   }
   return { reaction: input.reaction };

@@ -38,8 +38,8 @@ describe("مركز الإشعارات", () => {
   it("يفلتر حالة القراءة ويفتح الإشعار مع تعليم غير المقروء كمقروء", async () => {
     mocks.listNotificationsUseQuery.mockReturnValue({
       data: [
-        { id: 7, type: "reply", title: "رد جديد على تعليقك", message: "كتب زائر ردًا مفيدًا على تعليقك حول تنظيف المكيفات.", targetPath: "/articles/ac", entityType: "reply", entityId: 14, isRead: false, createdAt: new Date("2026-08-16T10:00:00Z") },
-        { id: 8, type: "report_review", title: "تمت مراجعة البلاغ", message: "لم يُكتشف محتوى مخالف بعد المراجعة.", targetPath: null, entityType: "report", entityId: 3, isRead: true, createdAt: new Date("2026-08-15T10:00:00Z") },
+        { id: 7, type: "reply", title: "رد جديد على تعليقك", message: "سارة كتبت ردًا مفيدًا على تعليقك حول تنظيف المكيفات.", targetPath: "/articles/ac", entityType: "reply", entityId: 14, isRead: false, createdAt: new Date("2026-08-16T10:00:00Z"), actorDisplayName: "سارة", actorAvatarKind: "leaf", actorAvatarUrl: "/manus-storage/sara-avatar.png" },
+        { id: 8, type: "reaction", title: "تفاعل جديد على تعليقك", message: "أحمد أبدى إعجابه بتعليقك.", targetPath: "/articles/jeddah", entityType: "comment", entityId: 9, isRead: true, createdAt: new Date("2026-08-15T10:00:00Z"), actorDisplayName: "أحمد", actorAvatarKind: "star", actorAvatarUrl: null },
       ],
       isLoading: false,
       isError: false,
@@ -48,11 +48,15 @@ describe("مركز الإشعارات", () => {
 
     render(<NotificationsPage />);
     expect(await screen.findByText("رد جديد على تعليقك")).toBeTruthy();
-    expect(screen.getByText("تمت مراجعة البلاغ")).toBeTruthy();
+    expect(screen.getByText("تفاعل جديد على تعليقك")).toBeTruthy();
+    expect(screen.getByText("سارة")).toBeTruthy();
+    expect(screen.getByAltText("صورة سارة").getAttribute("src")).toBe("/manus-storage/sara-avatar.png");
+    expect(screen.getByText("أحمد")).toBeTruthy();
+    expect(screen.getByLabelText("صورة أحمد")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: /غير مقروءة/ }));
     expect(screen.getByText("رد جديد على تعليقك")).toBeTruthy();
-    expect(screen.queryByText("تمت مراجعة البلاغ")).toBeNull();
+    expect(screen.queryByText("تفاعل جديد على تعليقك")).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: /فتح الإشعار/ }));
     await waitFor(() => expect(mocks.markReadMutate).toHaveBeenCalledWith({ visitorId: "f4ee2f36-6d7f-4e29-8cd9-c6a1e53d4a65", ids: [7] }));

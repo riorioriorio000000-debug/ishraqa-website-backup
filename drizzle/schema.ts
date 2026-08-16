@@ -150,6 +150,10 @@ export const siteNotifications = mysqlTable("site_notifications", {
   targetPath: varchar("targetPath", { length: 280 }),
   entityType: mysqlEnum("entityType", ["comment", "reply", "report", "system"]),
   entityId: int("entityId"),
+  /** Profile snapshot for replies and reactions; null keeps earlier/system notifications compatible. */
+  actorDisplayName: varchar("actorDisplayName", { length: 64 }),
+  actorAvatarKind: varchar("actorAvatarKind", { length: 32 }),
+  actorAvatarUrl: varchar("actorAvatarUrl", { length: 1024 }),
   isRead: boolean("isRead").notNull().default(false),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 }, (table) => ({
