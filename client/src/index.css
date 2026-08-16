@@ -811,9 +811,11 @@ img { -webkit-user-drag: none; user-drag: none; }
 .comment-reply-card .comment-copy > strong { display: inline-block; margin-left: .38rem; color: #15565a; font-size: .84rem; }
 .comment-date { display: inline-block; color: #6d8682; font-size: .67rem; font-variant-numeric: tabular-nums; }
 .comment-reply-card .comment-copy > p { margin: .35rem 0 .55rem; color: #3e6461; font-size: .86rem; line-height: 1.85; }
-.comment-reply-action, .comment-report-action { display: inline-flex; align-items: center; gap: .28rem; border: 0; background: transparent; color: #52706d; font: inherit; font-size: .72rem; font-weight: 800; cursor: pointer; transition: color .16s var(--ease-out), transform .16s var(--ease-out); }
+.comment-reply-action, .comment-report-action, .comment-reply-delete-action { display: inline-flex; align-items: center; gap: .28rem; border: 0; background: transparent; color: #52706d; font: inherit; font-size: .72rem; font-weight: 800; cursor: pointer; transition: color .16s var(--ease-out), transform .16s var(--ease-out), opacity .16s var(--ease-out); }
 .comment-reply-action:hover, .comment-reply-action:focus-visible { color: #0f5c63; outline: none; }
 .comment-report-action { color: #9b5a40; }.comment-report-action:hover, .comment-report-action:focus-visible { color: #a63b31; outline: none; }
+.comment-reply-delete-action { color: #8f5548; }.comment-reply-delete-action:hover, .comment-reply-delete-action:focus-visible { color: #a63b31; outline: none; }
+@media (hover: hover) and (pointer: fine) { .comment-reply-card .comment-reply-delete-action { opacity: 0; transform: translateX(3px); }.comment-reply-card:hover .comment-reply-delete-action, .comment-reply-card:focus-within .comment-reply-delete-action { opacity: 1; transform: translateX(0); } }
 .comment-reply-form { display: grid; gap: .7rem; margin: .1rem 0 .85rem; padding: .7rem 0; background: transparent; }
 .comment-reply-form-inline { margin: .9rem 0 .1rem; }
 .comment-reply-form > div { display: flex; align-items: center; justify-content: space-between; gap: .7rem; color: #15565a; font-size: .84rem; }.comment-reply-form > div button { border: 0; background: transparent; color: #8b6530; font: inherit; font-size: .76rem; font-weight: 800; cursor: pointer; }

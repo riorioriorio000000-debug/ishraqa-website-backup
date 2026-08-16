@@ -465,6 +465,29 @@ export async function deleteVisitorComment(commentId: number, visitorId: string)
   return { deleted: true as const };
 }
 
+export async function deleteVisitorReply(replyId: number, visitorId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const [existing] = await db.select({ id: commentReplies.id, commentId: commentReplies.commentId })
+    .from(commentReplies)
+    .where(and(eq(commentReplies.id, replyId), eq(commentReplies.visitorId, visitorId), isNull(commentReplies.deletedAt)))
+    .limit(1);
+  if (!existing) return { deleted: false as const };
+
+  await db.update(commentReplies).set({ deletedAt: new Date(), updatedAt: new Date() }).where(eq(commentReplies.id, replyId));
+  const [comment] = await db.select({ pageKey: siteComments.pageKey }).from(siteComments).where(eq(siteComments.id, existing.commentId)).limit(1);
+  void createVisitorNotification({
+    visitorId,
+    type: "comment_deleted",
+    title: "تم حذف ردك",
+    message: "أزيل ردك من الصفحة.",
+    targetPath: comment ? notificationTargetPath(comment.pageKey) : "/",
+    entityType: "reply",
+    entityId: replyId,
+  });
+  return { deleted: true as const };
+}
+
 export async function submitCommentReply(input: VisitorOwnedCommentInput & { commentId: number; parentReplyId?: number | null }) {
   const db = await getDb();
   if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");

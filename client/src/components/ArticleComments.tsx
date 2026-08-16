@@ -70,6 +70,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   const [ratingPrivate, setRatingPrivate] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<number>();
   const [commentPendingDeletion, setCommentPendingDeletion] = useState<number>();
+  const [replyPendingDeletion, setReplyPendingDeletion] = useState<number>();
   const [reactingTo, setReactingTo] = useState<Array<number | string>>([]);
   const [undoingCommentId, setUndoingCommentId] = useState<number>();
   const [status, setStatus] = useState<string>();
@@ -114,6 +115,17 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     setStatus(result.deleted ? "حُذف تعليقك. يمكنك إضافة تعليق جديد متى أردت." : "تعذر حذف التعليق لأنه لم يعد متاحًا ضمن ملكيتك.");
     void comments.refetch();
   } });
+  const removeReply = trpc.interactions.deleteReply.useMutation({
+    onSuccess: result => {
+      setReplyPendingDeletion(undefined);
+      setStatus(result.deleted ? "حُذف ردك." : "تعذر حذف الرد لأنه لم يعد متاحًا ضمن ملكيتك.");
+      void comments.refetch();
+    },
+    onError: () => {
+      setReplyPendingDeletion(undefined);
+      setStatus("تعذر حذف الرد الآن. يرجى المحاولة لاحقًا.");
+    },
+  });
   const react = trpc.interactions.react.useMutation({
     onError: () => { void comments.refetch(); },
     onSettled: (_value, _error, variables) => {
@@ -226,6 +238,10 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     setReplyTarget({ commentId, parentReplyId, label });
     setReplyBody("");
   }
+  function cancelReply() {
+    setReplyTarget(undefined);
+    setReplyBody("");
+  }
   function toggleReplyReaction(replyId: number, current: "heart" | "broken" | null, requested: "heart" | "broken") {
     const reactionKey = `reply:${replyId}`;
     if (!visitorId || reactingTo.includes(reactionKey)) return;
@@ -241,7 +257,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   }
   function replyComposer(commentId: number, parentReplyId: number | null | undefined) {
     if (!replyTarget || replyTarget.commentId !== commentId || (replyTarget.parentReplyId ?? null) !== (parentReplyId ?? null)) return null;
-    return <form className="comment-reply-form comment-reply-form-inline" onSubmit={publishReply}><div><strong>رد على {replyTarget.label}</strong><button type="button" onClick={() => setReplyTarget(undefined)}>إلغاء</button></div><label>ردك<textarea value={replyBody} onChange={event => setReplyBody(event.target.value)} minLength={4} maxLength={800} placeholder="اكتب ردك…" required autoFocus /></label><button className="button" type="submit" disabled={!visitorId || replyBody.trim().length < 4}><Send size={16} /> نشر الرد</button></form>;
+    return <form className="comment-reply-form comment-reply-form-inline" onSubmit={publishReply}><div><strong>رد على {replyTarget.label}</strong><button type="button" onClick={cancelReply}>إلغاء</button></div><label>ردك<textarea value={replyBody} onChange={event => setReplyBody(event.target.value)} minLength={4} maxLength={800} placeholder="اكتب ردك…" required autoFocus /></label><button className="button" type="submit" disabled={!visitorId || replyBody.trim().length < 4}><Send size={16} /> نشر الرد</button></form>;
   }
   function replyThread(comment: NonNullable<typeof comments.data>[number]) {
     const replyCount = comment.replies?.length ?? 0;
@@ -253,7 +269,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
         {comment.replies?.map(reply => <article className={`comment-reply-card ${reply.parentReplyId ? "is-nested" : ""}`} key={reply.id}>
           <div className="comment-avatar comment-reply-avatar" aria-hidden="true">{reply.avatarUrl ? <img src={reply.avatarUrl} alt="" loading="lazy" /> : <AvatarArt kind={avatarKinds.includes(reply.avatarKind as AvatarKind) ? reply.avatarKind as AvatarKind : "wave"} />}</div>
           <div className="comment-copy"><strong>{reply.displayName}</strong><time className="comment-date" dateTime={contributionDateTime(reply.createdAt)}>{formatContributionDate(reply.createdAt)}</time><p>{reply.body}</p>
-            <div className="comment-reactions"><button type="button" className={`${reply.viewerReaction === "heart" ? "active " : ""}heart ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "heart")} aria-pressed={reply.viewerReaction === "heart"} aria-label="أعجبني الرد"><Heart size={16} fill="currentColor" /> <span>{reply.hearts}</span></button><button type="button" className={`${reply.viewerReaction === "broken" ? "active " : ""}broken ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "broken")} aria-pressed={reply.viewerReaction === "broken"} aria-label="لم يعجبني الرد"><HeartCrack size={16} /> <span>{reply.broken}</span></button><button type="button" className="comment-reply-action" disabled={!visitorId} onClick={() => openReply(comment.id, reply.id, reply.displayName)}><MessageCircle size={14} /> رد</button><button type="button" className="comment-report-action" disabled={!visitorId} onClick={() => { setReportDetails(""); setReportTarget({ type: "reply", id: reply.id }); }}><Flag size={15} /> إبلاغ</button></div>
+            <div className="comment-reactions"><button type="button" className={`${reply.viewerReaction === "heart" ? "active " : ""}heart ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "heart")} aria-pressed={reply.viewerReaction === "heart"} aria-label="أعجبني الرد"><Heart size={16} fill="currentColor" /> <span>{reply.hearts}</span></button><button type="button" className={`${reply.viewerReaction === "broken" ? "active " : ""}broken ${reactingTo.includes(`reply:${reply.id}`) ? "is-reacting" : ""}`} onClick={() => toggleReplyReaction(reply.id, reply.viewerReaction, "broken")} aria-pressed={reply.viewerReaction === "broken"} aria-label="لم يعجبني الرد"><HeartCrack size={16} /> <span>{reply.broken}</span></button><button type="button" className="comment-reply-action" disabled={!visitorId} onClick={() => openReply(comment.id, reply.id, reply.displayName)}><MessageCircle size={14} /> رد</button><button type="button" className="comment-report-action" disabled={!visitorId} onClick={() => { setReportDetails(""); setReportTarget({ type: "reply", id: reply.id }); }}><Flag size={15} /> إبلاغ</button>{reply.isOwner && <button type="button" className="comment-reply-delete-action" disabled={removeReply.isPending || !visitorId} onClick={() => setReplyPendingDeletion(reply.id)} aria-label="حذف الرد"><Trash2 size={14} /> حذف</button>}</div>
             {replyComposer(comment.id, reply.id)}</div>
         </article>)}
       </div>}
@@ -275,6 +291,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
     </div>
     <Dialog open={profileOpen} onOpenChange={setProfileOpen}><DialogContent className="comment-profile-dialog" dir="rtl"><DialogHeader><DialogTitle>{dialogTitle}</DialogTitle><DialogDescription>{profileDescription}</DialogDescription></DialogHeader>{profileMode === "rating-settings" ? <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي للعامة.</label> : <div className="comment-profile-fields"><label>اسم العرض<input value={displayName} onChange={event => setDisplayName(event.target.value)} minLength={2} maxLength={64} placeholder="اسمك" required /></label><div className="profile-avatar-picker"><span>صورة الملف الشخصي <small>اختيارية</small></span><div className="profile-avatar-preview">{avatarPreview ? <img src={avatarPreview} alt="معاينة صورة الملف الشخصي" /> : <AvatarArt kind={avatarKind} />}</div><div className="ready-avatar-options"><span>اختر صورة جاهزة</span><div>{readyAvatarOptions.map(avatar => <button type="button" key={avatar.url} className={avatarPreview === avatar.url ? "active" : ""} onClick={() => setAvatarPreview(avatar.url)} aria-label={avatar.label}><img src={avatar.url} alt="" /></button>)}</div></div></div>{profileMode === "comment" && showLinkedRating && feedback.data?.ownRating && <label className="article-rating-visibility dialog-rating-visibility"><input type="checkbox" checked={!ratingPrivate} onChange={event => setRatingPrivate(!event.target.checked)} /> إظهار تقييمي بجانب تعليقي.</label>}</div>}<DialogFooter><button type="button" className="button ghost" onClick={() => setProfileOpen(false)}>إلغاء</button><button type="button" className="button" disabled={profileActionDisabled} onClick={publishWithProfile}>{profileActionLabel}</button></DialogFooter></DialogContent></Dialog>
     <AlertDialog open={Boolean(commentPendingDeletion)} onOpenChange={open => { if (!open && !remove.isPending) setCommentPendingDeletion(undefined); }}><AlertDialogContent dir="rtl"><AlertDialogHeader><AlertDialogTitle>حذف تعليقك؟</AlertDialogTitle><AlertDialogDescription>سيُحذف تعليقك من الصفحة، وستتمكن من كتابة تعليق جديد بعد الحذف.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction className="bg-red-700 text-white hover:bg-red-800" disabled={remove.isPending || !visitorId} onClick={event => { event.preventDefault(); if (commentPendingDeletion && visitorId) remove.mutate({ commentId: commentPendingDeletion, visitorId }); }}>{remove.isPending ? "جارٍ الحذف…" : "حذف التعليق"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
+    <AlertDialog open={Boolean(replyPendingDeletion)} onOpenChange={open => { if (!open && !removeReply.isPending) setReplyPendingDeletion(undefined); }}><AlertDialogContent dir="rtl"><AlertDialogHeader><AlertDialogTitle>حذف ردك؟</AlertDialogTitle><AlertDialogDescription>سيُحذف ردك من الصفحة بعد التأكيد، ولا يمكن استعادته من الواجهة.</AlertDialogDescription></AlertDialogHeader><AlertDialogFooter><AlertDialogCancel>إلغاء</AlertDialogCancel><AlertDialogAction className="bg-red-700 text-white hover:bg-red-800" disabled={removeReply.isPending || !visitorId} onClick={event => { event.preventDefault(); if (replyPendingDeletion && visitorId) removeReply.mutate({ replyId: replyPendingDeletion, visitorId }); }}>{removeReply.isPending ? "جارٍ الحذف…" : "حذف الرد"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent></AlertDialog>
     <Dialog open={Boolean(reportTarget)} onOpenChange={open => { if (!open && !report.isPending) setReportTarget(undefined); }}><DialogContent className="comment-report-dialog" dir="rtl"><DialogHeader><DialogTitle>الإبلاغ عن محتوى</DialogTitle><DialogDescription>اكتب سبب الإبلاغ بإيجاز. يراجع النظام النص والاسم وصورة الملف الشخصي عند وجودها، ولا يُحذف المحتوى أو يُقيّد صاحبه إلا عند تأكيد مخالفة فعلية.</DialogDescription></DialogHeader><div className="comment-report-fields"><label>سبب الإبلاغ<textarea value={reportDetails} onChange={event => setReportDetails(event.target.value)} minLength={4} maxLength={700} placeholder="مثال: إساءة، محتوى غير لائق، أو صورة ملف غير مناسبة…" required autoFocus /></label></div><DialogFooter><button type="button" className="button ghost" disabled={report.isPending} onClick={() => setReportTarget(undefined)}>إلغاء</button><button type="button" className="button" disabled={!visitorId || !reportTarget || report.isPending || reportDetails.trim().length < 4} onClick={() => visitorId && reportTarget && report.mutate({ reporterVisitorId: visitorId, targetType: reportTarget.type, targetId: reportTarget.id, reason: inferReportReason(reportDetails), details: reportDetails.trim() })}>{report.isPending ? "جارٍ الإرسال…" : "إرسال البلاغ"}</button></DialogFooter></DialogContent></Dialog>
   </section>;
 }
