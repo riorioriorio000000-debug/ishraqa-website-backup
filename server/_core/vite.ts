@@ -30,6 +30,37 @@ export function buildSitemapXml(paths = getSitemapPaths()) {
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 }
 
+export function buildStructuredData(meta: SsrHeadMeta) {
+  const canonical = `${canonicalOrigin}${meta.canonicalPath}`;
+  const organizationId = `${canonicalOrigin}/#organization`;
+  const isAboutPage = meta.canonicalPath === "/about";
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${canonicalOrigin}/#website`,
+        url: `${canonicalOrigin}/`,
+        name: "شركة الإشراقة",
+        alternateName: "الإشراقة",
+        inLanguage: "ar-SA",
+        publisher: { "@id": organizationId },
+      },
+      {
+        "@type": isAboutPage ? ["WebPage", "AboutPage"] : "WebPage",
+        "@id": `${canonical}#webpage`,
+        url: canonical,
+        name: meta.title,
+        description: meta.description,
+        inLanguage: "ar-SA",
+        isPartOf: { "@id": `${canonicalOrigin}/#website` },
+        primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png") },
+        ...(isAboutPage ? { about: { "@id": organizationId } } : {}),
+      },
+    ],
+  };
+}
+
 function sendDynamicSitemap(_req: Request, res: Response) {
   res.status(200).set({ "Content-Type": "application/xml; charset=utf-8", "Cache-Control": "no-cache" }).end(buildSitemapXml());
 }
@@ -39,7 +70,8 @@ export function buildHead(meta: SsrHeadMeta) {
   const image = absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png");
   const robots = meta.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large";
   const keywords = meta.keywords.join(", ");
-  return `<title>${escapeHtml(meta.title)}</title><meta name="description" content="${escapeHtml(meta.description)}" />${keywords ? `<meta name="keywords" content="${escapeHtml(keywords)}" />` : ""}<meta name="robots" content="${robots}" /><link rel="canonical" href="${escapeHtml(canonical)}" /><meta property="og:locale" content="ar_SA" /><meta property="og:type" content="${meta.ogType ?? "website"}" /><meta property="og:title" content="${escapeHtml(meta.title)}" /><meta property="og:description" content="${escapeHtml(meta.description)}" /><meta property="og:url" content="${escapeHtml(canonical)}" /><meta property="og:site_name" content="الإشراقة" /><meta property="og:image" content="${escapeHtml(image)}" /><meta property="og:image:alt" content="${escapeHtml(meta.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش")}" /><meta name="twitter:card" content="${meta.image ? "summary_large_image" : "summary"}" /><meta name="twitter:title" content="${escapeHtml(meta.title)}" /><meta name="twitter:description" content="${escapeHtml(meta.description)}" /><meta name="twitter:image" content="${escapeHtml(image)}" />`;
+  const structuredData = JSON.stringify(buildStructuredData(meta)).replace(/</g, "\\u003c");
+  return `<title>${escapeHtml(meta.title)}</title><meta name="description" content="${escapeHtml(meta.description)}" />${keywords ? `<meta name="keywords" content="${escapeHtml(keywords)}" />` : ""}<meta name="robots" content="${robots}" /><link rel="canonical" href="${escapeHtml(canonical)}" /><link rel="alternate" hreflang="ar-SA" href="${escapeHtml(canonical)}" /><meta property="og:locale" content="ar_SA" /><meta property="og:type" content="${meta.ogType ?? "website"}" /><meta property="og:title" content="${escapeHtml(meta.title)}" /><meta property="og:description" content="${escapeHtml(meta.description)}" /><meta property="og:url" content="${escapeHtml(canonical)}" /><meta property="og:site_name" content="شركة الإشراقة" /><meta property="og:image" content="${escapeHtml(image)}" /><meta property="og:image:alt" content="${escapeHtml(meta.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش")}" /><meta name="twitter:card" content="${meta.image ? "summary_large_image" : "summary"}" /><meta name="twitter:title" content="${escapeHtml(meta.title)}" /><meta name="twitter:description" content="${escapeHtml(meta.description)}" /><meta name="twitter:image" content="${escapeHtml(image)}" /><script type="application/ld+json">${structuredData}</script>`;
 }
 
 export function composeHtml(template: string, rendered: { html: string; dehydratedState: unknown; head: SsrHeadMeta }) {

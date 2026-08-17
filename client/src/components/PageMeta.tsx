@@ -15,7 +15,6 @@ const conciseTitlesByPath: Record<string, string> = {
   "/booking": "الحجز",
   "/articles": "المقالات",
   "/where-we-work": "نطاق الخدمة",
-  "/about": "عنّا",
   "/faq": "الأسئلة الشائعة",
   "/customer-service": "خدمة العملاء",
 };
@@ -33,7 +32,7 @@ function setMeta(attribute: "name" | "property", key: string, content: string) {
 export default function PageMeta({ title, description, keywords, path, image, imageAlt }: PageMetaProps) {
   useEffect(() => {
     const pageTitle = conciseTitlesByPath[path] ?? title;
-    const fullTitle = `${pageTitle} | شركة الإشراقة`;
+    const fullTitle = pageTitle.includes("شركة الإشراقة") ? pageTitle : `${pageTitle} | شركة الإشراقة`;
     const canonicalUrl = `https://al-eshraqa.co${path}`;
     document.title = fullTitle;
     setMeta("name", "description", description);

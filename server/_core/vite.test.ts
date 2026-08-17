@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getSsrHeadMeta } from "../../client/src/ssr/meta";
-import { composeHtml, getLegacyArticleRedirectTarget, getLegacyRedirectTarget } from "./vite";
+import { buildStructuredData, composeHtml, getLegacyArticleRedirectTarget, getLegacyRedirectTarget } from "./vite";
 
 describe("التحويلات الدائمة وعرض SEO الخادمي", () => {
   it("يحدد وجهة الرابط المفهرس القديم فقط دون إعادة تحويل الرابط القانوني", () => {
@@ -27,5 +27,13 @@ describe("التحويلات الدائمة وعرض SEO الخادمي", () => 
     expect(html).toContain(`<meta name="description" content="${meta.description}" />`);
     expect(html).toContain('rel="canonical" href="https://al-eshraqa.co/articles/cleaning-riyadh"');
     expect(html).toContain("بدء التواصل عبر واتساب");
+  });
+
+  it("يربط الصفحة الرئيسية وصفحة عنّا بالنطاق الرسمي وكيان الموقع المنظم", () => {
+    const homeSchema = buildStructuredData(getSsrHeadMeta("/"));
+    const aboutSchema = buildStructuredData(getSsrHeadMeta("/about"));
+
+    expect(homeSchema["@graph"][0]).toMatchObject({ "@type": "WebSite", url: "https://al-eshraqa.co/", name: "شركة الإشراقة" });
+    expect(aboutSchema["@graph"][1]).toMatchObject({ "@type": ["WebPage", "AboutPage"], url: "https://al-eshraqa.co/about", about: { "@id": "https://al-eshraqa.co/#organization" } });
   });
 });
