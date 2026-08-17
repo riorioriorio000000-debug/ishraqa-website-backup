@@ -88,7 +88,7 @@ function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="site-share-dialog" dir="rtl" aria-describedby="site-share-description" showCloseButton={false}>
+      <DialogContent className="site-share-dialog" overlayClassName="site-share-overlay" dir="rtl" aria-describedby="site-share-description" showCloseButton={false}>
         <DialogClose className="site-share-close" aria-label="إغلاق نافذة المشاركة">
           <X size={18} aria-hidden="true" />
           <span>إغلاق</span>

@@ -929,7 +929,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 }
 .site-share-app > span { font-weight: 850; }
 .site-share-app > small { color: #718581; font-size: .58rem; }
-.site-share-app:hover, .site-share-app:focus-visible { background: rgba(255, 253, 248, .88); box-shadow: none; filter: none; transform: translateY(-2px); }
+.site-share-app:hover, .site-share-app:focus-visible { background: transparent; box-shadow: none; filter: none; transform: translateY(-2px); }
 .site-share-app:focus-visible { outline: 3px solid rgba(193, 157, 89, .28); outline-offset: 2px; }
 .site-share-whatsapp, .site-share-facebook, .site-share-x, .site-share-telegram, .site-share-email, .site-share-tiktok, .site-share-copy { background: transparent; }
 .site-share-whatsapp > svg { background: #e7f5ed; color: #147c54; }.site-share-facebook > strong { background: #eaf0fa; color: #31568f; }.site-share-x > strong { background: #eef1f1; color: #1f2b2d; }.site-share-telegram > svg { background: #e7f5fb; color: #2076a3; }.site-share-email > svg { background: #fcf0d9; color: #8b5c26; }.site-share-tiktok > svg { background: #f3eeee; color: #293034; }.site-share-copy > svg { background: #fdf1d7; color: #89692d; }
@@ -963,7 +963,7 @@ img { -webkit-user-drag: none; user-drag: none; }
   cursor: pointer;
   transition: color .16s var(--ease-out), background .16s var(--ease-out), transform .16s var(--ease-out);
 }
-.site-share-close:hover { background: rgba(227, 240, 237, .72); color: #0f5c63; }
+.site-share-close:hover { background: transparent; color: #0f5c63; }
 .site-share-close:active { transform: scale(.97); }
 .site-share-close:focus-visible { outline: 3px solid rgba(193, 157, 89, .34); outline-offset: 2px; }
 .site-share-app, .site-share-whatsapp, .site-share-facebook, .site-share-x, .site-share-telegram, .site-share-email, .site-share-tiktok, .site-share-copy { background: transparent !important; }
@@ -1003,4 +1003,32 @@ img { -webkit-user-drag: none; user-drag: none; }
   .site-share-app { min-height: 4.55rem; padding: .45rem .2rem; }
   .site-share-note { margin-bottom: 2.8rem; font-size: .67rem; }
   .site-share-copy-toast { right: .75rem; bottom: .75rem; left: .75rem; font-size: .73rem; }
+}
+
+/* The share dialog alone softens the page behind it, then releases that blur with the dialog exit. */
+.site-share-overlay {
+  background: rgba(8, 54, 57, .26) !important;
+  -webkit-backdrop-filter: blur(9px);
+  backdrop-filter: blur(9px);
+}
+.site-share-app > svg,
+.site-share-app > strong {
+  background: transparent !important;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .site-share-overlay[data-state="open"] {
+    animation: site-share-overlay-blur-in .2s var(--ease-out);
+  }
+  .site-share-overlay[data-state="closed"] {
+    animation: site-share-overlay-blur-out .18s var(--ease-out);
+  }
+}
+@keyframes site-share-overlay-blur-in {
+  from { background-color: rgba(8, 54, 57, 0); -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
+  to { background-color: rgba(8, 54, 57, .26); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); }
+}
+@keyframes site-share-overlay-blur-out {
+  from { background-color: rgba(8, 54, 57, .26); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); }
+  to { background-color: rgba(8, 54, 57, 0); -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
 }
