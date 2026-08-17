@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPlatformShareUrl, getOfficialShareUrl } from "./SiteShareDialog";
+import { buildEmailShareUrl, buildPlatformShareUrl, getOfficialShareUrl } from "./SiteShareDialog";
 
 describe("مشاركة صفحات الإشراقة", () => {
   it("تبني رابطًا قانونيًا على النطاق الرسمي", () => {
@@ -13,5 +13,13 @@ describe("مشاركة صفحات الإشراقة", () => {
     expect(buildPlatformShareUrl("facebook", request)).toContain(encodeURIComponent(request.url));
     expect(buildPlatformShareUrl("x", request)).toContain(encodeURIComponent(request.text));
     expect(buildPlatformShareUrl("telegram", request)).toContain(encodeURIComponent(request.url));
+  });
+
+  it("يجهّز البريد الإلكتروني بعنوان ورسالة ورابط الصفحة", () => {
+    const request = { title: "دليل التنظيف", text: "اقرأ دليل التنظيف", url: "https://al-eshraqa.co/articles/cleaning-riyadh" };
+    const emailUrl = buildEmailShareUrl(request);
+    expect(emailUrl).toMatch(/^mailto:\?subject=/);
+    expect(emailUrl).toContain(encodeURIComponent(request.title));
+    expect(emailUrl).toContain(encodeURIComponent(request.url));
   });
 });

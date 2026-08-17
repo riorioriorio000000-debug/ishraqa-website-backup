@@ -1,4 +1,4 @@
-import { Check, Copy, Link2, MessageCircle, Music2, Send, Share2 } from "lucide-react";
+import { Check, Copy, Link2, Mail, MessageCircle, Music2, Send, Share2 } from "lucide-react";
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -33,6 +33,12 @@ export function buildPlatformShareUrl(platform: "whatsapp" | "facebook" | "x" | 
   if (platform === "facebook") return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(request.url)}`;
   if (platform === "x") return `https://x.com/intent/post?text=${encodeURIComponent(request.text)}&url=${encodeURIComponent(request.url)}`;
   return `https://t.me/share/url?url=${encodeURIComponent(request.url)}&text=${encodeURIComponent(request.text)}`;
+}
+
+export function buildEmailShareUrl(request: ResolvedShareRequest) {
+  const subject = `مشاركة صفحة: ${request.title}`;
+  const body = `${request.text}\n\nرابط الصفحة: ${request.url}\n\nمع تحيات شركة الإشراقة للخدمات المنزلية.`;
+  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRequest; open: boolean; onOpenChange: (open: boolean) => void }) {
@@ -72,6 +78,7 @@ function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRe
           <a className="site-share-app site-share-facebook" href={buildPlatformShareUrl("facebook", request)} target="_blank" rel="noreferrer"><strong aria-hidden="true">f</strong><span>فيسبوك</span></a>
           <a className="site-share-app site-share-x" href={buildPlatformShareUrl("x", request)} target="_blank" rel="noreferrer"><strong aria-hidden="true">𝕏</strong><span>X</span></a>
           <a className="site-share-app site-share-telegram" href={buildPlatformShareUrl("telegram", request)} target="_blank" rel="noreferrer"><Send size={20} aria-hidden="true" /><span>تيليغرام</span></a>
+          <a className="site-share-app site-share-email" href={buildEmailShareUrl(request)}><Mail size={20} aria-hidden="true" /><span>البريد الإلكتروني</span></a>
           <button className="site-share-app site-share-tiktok" type="button" onClick={nativeShare}><Music2 size={20} aria-hidden="true" /><span>تيك توك</span><small>قائمة الجهاز</small></button>
           <button className="site-share-app site-share-copy" type="button" onClick={copyLink}>{copied ? <Check size={20} aria-hidden="true" /> : <Copy size={20} aria-hidden="true" />}<span>{copied ? "تم النسخ" : "نسخ الرابط"}</span></button>
         </div>
