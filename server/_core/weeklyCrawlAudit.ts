@@ -1,4 +1,5 @@
 import type { Request as ExpressRequest, Response as ExpressResponse } from "express";
+import { HttpError } from "@shared/_core/errors";
 import { sdk } from "./sdk";
 
 const OFFICIAL_ORIGIN = "https://al-eshraqa.co";
@@ -192,6 +193,10 @@ export async function weeklyCrawlAuditHandler(req: ExpressRequest, res: ExpressR
     res.status(200).json({ ok: report.issues.length === 0, taskUid: user.taskUid, report });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown crawl audit failure";
+    if (error instanceof HttpError) {
+      res.status(error.statusCode).json({ error: message });
+      return;
+    }
     console.error("[weekly-crawl-audit]", error);
     res.status(500).json({ error: message, timestamp: new Date().toISOString() });
   }
