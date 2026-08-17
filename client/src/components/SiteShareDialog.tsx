@@ -1,9 +1,10 @@
-import { Check, Copy, Link2, Mail, MessageCircle, Music2, Send, Share2 } from "lucide-react";
+import { Check, Copy, Link2, Mail, MessageCircle, Music2, Send, Share2, X } from "lucide-react";
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { useLocation } from "wouter";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const OFFICIAL_ORIGIN = "https://al-eshraqa.co";
+export const COPY_SUCCESS_MESSAGE = "تم نسخ رابط الصفحة، يمكنك مشاركته الآن.";
 
 export type ShareRequest = {
   title?: string;
@@ -54,15 +55,24 @@ function getCurrentPageDescription() {
 
 function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRequest; open: boolean; onOpenChange: (open: boolean) => void }) {
   const [copied, setCopied] = useState(false);
+  const [copyNotice, setCopyNotice] = useState("");
+
+  const showCopyNotice = useCallback((notice: string) => {
+    setCopyNotice(notice);
+    window.setTimeout(() => setCopyNotice(""), 2600);
+  }, []);
+
   const copyLink = useCallback(async () => {
     try {
       await navigator.clipboard?.writeText(request.url);
       setCopied(true);
+      showCopyNotice(COPY_SUCCESS_MESSAGE);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
       window.prompt("انسخ الرابط من هنا:", request.url);
+      showCopyNotice("افتح نافذة النسخ ثم انسخ الرابط.");
     }
-  }, [request.url]);
+  }, [request.url, showCopyNotice]);
 
   const nativeShare = useCallback(async () => {
     if (navigator.share) {
@@ -78,7 +88,11 @@ function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRe
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="site-share-dialog" dir="rtl" aria-describedby="site-share-description">
+      <DialogContent className="site-share-dialog" dir="rtl" aria-describedby="site-share-description" showCloseButton={false}>
+        <DialogClose className="site-share-close" aria-label="إغلاق نافذة المشاركة">
+          <X size={18} aria-hidden="true" />
+          <span>إغلاق</span>
+        </DialogClose>
         <DialogHeader className="site-share-heading">
           <span className="site-share-dialog-icon" aria-hidden="true"><Share2 size={22} /></span>
           <DialogTitle>مشاركة الصفحة</DialogTitle>
@@ -94,6 +108,7 @@ function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRe
           <button className="site-share-app site-share-copy" type="button" onClick={copyLink}>{copied ? <Check size={20} aria-hidden="true" /> : <Copy size={20} aria-hidden="true" />}<span>{copied ? "تم النسخ" : "نسخ الرابط"}</span></button>
         </div>
         <p className="site-share-note"><Link2 size={15} aria-hidden="true" /> يفتح خيار تيك توك قائمة المشاركة الأصلية في جهازك أو ينسخ الرابط؛ لا يوفر تيك توك رابط مشاركة ويب مباشرًا للمنشورات.</p>
+        {copyNotice && <div className="site-share-copy-toast" role="status" aria-live="polite"><Check size={18} aria-hidden="true" /><span>{copyNotice}</span></div>}
       </DialogContent>
     </Dialog>
   );

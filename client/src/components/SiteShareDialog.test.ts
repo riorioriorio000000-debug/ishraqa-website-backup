@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEmailShareUrl, buildPlatformShareUrl, buildShareText, getOfficialShareUrl } from "./SiteShareDialog";
+import { buildEmailShareUrl, buildPlatformShareUrl, buildShareText, COPY_SUCCESS_MESSAGE, getOfficialShareUrl } from "./SiteShareDialog";
 
 describe("مشاركة صفحات الإشراقة", () => {
   it("تبني رابطًا قانونيًا على النطاق الرسمي", () => {
@@ -30,5 +30,9 @@ describe("مشاركة صفحات الإشراقة", () => {
     expect(text).toContain(title);
     expect(text).toContain(description);
     expect(buildEmailShareUrl({ title, text, url: "https://al-eshraqa.co/articles/cleaning-riyadh" })).toContain(encodeURIComponent(description));
+  });
+
+  it("يستخدم رسالة نجاح واضحة بعد نسخ الرابط", () => {
+    expect(COPY_SUCCESS_MESSAGE).toBe("تم نسخ رابط الصفحة، يمكنك مشاركته الآن.");
   });
 });
