@@ -1,0 +1,108 @@
+تدقيق خريطة الموقع
+وقت التنفيذ (UTC): 20260817T201644Z
+خريطة الموقع: https://al-eshraqa.co/sitemap.xml
+عدد الروابط: 206
+
+ملخص حالات HTTP:
+curl: (28) Connection timed out after 30002 milliseconds	1
+curl: (28) Operation timed out after 30000 milliseconds with 0 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 138596 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 138597 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 151275 bytes received	2
+curl: (28) Operation timed out after 30000 milliseconds with 159696 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 159723 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 167806 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 172296 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 172393 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 189291 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 197485 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 206189 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 218547 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 218629 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 21877 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 235160 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 251526 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 260956 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 267764 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 326448 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 340388 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 382530 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 389473 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 92074 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 96187 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 96652 bytes received	1
+curl: (28) Operation timed out after 30000 milliseconds with 98424 bytes received	2
+curl: (28) Operation timed out after 30001 milliseconds with 104596 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 109002 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 121509 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 125823 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 130005 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 130157 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 1360 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 147045 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 159621 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 159724 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 201847 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 214637 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 218866 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 218867 bytes received	1
+curl: (28) Operation timed out after 30001 milliseconds with 234929 bytes received	1
+curl: (28) Operation timed out after 30002 milliseconds with 21877 bytes received	1
+curl: (28) Operation timed out after 30002 milliseconds with 267939 bytes received	1
+curl: (28) Operation timed out after 30002 milliseconds with 50590 bytes received	1
+curl: (28) Operation timed out after 30002 milliseconds with 51959 bytes received	1
+curl: (28) Operation timed out after 30002 milliseconds with 83562 bytes received	1
+https://al-eshraqa.co/	1
+https://al-eshraqa.co/about	1
+https://al-eshraqa.co/articles	1
+https://al-eshraqa.co/articles/ac-maintenance-al-kharma	1
+https://al-eshraqa.co/articles/ac-maintenance-guide	1
+https://al-eshraqa.co/articles/ac-maintenance-jeddah	1
+https://al-eshraqa.co/articles/ac-maintenance-service-saudi-arabia	1
+https://al-eshraqa.co/articles/apartment-cleaning-guide	1
+https://al-eshraqa.co/articles/carpet-cleaning-guide	1
+https://al-eshraqa.co/articles/cleaning-riyadh	1
+https://al-eshraqa.co/articles/cleaning-unaizah	1
+https://al-eshraqa.co/articles/furniture-moving-guide	1
+https://al-eshraqa.co/articles/furniture-moving-service-saudi-arabia	1
+https://al-eshraqa.co/articles/home-cleaning-guide	1
+https://al-eshraqa.co/articles/home-cleaning-service-saudi-arabia	1
+https://al-eshraqa.co/articles/kitchen-care-guide	1
+https://al-eshraqa.co/articles/kitchen-cleaning-tabuk	1
+https://al-eshraqa.co/articles/majlis-cleaning-guide	1
+https://al-eshraqa.co/articles/pest-control-guide	1
+https://al-eshraqa.co/articles/tank-cleaning-guide	1
+https://al-eshraqa.co/booking	1
+https://al-eshraqa.co/calculator	1
+https://al-eshraqa.co/customer-service	1
+https://al-eshraqa.co/faq	1
+https://al-eshraqa.co/privacy	1
+https://al-eshraqa.co/services	1
+https://al-eshraqa.co/services/ac-maintenance/abha	1
+https://al-eshraqa.co/services/ac-maintenance/buraydah	1
+https://al-eshraqa.co/services/ac-maintenance/dammam	1
+https://al-eshraqa.co/services/ac-maintenance/hail	1
+https://al-eshraqa.co/services/ac-maintenance/jazan	1
+https://al-eshraqa.co/services/ac-maintenance/jeddah	1
+https://al-eshraqa.co/services/ac-maintenance/khamis-mushait	1
+https://al-eshraqa.co/services/ac-maintenance/khobar	1
+https://al-eshraqa.co/services/ac-maintenance/makkah	1
+https://al-eshraqa.co/services/ac-maintenance/najran	1
+https://al-eshraqa.co/services/ac-maintenance/riyadh	1
+https://al-eshraqa.co/services/ac-maintenance/tabuk	1
+https://al-eshraqa.co/services/ac-maintenance/taif	1
+https://al-eshraqa.co/services/furniture-moving/dammam	1
+https://al-eshraqa.co/services/furniture-moving/jeddah	1
+https://al-eshraqa.co/services/furniture-moving/madinah	1
+https://al-eshraqa.co/services/furniture-moving/makkah	1
+https://al-eshraqa.co/services/furniture-moving/riyadh	1
+https://al-eshraqa.co/services/home-cleaning/madinah	1
+https://al-eshraqa.co/services/home-cleaning/tabuk	1
+https://al-eshraqa.co/services/home-maintenance/buraydah	1
+https://al-eshraqa.co/services/home-maintenance/jazan	1
+https://al-eshraqa.co/services/home-maintenance/najran	1
+https://al-eshraqa.co/where-we-work	1
+200	156
+
+
+النتائج التفصيلية محفوظة في: audit/indexing-20260817T201644Z/http-results.tsv

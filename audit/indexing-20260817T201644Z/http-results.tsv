@@ -1,0 +1,257 @@
+url	status	final_url	redirects	content_type	time_seconds	error
+https://al-eshraqa.co/services	curl: (28) Operation timed out after 30000 milliseconds with 96187 bytes received
+200	https://al-eshraqa.co/services	0	text/html; charset=utf-8	30.000619
+https://al-eshraqa.co/booking	curl: (28) Operation timed out after 30000 milliseconds with 206189 bytes received
+200	https://al-eshraqa.co/booking	0	text/html; charset=utf-8	30.000691
+https://al-eshraqa.co/calculator	curl: (28) Operation timed out after 30000 milliseconds with 172393 bytes received
+200	https://al-eshraqa.co/calculator	0	text/html; charset=utf-8	30.000851
+https://al-eshraqa.co/	curl: (28) Operation timed out after 30000 milliseconds with 98424 bytes received
+200	https://al-eshraqa.co/	0	text/html; charset=utf-8	30.000857
+https://al-eshraqa.co/about	curl: (28) Operation timed out after 30000 milliseconds with 189291 bytes received
+https://al-eshraqa.co/where-we-work	curl: (28) Operation timed out after 30001 milliseconds with 121509 bytes received
+200	https://al-eshraqa.co/where-we-work	0	text/html; charset=utf-8	30.001340
+200	https://al-eshraqa.co/about	0	text/html; charset=utf-8	30.000728
+https://al-eshraqa.co/articles	curl: (28) Operation timed out after 30001 milliseconds with 104596 bytes received
+200	https://al-eshraqa.co/articles	0	text/html; charset=utf-8	30.001301
+https://al-eshraqa.co/faq	curl: (28) Operation timed out after 30001 milliseconds with 218867 bytes received
+200	https://al-eshraqa.co/faq	0	text/html; charset=utf-8	30.001123
+https://al-eshraqa.co/customer-service	curl: (28) Operation timed out after 30001 milliseconds with 130157 bytes received
+200	https://al-eshraqa.co/customer-service	0	text/html; charset=utf-8	30.001263
+https://al-eshraqa.co/privacy	curl: (28) Operation timed out after 30000 milliseconds with 151275 bytes received
+200	https://al-eshraqa.co/privacy	0	text/html; charset=utf-8	30.000469
+https://al-eshraqa.co/articles/ac-maintenance-guide	curl: (28) Operation timed out after 30000 milliseconds with 260956 bytes received
+200	https://al-eshraqa.co/articles/ac-maintenance-guide	0	text/html; charset=utf-8	30.000739
+https://al-eshraqa.co/articles/home-cleaning-guide	curl: (28) Operation timed out after 30001 milliseconds with 147045 bytes received
+200	https://al-eshraqa.co/articles/home-cleaning-guide	0	text/html; charset=utf-8	30.001805
+https://al-eshraqa.co/articles/furniture-moving-guide	curl: (28) Operation timed out after 30000 milliseconds with 138597 bytes received
+200	https://al-eshraqa.co/articles/furniture-moving-guide	0	text/html; charset=utf-8	30.000340
+https://al-eshraqa.co/articles/kitchen-care-guide	curl: (28) Operation timed out after 30000 milliseconds with 167806 bytes received
+200	https://al-eshraqa.co/articles/kitchen-care-guide	0	text/html; charset=utf-8	30.000494
+https://al-eshraqa.co/articles/majlis-cleaning-guide	curl: (28) Operation timed out after 30000 milliseconds with 138596 bytes received
+200	https://al-eshraqa.co/articles/majlis-cleaning-guide	0	text/html; charset=utf-8	30.000598
+https://al-eshraqa.co/articles/carpet-cleaning-guide	curl: (28) Operation timed out after 30000 milliseconds with 0 bytes received
+000	https://al-eshraqa.co/articles/carpet-cleaning-guide	0		30.000410
+https://al-eshraqa.co/articles/pest-control-guide	curl: (28) Operation timed out after 30000 milliseconds with 98424 bytes received
+200	https://al-eshraqa.co/articles/pest-control-guide	0	text/html; charset=utf-8	30.000396
+https://al-eshraqa.co/articles/tank-cleaning-guide	curl: (28) Operation timed out after 30001 milliseconds with 1360 bytes received
+200	https://al-eshraqa.co/articles/tank-cleaning-guide	0	text/html; charset=utf-8	30.001191
+https://al-eshraqa.co/articles/apartment-cleaning-guide	curl: (28) Operation timed out after 30002 milliseconds with 51959 bytes received
+200	https://al-eshraqa.co/articles/apartment-cleaning-guide	0	text/html; charset=utf-8	30.002327
+https://al-eshraqa.co/articles/ac-maintenance-service-saudi-arabia	curl: (28) Operation timed out after 30001 milliseconds with 159621 bytes received
+200	https://al-eshraqa.co/articles/ac-maintenance-service-saudi-arabia	0	text/html; charset=utf-8	30.001029
+https://al-eshraqa.co/articles/furniture-moving-service-saudi-arabia	curl: (28) Operation timed out after 30001 milliseconds with 159724 bytes received
+https://al-eshraqa.co/articles/ac-maintenance-jeddah	curl: (28) Operation timed out after 30000 milliseconds with 159723 bytes received
+200	https://al-eshraqa.co/articles/furniture-moving-service-saudi-arabia	0	text/html; charset=utf-8	30.001082
+200	https://al-eshraqa.co/articles/ac-maintenance-jeddah	0	text/html; charset=utf-8	30.000555
+https://al-eshraqa.co/articles/home-cleaning-service-saudi-arabia	curl: (28) Operation timed out after 30000 milliseconds with 159696 bytes received
+200	https://al-eshraqa.co/articles/home-cleaning-service-saudi-arabia	0	text/html; charset=utf-8	30.000965
+https://al-eshraqa.co/articles/cleaning-riyadh	curl: (28) Operation timed out after 30000 milliseconds with 172296 bytes received
+200	https://al-eshraqa.co/articles/cleaning-riyadh	0	text/html; charset=utf-8	30.000359
+https://al-eshraqa.co/articles/ac-maintenance-taif	200	https://al-eshraqa.co/articles/ac-maintenance-taif	0	text/html; charset=utf-8	5.898061
+https://al-eshraqa.co/articles/moving-makkah	200	https://al-eshraqa.co/articles/moving-makkah	0	text/html; charset=utf-8	5.911110
+https://al-eshraqa.co/articles/moving-abha	200	https://al-eshraqa.co/articles/moving-abha	0	text/html; charset=utf-8	8.918797
+https://al-eshraqa.co/articles/ac-maintenance-yanbu	200	https://al-eshraqa.co/articles/ac-maintenance-yanbu	0	text/html; charset=utf-8	6.323578
+https://al-eshraqa.co/articles/cleaning-jubail	200	https://al-eshraqa.co/articles/cleaning-jubail	0	text/html; charset=utf-8	11.093187
+https://al-eshraqa.co/articles/moving-jazan	200	https://al-eshraqa.co/articles/moving-jazan	0	text/html; charset=utf-8	17.823009
+https://al-eshraqa.co/articles/home-services-buraydah	200	https://al-eshraqa.co/articles/home-services-buraydah	0	text/html; charset=utf-8	20.365039
+https://al-eshraqa.co/articles/home-services-dammam	200	https://al-eshraqa.co/articles/home-services-dammam	0	text/html; charset=utf-8	20.878912
+https://al-eshraqa.co/articles/kitchen-cleaning-madinah	200	https://al-eshraqa.co/articles/kitchen-cleaning-madinah	0	text/html; charset=utf-8	22.867004
+https://al-eshraqa.co/articles/home-services-al-ahsa	200	https://al-eshraqa.co/articles/home-services-al-ahsa	0	text/html; charset=utf-8	20.638016
+https://al-eshraqa.co/articles/kitchen-cleaning-najran	200	https://al-eshraqa.co/articles/kitchen-cleaning-najran	0	text/html; charset=utf-8	26.770025
+https://al-eshraqa.co/articles/cleaning-khobar	200	https://al-eshraqa.co/articles/cleaning-khobar	0	text/html; charset=utf-8	27.079899
+https://al-eshraqa.co/articles/moving-sakaka	200	https://al-eshraqa.co/articles/moving-sakaka	0	text/html; charset=utf-8	13.785642
+https://al-eshraqa.co/articles/ac-maintenance-hail	200	https://al-eshraqa.co/articles/ac-maintenance-hail	0	text/html; charset=utf-8	29.735285
+https://al-eshraqa.co/articles/kitchen-cleaning-tabuk	curl: (28) Operation timed out after 30000 milliseconds with 389473 bytes received
+200	https://al-eshraqa.co/articles/kitchen-cleaning-tabuk	0	text/html; charset=utf-8	30.000352
+https://al-eshraqa.co/articles/cleaning-unaizah	curl: (28) Operation timed out after 30000 milliseconds with 151275 bytes received
+200	https://al-eshraqa.co/articles/cleaning-unaizah	0	text/html; charset=utf-8	30.000257
+https://al-eshraqa.co/articles/kitchen-cleaning-arar	200	https://al-eshraqa.co/articles/kitchen-cleaning-arar	0	text/html; charset=utf-8	14.397345
+https://al-eshraqa.co/articles/home-services-al-bahah	200	https://al-eshraqa.co/articles/home-services-al-bahah	0	text/html; charset=utf-8	15.914389
+https://al-eshraqa.co/articles/kitchen-cleaning-dhahran	200	https://al-eshraqa.co/articles/kitchen-cleaning-dhahran	0	text/html; charset=utf-8	9.818507
+https://al-eshraqa.co/articles/ac-maintenance-qatif	200	https://al-eshraqa.co/articles/ac-maintenance-qatif	0	text/html; charset=utf-8	17.862812
+https://al-eshraqa.co/articles/ac-maintenance-turbah	200	https://al-eshraqa.co/articles/ac-maintenance-turbah	0	text/html; charset=utf-8	7.739126
+https://al-eshraqa.co/articles/cleaning-al-kharj	200	https://al-eshraqa.co/articles/cleaning-al-kharj	0	text/html; charset=utf-8	15.564174
+https://al-eshraqa.co/articles/moving-al-wajh	200	https://al-eshraqa.co/articles/moving-al-wajh	0	text/html; charset=utf-8	6.417107
+https://al-eshraqa.co/articles/cleaning-al-majmaah	200	https://al-eshraqa.co/articles/cleaning-al-majmaah	0	text/html; charset=utf-8	15.785523
+https://al-eshraqa.co/articles/moving-shaqra	200	https://al-eshraqa.co/articles/moving-shaqra	0	text/html; charset=utf-8	13.123553
+https://al-eshraqa.co/articles/moving-ras-tanura	200	https://al-eshraqa.co/articles/moving-ras-tanura	0	text/html; charset=utf-8	20.107950
+https://al-eshraqa.co/articles/kitchen-cleaning-qunfudhah	200	https://al-eshraqa.co/articles/kitchen-cleaning-qunfudhah	0	text/html; charset=utf-8	13.277767
+https://al-eshraqa.co/articles/cleaning-khamis-mushait	200	https://al-eshraqa.co/articles/cleaning-khamis-mushait	0	text/html; charset=utf-8	23.124120
+https://al-eshraqa.co/articles/home-services-rabigh	200	https://al-eshraqa.co/articles/home-services-rabigh	0	text/html; charset=utf-8	14.936171
+https://al-eshraqa.co/articles/kitchen-cleaning-umlaj	200	https://al-eshraqa.co/articles/kitchen-cleaning-umlaj	0	text/html; charset=utf-8	8.060534
+https://al-eshraqa.co/articles/cleaning-al-lith	200	https://al-eshraqa.co/articles/cleaning-al-lith	0	text/html; charset=utf-8	17.102146
+https://al-eshraqa.co/articles/cleaning-rass	200	https://al-eshraqa.co/articles/cleaning-rass	0	text/html; charset=utf-8	5.434623
+https://al-eshraqa.co/articles/cleaning-al-ula	200	https://al-eshraqa.co/articles/cleaning-al-ula	0	text/html; charset=utf-8	9.734827
+https://al-eshraqa.co/articles/ac-maintenance-zulfi	200	https://al-eshraqa.co/articles/ac-maintenance-zulfi	0	text/html; charset=utf-8	23.302017
+https://al-eshraqa.co/articles/home-services-duba	200	https://al-eshraqa.co/articles/home-services-duba	0	text/html; charset=utf-8	11.371908
+https://al-eshraqa.co/articles/kitchen-cleaning-qurayyat	200	https://al-eshraqa.co/articles/kitchen-cleaning-qurayyat	0	text/html; charset=utf-8	10.209567
+https://al-eshraqa.co/articles/moving-mithnab	200	https://al-eshraqa.co/articles/moving-mithnab	0	text/html; charset=utf-8	8.434529
+https://al-eshraqa.co/articles/home-services-tayma	200	https://al-eshraqa.co/articles/home-services-tayma	0	text/html; charset=utf-8	11.582067
+https://al-eshraqa.co/articles/ac-maintenance-al-khafji	200	https://al-eshraqa.co/articles/ac-maintenance-al-khafji	0	text/html; charset=utf-8	11.923858
+https://al-eshraqa.co/articles/moving-hafar-al-batin	200	https://al-eshraqa.co/articles/moving-hafar-al-batin	0	text/html; charset=utf-8	11.988457
+https://al-eshraqa.co/articles/kitchen-cleaning-afif	200	https://al-eshraqa.co/articles/kitchen-cleaning-afif	0	text/html; charset=utf-8	8.658341
+https://al-eshraqa.co/articles/ac-maintenance-bukayriyah	200	https://al-eshraqa.co/articles/ac-maintenance-bukayriyah	0	text/html; charset=utf-8	12.581439
+https://al-eshraqa.co/articles/home-services-dawadmi	200	https://al-eshraqa.co/articles/home-services-dawadmi	0	text/html; charset=utf-8	8.453907
+https://al-eshraqa.co/articles/ac-maintenance-al-ardah	200	https://al-eshraqa.co/articles/ac-maintenance-al-ardah	0	text/html; charset=utf-8	4.615801
+https://al-eshraqa.co/articles/kitchen-cleaning-al-namas	200	https://al-eshraqa.co/articles/kitchen-cleaning-al-namas	0	text/html; charset=utf-8	9.597423
+https://al-eshraqa.co/articles/home-services-muhayil	200	https://al-eshraqa.co/articles/home-services-muhayil	0	text/html; charset=utf-8	11.570937
+https://al-eshraqa.co/articles/cleaning-wadi-ad-dawasir	200	https://al-eshraqa.co/articles/cleaning-wadi-ad-dawasir	0	text/html; charset=utf-8	16.465669
+https://al-eshraqa.co/articles/moving-abu-arish	200	https://al-eshraqa.co/articles/moving-abu-arish	0	text/html; charset=utf-8	11.590484
+https://al-eshraqa.co/articles/kitchen-cleaning-bisha	200	https://al-eshraqa.co/articles/kitchen-cleaning-bisha	0	text/html; charset=utf-8	13.491606
+https://al-eshraqa.co/articles/home-services-baljurashi	200	https://al-eshraqa.co/articles/home-services-baljurashi	0	text/html; charset=utf-8	11.052596
+https://al-eshraqa.co/articles/moving-ranyah	200	https://al-eshraqa.co/articles/moving-ranyah	0	text/html; charset=utf-8	14.305416
+https://al-eshraqa.co/articles/ac-maintenance-samtah	200	https://al-eshraqa.co/articles/ac-maintenance-samtah	0	text/html; charset=utf-8	13.706030
+https://al-eshraqa.co/articles/cleaning-sabya	200	https://al-eshraqa.co/articles/cleaning-sabya	0	text/html; charset=utf-8	15.553142
+https://al-eshraqa.co/articles/cleaning-al-mandaq	200	https://al-eshraqa.co/articles/cleaning-al-mandaq	0	text/html; charset=utf-8	13.397300
+https://al-eshraqa.co/services/home-cleaning/jeddah	200	https://al-eshraqa.co/services/home-cleaning/jeddah	0	text/html; charset=utf-8	4.978790
+https://al-eshraqa.co/services/home-cleaning/makkah	200	https://al-eshraqa.co/services/home-cleaning/makkah	0	text/html; charset=utf-8	7.030998
+https://al-eshraqa.co/services/home-cleaning/abha	200	https://al-eshraqa.co/services/home-cleaning/abha	0	text/html; charset=utf-8	4.645994
+https://al-eshraqa.co/services/home-cleaning/khobar	200	https://al-eshraqa.co/services/home-cleaning/khobar	0	text/html; charset=utf-8	6.584038
+https://al-eshraqa.co/articles/moving-kaec	200	https://al-eshraqa.co/articles/moving-kaec	0	text/html; charset=utf-8	12.557419
+https://al-eshraqa.co/services/home-cleaning/riyadh	200	https://al-eshraqa.co/services/home-cleaning/riyadh	0	text/html; charset=utf-8	13.585432
+https://al-eshraqa.co/articles/ac-maintenance-al-kharma	curl: (28) Operation timed out after 30002 milliseconds with 83562 bytes received
+200	https://al-eshraqa.co/articles/ac-maintenance-al-kharma	0	text/html; charset=utf-8	30.002914
+https://al-eshraqa.co/services/sofa-cleaning/riyadh	200	https://al-eshraqa.co/services/sofa-cleaning/riyadh	0	text/html; charset=utf-8	9.410878
+https://al-eshraqa.co/services/sofa-cleaning/jeddah	200	https://al-eshraqa.co/services/sofa-cleaning/jeddah	0	text/html; charset=utf-8	6.507485
+https://al-eshraqa.co/services/home-cleaning/hail	200	https://al-eshraqa.co/services/home-cleaning/hail	0	text/html; charset=utf-8	18.077087
+https://al-eshraqa.co/services/sofa-cleaning/makkah	200	https://al-eshraqa.co/services/sofa-cleaning/makkah	0	text/html; charset=utf-8	5.735513
+https://al-eshraqa.co/services/sofa-cleaning/madinah	200	https://al-eshraqa.co/services/sofa-cleaning/madinah	0	text/html; charset=utf-8	5.676657
+https://al-eshraqa.co/services/home-cleaning/buraydah	200	https://al-eshraqa.co/services/home-cleaning/buraydah	0	text/html; charset=utf-8	19.886505
+https://al-eshraqa.co/services/home-cleaning/jazan	200	https://al-eshraqa.co/services/home-cleaning/jazan	0	text/html; charset=utf-8	16.518437
+https://al-eshraqa.co/services/home-cleaning/taif	200	https://al-eshraqa.co/services/home-cleaning/taif	0	text/html; charset=utf-8	17.377460
+https://al-eshraqa.co/services/sofa-cleaning/dammam	200	https://al-eshraqa.co/services/sofa-cleaning/dammam	0	text/html; charset=utf-8	5.545027
+https://al-eshraqa.co/services/home-cleaning/khamis-mushait	200	https://al-eshraqa.co/services/home-cleaning/khamis-mushait	0	text/html; charset=utf-8	22.194934
+https://al-eshraqa.co/services/home-cleaning/najran	200	https://al-eshraqa.co/services/home-cleaning/najran	0	text/html; charset=utf-8	19.021350
+https://al-eshraqa.co/services/home-cleaning/dammam	200	https://al-eshraqa.co/services/home-cleaning/dammam	0	text/html; charset=utf-8	27.885118
+https://al-eshraqa.co/services/sofa-cleaning/abha	200	https://al-eshraqa.co/services/sofa-cleaning/abha	0	text/html; charset=utf-8	6.708961
+https://al-eshraqa.co/services/sofa-cleaning/tabuk	200	https://al-eshraqa.co/services/sofa-cleaning/tabuk	0	text/html; charset=utf-8	8.176103
+https://al-eshraqa.co/services/home-cleaning/madinah	curl: (28) Operation timed out after 30002 milliseconds with 267939 bytes received
+200	https://al-eshraqa.co/services/home-cleaning/madinah	0	text/html; charset=utf-8	30.002119
+https://al-eshraqa.co/services/home-cleaning/tabuk	curl: (28) Operation timed out after 30000 milliseconds with 92074 bytes received
+200	https://al-eshraqa.co/services/home-cleaning/tabuk	0	text/html; charset=utf-8	30.000921
+https://al-eshraqa.co/services/sofa-cleaning/buraydah	200	https://al-eshraqa.co/services/sofa-cleaning/buraydah	0	text/html; charset=utf-8	10.715194
+https://al-eshraqa.co/services/sofa-cleaning/khamis-mushait	200	https://al-eshraqa.co/services/sofa-cleaning/khamis-mushait	0	text/html; charset=utf-8	11.321329
+https://al-eshraqa.co/services/tank-cleaning/riyadh	200	https://al-eshraqa.co/services/tank-cleaning/riyadh	0	text/html; charset=utf-8	9.890691
+https://al-eshraqa.co/services/sofa-cleaning/khobar	200	https://al-eshraqa.co/services/sofa-cleaning/khobar	0	text/html; charset=utf-8	18.087123
+https://al-eshraqa.co/services/sofa-cleaning/hail	200	https://al-eshraqa.co/services/sofa-cleaning/hail	0	text/html; charset=utf-8	16.319547
+https://al-eshraqa.co/services/sofa-cleaning/najran	200	https://al-eshraqa.co/services/sofa-cleaning/najran	0	text/html; charset=utf-8	13.815764
+https://al-eshraqa.co/services/sofa-cleaning/jazan	200	https://al-eshraqa.co/services/sofa-cleaning/jazan	0	text/html; charset=utf-8	17.038555
+https://al-eshraqa.co/services/sofa-cleaning/taif	200	https://al-eshraqa.co/services/sofa-cleaning/taif	0	text/html; charset=utf-8	19.678773
+https://al-eshraqa.co/services/tank-cleaning/jeddah	200	https://al-eshraqa.co/services/tank-cleaning/jeddah	0	text/html; charset=utf-8	14.222429
+https://al-eshraqa.co/services/tank-cleaning/madinah	200	https://al-eshraqa.co/services/tank-cleaning/madinah	0	text/html; charset=utf-8	15.257310
+https://al-eshraqa.co/services/tank-cleaning/dammam	200	https://al-eshraqa.co/services/tank-cleaning/dammam	0	text/html; charset=utf-8	15.026564
+https://al-eshraqa.co/services/tank-cleaning/hail	200	https://al-eshraqa.co/services/tank-cleaning/hail	0	text/html; charset=utf-8	6.365538
+https://al-eshraqa.co/services/tank-cleaning/buraydah	200	https://al-eshraqa.co/services/tank-cleaning/buraydah	0	text/html; charset=utf-8	6.604710
+https://al-eshraqa.co/services/tank-cleaning/tabuk	200	https://al-eshraqa.co/services/tank-cleaning/tabuk	0	text/html; charset=utf-8	12.421730
+https://al-eshraqa.co/services/tank-cleaning/khamis-mushait	200	https://al-eshraqa.co/services/tank-cleaning/khamis-mushait	0	text/html; charset=utf-8	7.310157
+https://al-eshraqa.co/services/tank-cleaning/taif	200	https://al-eshraqa.co/services/tank-cleaning/taif	0	text/html; charset=utf-8	6.511906
+https://al-eshraqa.co/services/tank-cleaning/khobar	200	https://al-eshraqa.co/services/tank-cleaning/khobar	0	text/html; charset=utf-8	14.844476
+https://al-eshraqa.co/services/home-maintenance/jeddah	200	https://al-eshraqa.co/services/home-maintenance/jeddah	0	text/html; charset=utf-8	5.045201
+https://al-eshraqa.co/services/tank-cleaning/najran	200	https://al-eshraqa.co/services/tank-cleaning/najran	0	text/html; charset=utf-8	7.783526
+https://al-eshraqa.co/services/tank-cleaning/abha	200	https://al-eshraqa.co/services/tank-cleaning/abha	0	text/html; charset=utf-8	14.453659
+https://al-eshraqa.co/services/home-maintenance/khobar	200	https://al-eshraqa.co/services/home-maintenance/khobar	0	text/html; charset=utf-8	5.665227
+https://al-eshraqa.co/services/tank-cleaning/jazan	200	https://al-eshraqa.co/services/tank-cleaning/jazan	0	text/html; charset=utf-8	9.515409
+https://al-eshraqa.co/services/home-maintenance/riyadh	200	https://al-eshraqa.co/services/home-maintenance/riyadh	0	text/html; charset=utf-8	9.231287
+https://al-eshraqa.co/services/home-maintenance/dammam	200	https://al-eshraqa.co/services/home-maintenance/dammam	0	text/html; charset=utf-8	7.739778
+https://al-eshraqa.co/services/tank-cleaning/makkah	200	https://al-eshraqa.co/services/tank-cleaning/makkah	0	text/html; charset=utf-8	25.881423
+https://al-eshraqa.co/services/home-maintenance/khamis-mushait	200	https://al-eshraqa.co/services/home-maintenance/khamis-mushait	0	text/html; charset=utf-8	5.275581
+https://al-eshraqa.co/services/home-maintenance/makkah	200	https://al-eshraqa.co/services/home-maintenance/makkah	0	text/html; charset=utf-8	11.504241
+https://al-eshraqa.co/services/home-maintenance/abha	200	https://al-eshraqa.co/services/home-maintenance/abha	0	text/html; charset=utf-8	9.416493
+https://al-eshraqa.co/services/home-maintenance/madinah	200	https://al-eshraqa.co/services/home-maintenance/madinah	0	text/html; charset=utf-8	15.546362
+https://al-eshraqa.co/services/home-maintenance/tabuk	200	https://al-eshraqa.co/services/home-maintenance/tabuk	0	text/html; charset=utf-8	13.958722
+https://al-eshraqa.co/services/ac-maintenance/madinah	200	https://al-eshraqa.co/services/ac-maintenance/madinah	0	text/html; charset=utf-8	6.462085
+https://al-eshraqa.co/services/home-maintenance/hail	200	https://al-eshraqa.co/services/home-maintenance/hail	0	text/html; charset=utf-8	23.474387
+https://al-eshraqa.co/services/home-maintenance/taif	200	https://al-eshraqa.co/services/home-maintenance/taif	0	text/html; charset=utf-8	23.876348
+https://al-eshraqa.co/services/home-maintenance/buraydah	curl: (28) Operation timed out after 30001 milliseconds with 109002 bytes received
+200	https://al-eshraqa.co/services/home-maintenance/buraydah	0	text/html; charset=utf-8	30.001644
+https://al-eshraqa.co/services/home-maintenance/jazan	curl: (28) Operation timed out after 30000 milliseconds with 251526 bytes received
+200	https://al-eshraqa.co/services/home-maintenance/jazan	0	text/html; charset=utf-8	30.000731
+https://al-eshraqa.co/services/home-maintenance/najran	curl: (28) Operation timed out after 30000 milliseconds with 267764 bytes received
+200	https://al-eshraqa.co/services/home-maintenance/najran	0	text/html; charset=utf-8	30.000140
+https://al-eshraqa.co/services/ac-maintenance/riyadh	curl: (28) Operation timed out after 30000 milliseconds with 197485 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/riyadh	0	text/html; charset=utf-8	30.000634
+https://al-eshraqa.co/services/ac-maintenance/jeddah	curl: (28) Operation timed out after 30000 milliseconds with 218547 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/jeddah	0	text/html; charset=utf-8	30.000475
+https://al-eshraqa.co/services/ac-maintenance/makkah	curl: (28) Operation timed out after 30001 milliseconds with 214637 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/makkah	0	text/html; charset=utf-8	30.001152
+https://al-eshraqa.co/services/ac-maintenance/dammam	curl: (28) Operation timed out after 30000 milliseconds with 21877 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/dammam	0	text/html; charset=utf-8	30.000491
+https://al-eshraqa.co/services/ac-maintenance/khobar	curl: (28) Operation timed out after 30001 milliseconds with 125823 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/khobar	0	text/html; charset=utf-8	30.001710
+https://al-eshraqa.co/services/ac-maintenance/tabuk	curl: (28) Operation timed out after 30001 milliseconds with 201847 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/tabuk	0	text/html; charset=utf-8	30.001362
+https://al-eshraqa.co/services/ac-maintenance/abha	curl: (28) Operation timed out after 30001 milliseconds with 234929 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/abha	0	text/html; charset=utf-8	30.001582
+https://al-eshraqa.co/services/ac-maintenance/khamis-mushait	curl: (28) Operation timed out after 30002 milliseconds with 50590 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/khamis-mushait	0	text/html; charset=utf-8	30.002306
+https://al-eshraqa.co/services/ac-maintenance/buraydah	curl: (28) Operation timed out after 30000 milliseconds with 326448 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/buraydah	0	text/html; charset=utf-8	30.000953
+https://al-eshraqa.co/services/ac-maintenance/hail	curl: (28) Operation timed out after 30001 milliseconds with 130005 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/hail	0	text/html; charset=utf-8	30.001265
+https://al-eshraqa.co/services/ac-maintenance/taif	curl: (28) Operation timed out after 30000 milliseconds with 218629 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/taif	0	text/html; charset=utf-8	30.000292
+https://al-eshraqa.co/services/ac-maintenance/jazan	curl: (28) Operation timed out after 30000 milliseconds with 340388 bytes received
+200	https://al-eshraqa.co/services/ac-maintenance/jazan	0	text/html; charset=utf-8	30.001005
+https://al-eshraqa.co/services/ac-maintenance/najran	curl: (28) Connection timed out after 30002 milliseconds
+000	https://al-eshraqa.co/services/ac-maintenance/najran	0		30.002753
+https://al-eshraqa.co/services/furniture-moving/riyadh	curl: (28) Operation timed out after 30002 milliseconds with 21877 bytes received
+200	https://al-eshraqa.co/services/furniture-moving/riyadh	0	text/html; charset=utf-8	30.002638
+https://al-eshraqa.co/services/furniture-moving/jeddah	curl: (28) Operation timed out after 30000 milliseconds with 235160 bytes received
+200	https://al-eshraqa.co/services/furniture-moving/jeddah	0	text/html; charset=utf-8	30.000663
+https://al-eshraqa.co/services/furniture-moving/makkah	curl: (28) Operation timed out after 30000 milliseconds with 96652 bytes received
+200	https://al-eshraqa.co/services/furniture-moving/makkah	0	text/html; charset=utf-8	30.001005
+https://al-eshraqa.co/services/furniture-moving/najran	200	https://al-eshraqa.co/services/furniture-moving/najran	0	text/html; charset=utf-8	4.556932
+https://al-eshraqa.co/services/furniture-moving/hail	200	https://al-eshraqa.co/services/furniture-moving/hail	0	text/html; charset=utf-8	6.672190
+https://al-eshraqa.co/services/furniture-moving/madinah	curl: (28) Operation timed out after 30001 milliseconds with 218866 bytes received
+200	https://al-eshraqa.co/services/furniture-moving/madinah	0	text/html; charset=utf-8	30.001240
+https://al-eshraqa.co/services/furniture-moving/dammam	curl: (28) Operation timed out after 30000 milliseconds with 382530 bytes received
+200	https://al-eshraqa.co/services/furniture-moving/dammam	0	text/html; charset=utf-8	30.000350
+https://al-eshraqa.co/services/furniture-moving/khobar	200	https://al-eshraqa.co/services/furniture-moving/khobar	0	text/html; charset=utf-8	28.548568
+https://al-eshraqa.co/services/pest-control/riyadh	200	https://al-eshraqa.co/services/pest-control/riyadh	0	text/html; charset=utf-8	5.139112
+https://al-eshraqa.co/services/furniture-moving/khamis-mushait	200	https://al-eshraqa.co/services/furniture-moving/khamis-mushait	0	text/html; charset=utf-8	14.183570
+https://al-eshraqa.co/services/furniture-moving/taif	200	https://al-eshraqa.co/services/furniture-moving/taif	0	text/html; charset=utf-8	11.498566
+https://al-eshraqa.co/services/furniture-moving/abha	200	https://al-eshraqa.co/services/furniture-moving/abha	0	text/html; charset=utf-8	20.010433
+https://al-eshraqa.co/services/pest-control/jeddah	200	https://al-eshraqa.co/services/pest-control/jeddah	0	text/html; charset=utf-8	6.183033
+https://al-eshraqa.co/services/furniture-moving/tabuk	200	https://al-eshraqa.co/services/furniture-moving/tabuk	0	text/html; charset=utf-8	20.854440
+https://al-eshraqa.co/services/pest-control/makkah	200	https://al-eshraqa.co/services/pest-control/makkah	0	text/html; charset=utf-8	5.696035
+https://al-eshraqa.co/services/pest-control/dammam	200	https://al-eshraqa.co/services/pest-control/dammam	0	text/html; charset=utf-8	4.759020
+https://al-eshraqa.co/services/pest-control/tabuk	200	https://al-eshraqa.co/services/pest-control/tabuk	0	text/html; charset=utf-8	3.848464
+https://al-eshraqa.co/services/pest-control/khobar	200	https://al-eshraqa.co/services/pest-control/khobar	0	text/html; charset=utf-8	5.082275
+https://al-eshraqa.co/services/pest-control/madinah	200	https://al-eshraqa.co/services/pest-control/madinah	0	text/html; charset=utf-8	6.096296
+https://al-eshraqa.co/services/furniture-moving/buraydah	200	https://al-eshraqa.co/services/furniture-moving/buraydah	0	text/html; charset=utf-8	15.059984
+https://al-eshraqa.co/services/furniture-moving/jazan	200	https://al-eshraqa.co/services/furniture-moving/jazan	0	text/html; charset=utf-8	13.489540
+https://al-eshraqa.co/services/pest-control/khamis-mushait	200	https://al-eshraqa.co/services/pest-control/khamis-mushait	0	text/html; charset=utf-8	5.297526
+https://al-eshraqa.co/services/pest-control/abha	200	https://al-eshraqa.co/services/pest-control/abha	0	text/html; charset=utf-8	7.687133
+https://al-eshraqa.co/services/insulation/jeddah	200	https://al-eshraqa.co/services/insulation/jeddah	0	text/html; charset=utf-8	5.918891
+https://al-eshraqa.co/services/insulation/madinah	200	https://al-eshraqa.co/services/insulation/madinah	0	text/html; charset=utf-8	5.656318
+https://al-eshraqa.co/services/insulation/riyadh	200	https://al-eshraqa.co/services/insulation/riyadh	0	text/html; charset=utf-8	6.787631
+https://al-eshraqa.co/services/pest-control/hail	200	https://al-eshraqa.co/services/pest-control/hail	0	text/html; charset=utf-8	7.541350
+https://al-eshraqa.co/services/pest-control/buraydah	200	https://al-eshraqa.co/services/pest-control/buraydah	0	text/html; charset=utf-8	8.267027
+https://al-eshraqa.co/services/insulation/khobar	200	https://al-eshraqa.co/services/insulation/khobar	0	text/html; charset=utf-8	4.169360
+https://al-eshraqa.co/services/insulation/makkah	200	https://al-eshraqa.co/services/insulation/makkah	0	text/html; charset=utf-8	8.032629
+https://al-eshraqa.co/services/pest-control/najran	200	https://al-eshraqa.co/services/pest-control/najran	0	text/html; charset=utf-8	12.931996
+https://al-eshraqa.co/services/insulation/taif	200	https://al-eshraqa.co/services/insulation/taif	0	text/html; charset=utf-8	5.536015
+https://al-eshraqa.co/services/insulation/buraydah	200	https://al-eshraqa.co/services/insulation/buraydah	0	text/html; charset=utf-8	7.884725
+https://al-eshraqa.co/services/insulation/najran	200	https://al-eshraqa.co/services/insulation/najran	0	text/html; charset=utf-8	5.913742
+https://al-eshraqa.co/services/pest-control/jazan	200	https://al-eshraqa.co/services/pest-control/jazan	0	text/html; charset=utf-8	15.341198
+https://al-eshraqa.co/services/pest-control/taif	200	https://al-eshraqa.co/services/pest-control/taif	0	text/html; charset=utf-8	16.269211
+https://al-eshraqa.co/services/insulation/khamis-mushait	200	https://al-eshraqa.co/services/insulation/khamis-mushait	0	text/html; charset=utf-8	9.198700
+https://al-eshraqa.co/services/insulation/abha	200	https://al-eshraqa.co/services/insulation/abha	0	text/html; charset=utf-8	9.899249
+https://al-eshraqa.co/services/insulation/hail	200	https://al-eshraqa.co/services/insulation/hail	0	text/html; charset=utf-8	10.668330
+https://al-eshraqa.co/services/insulation/tabuk	200	https://al-eshraqa.co/services/insulation/tabuk	0	text/html; charset=utf-8	12.391730
+https://al-eshraqa.co/services/painting/makkah	200	https://al-eshraqa.co/services/painting/makkah	0	text/html; charset=utf-8	4.313193
+https://al-eshraqa.co/services/painting/dammam	200	https://al-eshraqa.co/services/painting/dammam	0	text/html; charset=utf-8	4.198440
+https://al-eshraqa.co/services/painting/riyadh	200	https://al-eshraqa.co/services/painting/riyadh	0	text/html; charset=utf-8	6.834385
+https://al-eshraqa.co/services/painting/abha	200	https://al-eshraqa.co/services/painting/abha	0	text/html; charset=utf-8	3.510079
+https://al-eshraqa.co/services/painting/madinah	200	https://al-eshraqa.co/services/painting/madinah	0	text/html; charset=utf-8	5.333349
+https://al-eshraqa.co/services/insulation/jazan	200	https://al-eshraqa.co/services/insulation/jazan	0	text/html; charset=utf-8	11.702778
+https://al-eshraqa.co/services/insulation/dammam	200	https://al-eshraqa.co/services/insulation/dammam	0	text/html; charset=utf-8	19.076845
+https://al-eshraqa.co/services/painting/jeddah	200	https://al-eshraqa.co/services/painting/jeddah	0	text/html; charset=utf-8	8.330108
+https://al-eshraqa.co/services/painting/khamis-mushait	200	https://al-eshraqa.co/services/painting/khamis-mushait	0	text/html; charset=utf-8	4.427573
+https://al-eshraqa.co/services/painting/hail	200	https://al-eshraqa.co/services/painting/hail	0	text/html; charset=utf-8	4.081006
+https://al-eshraqa.co/services/painting/khobar	200	https://al-eshraqa.co/services/painting/khobar	0	text/html; charset=utf-8	9.094970
+https://al-eshraqa.co/services/painting/taif	200	https://al-eshraqa.co/services/painting/taif	0	text/html; charset=utf-8	6.199731
+https://al-eshraqa.co/services/painting/najran	200	https://al-eshraqa.co/services/painting/najran	0	text/html; charset=utf-8	5.795858
+https://al-eshraqa.co/services/painting/tabuk	200	https://al-eshraqa.co/services/painting/tabuk	0	text/html; charset=utf-8	9.916809
+https://al-eshraqa.co/services/painting/jazan	200	https://al-eshraqa.co/services/painting/jazan	0	text/html; charset=utf-8	8.642942
+https://al-eshraqa.co/services/painting/buraydah	200	https://al-eshraqa.co/services/painting/buraydah	0	text/html; charset=utf-8	10.500464

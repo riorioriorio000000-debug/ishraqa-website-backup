@@ -19,14 +19,16 @@ fi
 
 check_url() {
   local url="$1"
-  local result
-  result="$(curl --location --silent --show-error --output /dev/null --max-time 30 \
+  local result output error
+  output="$(curl --head --location --silent --show-error --output /dev/null --max-time 30 \
     --write-out '%{http_code}\t%{url_effective}\t%{num_redirects}\t%{content_type}\t%{time_total}' "$url" 2>&1 || true)"
+  result="$(printf '%s\n' "$output" | tail -n 1)"
+  error="$(printf '%s\n' "$output" | sed '$d' | tr '\n' ' ' | sed 's/[[:space:]]\+$//')"
 
-  if [[ "$result" == *$'\t'* ]]; then
-    printf '%s\t%s\n' "$url" "$result"
+  if [[ "$result" =~ ^[0-9]{3}$'\t' ]]; then
+    printf '%s\t%s\t%s\n' "$url" "$result" "$error"
   else
-    printf '%s\t000\t\t0\t\t0\t%s\n' "$url" "$result"
+    printf '%s\t000\t\t0\t\t0\t%s\n' "$url" "$output"
   fi
 }
 
