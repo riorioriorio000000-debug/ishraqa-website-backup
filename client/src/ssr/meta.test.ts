@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { getLegacyArticleRedirectPath, getSitemapPaths, getSsrHeadMeta } from "./meta";
 
 describe("البيانات الوصفية للعرض الخادمي", () => {
-  it("ينشئ للصفحة الرئيسية عنوانًا ووصفًا وcanonical محليًا دون حشو أو وعود ترتيب", () => {
+  it("ينشئ للصفحة الرئيسية العنوان والوصف المعتمدين وcanonical محليًا دون وعود ترتيب", () => {
     const meta = getSsrHeadMeta("/");
 
-    expect(meta.title).toBe("شركة تنظيف وصيانة في السعودية | شركة الإشراقة");
-    expect(meta.description).toContain("تنظيف المنازل");
+    expect(meta.title).toBe("شركة الاشراقة | للخدمات المنزلية في السعودية");
+    expect(meta.description).toBe("خدمات متنوعة تٌلبي كل احتياجات بيتك · نظافة الأثاث المنزلي · النظافة التأهيلية · مكافحة الحشرات · الصيانة المنزلية · تنسيق الحدائق · نقل الأثاث · خدمة التنظيف بالساعة.");
     expect(meta.canonicalPath).toBe("/");
     expect(meta.keywords).toContain("شركة تنظيف في الخرج");
     expect(meta.description).not.toMatch(/الصفحة الأولى|الأقل سعرًا|مضمون/);

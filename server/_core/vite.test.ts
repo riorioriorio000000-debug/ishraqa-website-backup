@@ -29,6 +29,15 @@ describe("التحويلات الدائمة وعرض SEO الخادمي", () => 
     expect(html).toContain("بدء التواصل عبر واتساب");
   });
 
+  it("يحافظ على عنوان ووصف الصفحة الرئيسية المعتمدين في مخرجات SEO", () => {
+    const meta = getSsrHeadMeta("/");
+
+    expect(meta.title).toBe("شركة الاشراقة | للخدمات المنزلية في السعودية");
+    expect(meta.description).toBe(
+      "خدمات متنوعة تٌلبي كل احتياجات بيتك · نظافة الأثاث المنزلي · النظافة التأهيلية · مكافحة الحشرات · الصيانة المنزلية · تنسيق الحدائق · نقل الأثاث · خدمة التنظيف بالساعة.",
+    );
+  });
+
   it("يربط الصفحة الرئيسية وصفحة عنّا بالنطاق الرسمي وكيان الموقع المنظم", () => {
     const homeSchema = buildStructuredData(getSsrHeadMeta("/"));
     const aboutSchema = buildStructuredData(getSsrHeadMeta("/about"));
