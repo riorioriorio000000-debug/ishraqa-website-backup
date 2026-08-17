@@ -10,6 +10,7 @@ type PageMetaProps = {
 };
 
 const conciseTitlesByPath: Record<string, string> = {
+  "/about": "عن شركة الإشراقة | خدمات منزلية في السعودية",
   "/services": "الخدمات",
   "/calculator": "الحاسبة التقديرية",
   "/booking": "الحجز",

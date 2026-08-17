@@ -28,4 +28,11 @@ describe("PageMeta", () => {
     expect(document.title).toBe("الأسئلة الشائعة | شركة الإشراقة");
     expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe("الأسئلة الشائعة | شركة الإشراقة");
   });
+
+  it("يوحّد عنوان صفحة عنّا مع اسم الشركة وخدماتها المنزلية", () => {
+    render(<PageMeta title="عنوان بديل" description="وصف تجريبي" keywords={["شركة الإشراقة"]} path="/about" />);
+
+    expect(document.title).toBe("عن شركة الإشراقة | خدمات منزلية في السعودية");
+    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe("عن شركة الإشراقة | خدمات منزلية في السعودية");
+  });
 });
