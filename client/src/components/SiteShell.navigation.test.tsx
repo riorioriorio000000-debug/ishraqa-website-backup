@@ -34,11 +34,11 @@ describe("SiteHeader", () => {
     expect(screen.getByRole("menuitem", { name: "أين نعمل" }).getAttribute("href")).toBe("/where-we-work");
   });
 
-  it("يبرز صفحة عن الإشراقة كرابط مباشر ضمن التنقل الرئيسي", () => {
+  it("يبرز صفحة من نحن كرابط مباشر ضمن التنقل الرئيسي", () => {
     render(<SiteHeader />);
 
     const navigation = screen.getByRole("navigation", { name: "التنقل الرئيسي" });
-    expect(within(navigation).getByRole("link", { name: "عن الإشراقة" }).getAttribute("href")).toBe("/about");
+    expect(within(navigation).getByRole("link", { name: "من نحن" }).getAttribute("href")).toBe("/about");
   });
 
   it("يضع رابط الإشعارات داخل إجراءات الترويسة", () => {
