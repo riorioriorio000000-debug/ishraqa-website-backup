@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
-import { ArrowLeft, BookOpen, CalendarCheck, Check, Edit3, FileText, ListChecks, Loader2, Paperclip, Play, Send, Share2, Sparkles, Trash2, User, Wrench, X } from "lucide-react";
+import { ArrowLeft, BookOpen, CalendarCheck, Check, Edit3, FileText, Link2, ListChecks, Loader2, Paperclip, Play, Send, Sparkles, Trash2, User, Wrench, X } from "lucide-react";
 import React, { useState, useEffect, useRef } from "react";
 import { Streamdown } from "streamdown";
 
@@ -495,7 +495,7 @@ export function AIChatBox({
         <div className="flex flex-wrap items-center justify-between gap-2 border-t bg-background/35 px-4 py-2">
           <span className="text-xs text-muted-foreground">أدوات المحادثة</span>
           <div className="flex items-center gap-1">
-            {onShareCurrentPage && <button type="button" onClick={onShareCurrentPage} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-semibold text-teal-900 transition hover:bg-teal-50 disabled:opacity-50"><Share2 aria-hidden="true" className="size-3.5" /> مشاركة هذه الصفحة</button>}
+            {onShareCurrentPage && <button type="button" onClick={onShareCurrentPage} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-semibold text-teal-900 transition hover:bg-teal-50 disabled:opacity-50"><Link2 aria-hidden="true" className="size-3.5" /> أضف الصفحة للمحادثة</button>}
             {onClearConversation && displayMessages.length > 0 && <button type="button" onClick={onClearConversation} disabled={isLoading} className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-100 disabled:opacity-50"><Trash2 aria-hidden="true" className="size-3.5" /> حذف السجل</button>}
           </div>
         </div>

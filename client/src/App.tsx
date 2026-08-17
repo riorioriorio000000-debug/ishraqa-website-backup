@@ -11,6 +11,7 @@ import ArticleDetailPage from "./pages/ArticleDetail";
 import PrivacyPage from "./pages/PrivacyPage";
 import { AboutPage, ArticlesPage, BookingPage, CoveragePage, FaqPage, ServicesPage } from "./pages/StaticPage";
 import ServiceCityPage from "./pages/ServiceCityPage";
+import { SiteShareProvider } from "./components/SiteShareDialog";
 
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const CustomerService = lazy(() => import("@/pages/CustomerService"));
@@ -39,9 +40,11 @@ function App() {
         // switchable
       >
         <TooltipProvider>
-          <ContentGuard />
-          <RouteScrollTop />
-          <Router />
+          <SiteShareProvider>
+            <ContentGuard />
+            <RouteScrollTop />
+            <Router />
+          </SiteShareProvider>
           <Toaster />
         </TooltipProvider>
       </ThemeProvider>
