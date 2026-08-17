@@ -7,6 +7,7 @@ const OFFICIAL_ORIGIN = "https://al-eshraqa.co";
 
 export type ShareRequest = {
   title?: string;
+  description?: string;
   text?: string;
   url?: string;
 };
@@ -39,6 +40,16 @@ export function buildEmailShareUrl(request: ResolvedShareRequest) {
   const subject = `مشاركة صفحة: ${request.title}`;
   const body = `${request.text}\n\nرابط الصفحة: ${request.url}\n\nمع تحيات شركة الإشراقة للخدمات المنزلية.`;
   return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+export function buildShareText(title: string, description?: string) {
+  const summary = description?.trim();
+  return summary ? `${title}\n${summary}` : title;
+}
+
+function getCurrentPageDescription() {
+  if (typeof document === "undefined") return "";
+  return document.head.querySelector<HTMLMetaElement>('meta[name="description"]')?.content?.trim() ?? "";
 }
 
 function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRequest; open: boolean; onOpenChange: (open: boolean) => void }) {
@@ -91,11 +102,12 @@ function ShareDialog({ request, open, onOpenChange }: { request: ResolvedShareRe
 export function SiteShareProvider({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
-  const [request, setRequest] = useState<ResolvedShareRequest>({ title: "شركة الاشراقة للخدمات المنزلية", text: "تعرف على خدمات الإشراقة المنزلية.", url: OFFICIAL_ORIGIN });
+  const [request, setRequest] = useState<ResolvedShareRequest>({ title: "شركة الاشراقة | للخدمات المنزلية في السعودية", text: buildShareText("شركة الاشراقة | للخدمات المنزلية في السعودية", "خدمات متنوعة تٌلبي كل احتياجات بيتك."), url: OFFICIAL_ORIGIN });
 
   const openShare = useCallback((next: ShareRequest = {}) => {
-    const title = next.title ?? (typeof document === "undefined" ? "شركة الاشراقة للخدمات المنزلية" : document.title);
-    setRequest({ title, text: next.text ?? `شارك صفحة «${title}» من شركة الإشراقة.`, url: getOfficialShareUrl(next.url ?? location) });
+    const title = next.title ?? (typeof document === "undefined" ? "شركة الاشراقة | للخدمات المنزلية في السعودية" : document.title);
+    const description = next.description ?? getCurrentPageDescription();
+    setRequest({ title, text: next.text ?? buildShareText(title, description), url: getOfficialShareUrl(next.url ?? location) });
     setOpen(true);
   }, [location]);
 
