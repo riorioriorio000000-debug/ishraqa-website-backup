@@ -48,7 +48,7 @@ export function composeHtml(template: string, rendered: { html: string; dehydrat
 }
 
 export function getLegacyArticleRedirectTarget(pathname: string) {
-  const legacySlug = pathname.match(/^\/articles\/([^/]+)$/)?.[1];
+  const legacySlug = pathname.match(/^\/(?:articles\/)?([^/]+)$/)?.[1];
   return legacySlug ? getLegacyArticleRedirectPath(legacySlug) : undefined;
 }
 
@@ -78,7 +78,7 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.get("/articles/:legacySlug", redirectLegacyPath);
+  app.get(["/articles/:legacySlug", "/:legacySlug"], redirectLegacyPath);
   app.get("/services/:serviceSlug/:citySlug", redirectLegacyPath);
   app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(vite.middlewares);
@@ -119,7 +119,7 @@ export function serveStatic(app: Express) {
   }
 
   app.get("/index.html", (_req, res) => res.redirect(301, "/"));
-  app.get("/articles/:legacySlug", redirectLegacyPath);
+  app.get(["/articles/:legacySlug", "/:legacySlug"], redirectLegacyPath);
   app.get("/services/:serviceSlug/:citySlug", redirectLegacyPath);
   app.get("/sitemap.xml", sendDynamicSitemap);
   app.use(express.static(distPath, { index: false, redirect: false }));

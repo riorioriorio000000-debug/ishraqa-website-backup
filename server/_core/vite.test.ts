@@ -6,7 +6,9 @@ describe("التحويلات الدائمة وعرض SEO الخادمي", () => 
   it("يحدد وجهة الرابط المفهرس القديم فقط دون إعادة تحويل الرابط القانوني", () => {
     expect(getLegacyArticleRedirectTarget("/articles/riyadh")).toBe("/articles/cleaning-riyadh");
     expect(getLegacyArticleRedirectTarget("/articles/riyadh-service-guide")).toBe("/articles/cleaning-riyadh");
+    expect(getLegacyArticleRedirectTarget("/riyadh-service-guide")).toBe("/articles/cleaning-riyadh");
     expect(getLegacyArticleRedirectTarget("/articles/cleaning-riyadh")).toBeUndefined();
+    expect(getLegacyArticleRedirectTarget("/privacy")).toBeUndefined();
   });
 
   it("يوحّد مسار خدمة التنظيف البديل مع المسار القانوني الدائم", () => {
