@@ -52,6 +52,15 @@ describe("بحث مكتبة المقالات", () => {
     expect(container.querySelectorAll(".secondary-article-grid article")).toHaveLength(58);
   });
 
+  it("يعطي صورة أول دليل أولوية تحميل حتى لا تتأخر عن ظهور البطاقة", () => {
+    const { container } = render(<ArticlesPage />);
+    const [firstImage, secondImage] = Array.from(container.querySelectorAll<HTMLImageElement>(".featured-article-media img"));
+
+    expect(firstImage.getAttribute("loading")).toBe("eager");
+    expect(firstImage.getAttribute("fetchpriority")).toBe("high");
+    expect(secondImage.getAttribute("loading")).toBe("lazy");
+  });
+
   it("يضم صورًا وملاحظات تحريرية مواءمة داخل الأدلة الرئيسية من دون الاسم السابق", () => {
     const mainArticles = articleEntries.filter((article) => article.category === "دليل رئيسي");
 

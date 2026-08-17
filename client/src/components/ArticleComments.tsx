@@ -59,7 +59,7 @@ function AvatarArt({ kind, className }: { kind: AvatarKind; className?: string }
   return <svg className={className} viewBox="0 0 64 64" aria-hidden="true">{shapes[kind]}</svg>;
 }
 
-export default function ArticleComments({ pageKey, showLinkedRating = true }: { pageKey: string; showLinkedRating?: boolean }) {
+export default function ArticleComments({ pageKey, showLinkedRating = true, sectionId = "comments" }: { pageKey: string; showLinkedRating?: boolean; sectionId?: string }) {
   const [visitorId, setVisitorId] = useState<string>();
   const [displayName, setDisplayName] = useState("");
   const [body, setBody] = useState("");
@@ -360,7 +360,7 @@ export default function ArticleComments({ pageKey, showLinkedRating = true }: { 
   const profileDescription = profileMode === "rating-settings" ? "حدّد ظهور تقييمك." : profileMode === "reply" ? "اختر الاسم والصورة قبل نشر الرد، وستُحفظ لمرتك التالية." : "اختر الاسم والصورة، وستُحفظ لمرتك التالية.";
   const profileActionLabel = isWorking ? "جارٍ الحفظ…" : profileMode === "rating-settings" ? "حفظ إعدادات التقييم" : profileMode === "reply" ? "نشر الرد" : editingCommentId ? "حفظ التعديل" : "نشر التعليق";
   const profileActionDisabled = isWorking || ((profileMode === "comment" || profileMode === "reply") && (displayName.trim().length < 2 || (profileMode === "reply" ? replyBody : body).trim().length < 4));
-  return <section id="comments" className="article-comments" aria-labelledby="comments-heading">
+  return <section id={sectionId} className="article-comments" aria-labelledby="comments-heading">
     <div className="article-comments-head"><h2 id="comments-heading">أضف تعليقًا</h2><p>اكتب ملاحظتك المرتبطة بالصفحة.</p>{showLinkedRating && feedback.data?.ownRating && <button type="button" className="comment-owner-action rating-settings-action" onClick={openRatingSettings}><Pencil size={15} /> إعداد ظهور تقييمي</button>}</div>
     {ownComment ? <div className="comment-owner-panel"><p>لديك تعليق منشور هنا.</p><div><button type="button" className="comment-owner-action" onClick={startEdit}><Pencil size={15} /> تعديل تعليقي</button><button type="button" className="comment-owner-action danger" disabled={remove.isPending || !visitorId} onClick={() => setCommentPendingDeletion(ownComment.id)}><Trash2 size={15} /> حذف تعليقي</button></div></div> : <form className="comment-form" onSubmit={openProfile}><label>تعليقك<textarea value={body} onChange={event => setBody(event.target.value)} minLength={4} maxLength={800} placeholder="اكتب تعليقك…" required /></label><button className="button" type="submit" disabled={!visitorId || isWorking}><Send size={16} /> أضف تعليقًا</button></form>}
     {status && <p className="comment-status" role="status">{status}</p>}

@@ -1,14 +1,38 @@
 import { ArrowLeft, ChevronUp, Share2, Sparkles } from "lucide-react";
-import React from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useRoute } from "wouter";
 import SiteShell from "@/components/SiteShell";
 import ArticleRating from "@/components/ArticleRating";
-import ArticleComments from "@/components/ArticleComments";
 import PageMeta from "@/components/PageMeta";
 import ArticleStructuredData from "@/components/ArticleStructuredData";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { articleShareImages } from "@/data/articleShareImages";
 import { useSiteShare } from "@/components/SiteShareDialog";
+
+const ArticleComments = lazy(() => import("@/components/ArticleComments"));
+
+function DeferredArticleComments({ pageKey }: { pageKey: string }) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(() => typeof window !== "undefined" && window.location.hash === "#comments");
+
+  useEffect(() => {
+    if (shouldLoad) return;
+    const wrapper = wrapperRef.current;
+    if (!wrapper || !window.IntersectionObserver) {
+      setShouldLoad(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setShouldLoad(true);
+      observer.disconnect();
+    }, { rootMargin: "720px 0px" });
+    observer.observe(wrapper);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return <div ref={wrapperRef}>{shouldLoad ? <Suspense fallback={<div className="comments-loading" role="status">جارٍ تجهيز التعليقات…</div>}><ArticleComments pageKey={pageKey} sectionId="comments-panel" /></Suspense> : <div className="comments-loading" aria-hidden="true">ستظهر التعليقات عند الاقتراب من هذا القسم.</div>}</div>;
+}
 
 type ArticleSection = readonly [heading: string, body: string];
 export type ArticleEntry = {
@@ -172,12 +196,12 @@ export default function ArticleDetailPage() {
     <main className={`article-detail article-tone-${articleTone}`} dir="rtl">
       <header className="article-hero"><div className="shell article-hero-copy"><Breadcrumb className="seo-breadcrumbs"><BreadcrumbList><BreadcrumbItem><BreadcrumbLink asChild><Link href="/">الرئيسية</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbLink asChild><Link href="/articles">المقالات</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbPage>{article.title}</BreadcrumbPage></BreadcrumbItem></BreadcrumbList></Breadcrumb><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> قراءة إرشادية من الإشراقة</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header>
       <article className="section article-reading-section"><div className="shell article-prose">
-        {article.image ? <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure> : <figure className="article-feature-image article-tone-visual" role="img" aria-label={`تكوين تجريدي هادئ لمقال ${article.title}`}><span aria-hidden="true" /><figcaption>تكوين بصري تجريدي بدرجات هوية الإشراقة.</figcaption></figure>}
+        {article.image ? <figure className="article-feature-image"><img src={article.image} alt={article.imageAlt ?? "صورة توضيحية من الإشراقة"} loading="eager" fetchPriority="high" decoding="async" /><figcaption>صورة توضيحية من أصول الإشراقة المعتمدة.</figcaption></figure> : <figure className="article-feature-image article-tone-visual" role="img" aria-label={`تكوين تجريدي هادئ لمقال ${article.title}`}><span aria-hidden="true" /><figcaption>تكوين بصري تجريدي بدرجات هوية الإشراقة.</figcaption></figure>}
         {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
         <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
         <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>
         <div className="article-actions"><button className="article-share-button article-share-more" type="button" onClick={() => openShare({ title: article.title, description: article.intro, url: articleUrl })} aria-label="مشاركة المقال"><Share2 size={18} /><span>مشاركة المقال</span></button></div>
-        <section className="article-feedback-hub" aria-label="تقييم وتعليقات القرّاء"><ArticleRating articleTitle={article.title} pageKey={article.slug} /><ArticleComments pageKey={article.slug} /></section>
+        <section id="comments" className="article-feedback-hub" aria-label="تقييم وتعليقات القرّاء"><ArticleRating articleTitle={article.title} pageKey={article.slug} /><DeferredArticleComments pageKey={article.slug} /></section>
         <button className="article-scroll-top" type="button" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="العودة إلى أعلى المقال"><ChevronUp size={20} /> العودة إلى أعلى المقال</button>
       </div></article>
     </main>

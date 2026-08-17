@@ -1,14 +1,38 @@
 // Design reminder: calm editorial service brand; keep navigation airy, warm, and practical with deep teal actions.
 import { ChevronDown, Menu, MessageCircle, Phone, Share2, X } from "lucide-react";
 import { Link, useLocation } from "wouter";
-import React, { useState } from "react";
+import React, { lazy, Suspense, useEffect, useRef, useState } from "react";
 import BrandMark from "./BrandMark";
 import WhatsAppFloat from "./WhatsAppFloat";
 import SiteVisitorCount from "./SiteVisitorCount";
-import ArticleComments from "./ArticleComments";
 import ServicePageVisitTracker from "./ServicePageVisitTracker";
 import NotificationBell from "./NotificationBell";
 import { useSiteShare } from "./SiteShareDialog";
+
+const ArticleComments = lazy(() => import("./ArticleComments"));
+
+function DeferredPageComments({ pageKey }: { pageKey: string }) {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(() => typeof window !== "undefined" && window.location.hash === "#comments");
+
+  useEffect(() => {
+    if (shouldLoad) return;
+    const section = sectionRef.current;
+    if (!section || !window.IntersectionObserver) {
+      setShouldLoad(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry?.isIntersecting) return;
+      setShouldLoad(true);
+      observer.disconnect();
+    }, { rootMargin: "720px 0px" });
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return <section ref={sectionRef} id="comments" className="page-comments-section section section-paper" dir="rtl" aria-label="تعليقات الصفحة"><div className="shell">{shouldLoad ? <Suspense fallback={<div className="comments-loading" role="status" aria-live="polite">جارٍ تجهيز التعليقات…</div>}><ArticleComments pageKey={pageKey} showLinkedRating={false} sectionId="comments-panel" /></Suspense> : <div className="comments-loading" aria-hidden="true">ستظهر التعليقات عند الاقتراب من هذا القسم.</div>}</div></section>;
+}
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -39,5 +63,5 @@ export default function SiteShell({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const shouldShowPageComments = !location.startsWith("/articles/") && location !== "/articles" && location !== "/notifications" && location !== "/privacy" && location !== "/notification-preferences";
   const pageKey = location === "/" ? "page:home" : `page:${location}`;
-  return <div className="site-frame"><SiteHeader /><ServicePageVisitTracker />{children}{shouldShowPageComments && <section className="page-comments-section section section-paper" dir="rtl"><div className="shell"><ArticleComments pageKey={pageKey} showLinkedRating={false} /></div></section>}<section className="site-tail" dir="rtl"><div className="shell site-tail-grid"><div><span className="eyebrow"><i /> خطوة تالية أوضح</span><h2>كل ما تحتاجه<br /><em>قريب منك.</em></h2><p>إن لم تكن مستعدًا للحجز الآن، يمكنك قراءة دليل عملي أو حساب الاحتياج أو سؤال المساعد قبل إرسال أي رسالة.</p></div><div className="site-tail-links"><Link href="/calculator">حاسبة الخدمة <span>تقدير أولي بلا سعر ثابت</span></Link><Link href="/articles">دليل العناية <span>قراءات وخطوات عملية</span></Link><Link href="/customer-service">اسأل المساعد <span>شرح وبحث داخل الموقع</span></Link></div></div></section><SiteFooter /><WhatsAppFloat /></div>;
+  return <div className="site-frame"><SiteHeader /><ServicePageVisitTracker />{children}{shouldShowPageComments && <DeferredPageComments pageKey={pageKey} />}<section className="site-tail" dir="rtl"><div className="shell site-tail-grid"><div><span className="eyebrow"><i /> خطوة تالية أوضح</span><h2>كل ما تحتاجه<br /><em>قريب منك.</em></h2><p>إن لم تكن مستعدًا للحجز الآن، يمكنك قراءة دليل عملي أو حساب الاحتياج أو سؤال المساعد قبل إرسال أي رسالة.</p></div><div className="site-tail-links"><Link href="/calculator">حاسبة الخدمة <span>تقدير أولي بلا سعر ثابت</span></Link><Link href="/articles">دليل العناية <span>قراءات وخطوات عملية</span></Link><Link href="/customer-service">اسأل المساعد <span>شرح وبحث داخل الموقع</span></Link></div></div></section><SiteFooter /><WhatsAppFloat /></div>;
 }
