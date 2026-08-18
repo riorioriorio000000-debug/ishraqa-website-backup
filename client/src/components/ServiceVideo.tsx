@@ -1,4 +1,4 @@
-import { Volume2, VolumeX } from "lucide-react";
+import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type ServiceVideoProps = {
@@ -14,6 +14,8 @@ export default function ServiceVideo({ title, description, src, featured = false
   const mediaRef = useRef<HTMLDivElement>(null);
   const [soundOn, setSoundOn] = useState(false);
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -30,6 +32,44 @@ export default function ServiceVideo({ title, description, src, featured = false
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !shouldLoadVideo) return;
+
+    const syncProgress = () => {
+      const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+      setProgress(duration ? (video.currentTime / duration) * 100 : 0);
+    };
+    const syncPlaying = () => setIsPlaying(!video.paused && !video.ended);
+
+    video.addEventListener("timeupdate", syncProgress);
+    video.addEventListener("loadedmetadata", syncProgress);
+    video.addEventListener("play", syncPlaying);
+    video.addEventListener("pause", syncPlaying);
+    video.addEventListener("ended", syncPlaying);
+    return () => {
+      video.removeEventListener("timeupdate", syncProgress);
+      video.removeEventListener("loadedmetadata", syncProgress);
+      video.removeEventListener("play", syncPlaying);
+      video.removeEventListener("pause", syncPlaying);
+      video.removeEventListener("ended", syncPlaying);
+    };
+  }, [shouldLoadVideo]);
+
+  const togglePlayback = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (!video.paused) {
+      video.pause();
+      return;
+    }
+    try {
+      await video.play();
+    } catch {
+      setIsPlaying(false);
+    }
+  };
+
   const toggleSound = async () => {
     const video = videoRef.current;
     if (!video) return;
@@ -44,16 +84,29 @@ export default function ServiceVideo({ title, description, src, featured = false
     }
   };
 
+  const seek = (value: number) => {
+    const video = videoRef.current;
+    if (!video || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    video.currentTime = (value / 100) * video.duration;
+    setProgress(value);
+  };
+
   return (
     <article className={`service-video-card${featured ? " featured" : ""}${compact ? " compact" : ""}`}>
       <div ref={mediaRef} className="service-video-media">
-        {shouldLoadVideo ? <><video ref={videoRef} muted={!soundOn} playsInline preload="metadata" controls controlsList="nodownload noplaybackrate" aria-label={`فيديو توضيحي لخدمة ${title}`}>
+        {shouldLoadVideo ? <><video ref={videoRef} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو توضيحي لخدمة ${title}`}>
           <source src={src} type="video/mp4" />
         </video>
-        <button type="button" className="video-sound-toggle" onClick={toggleSound} aria-pressed={soundOn} aria-label={soundOn ? "إيقاف صوت الفيديو" : "تشغيل صوت الفيديو"}>
-          {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
-          <span>{soundOn ? "إيقاف الصوت" : "تشغيل الصوت"}</span>
-        </button></> : <div className="service-video-placeholder" aria-label={`معاينة مرئية لخدمة ${title}`} />}
+        <div className="video-controls" aria-label={`عناصر تحكم فيديو ${title}`}>
+          <button type="button" className="video-control-button" onClick={togglePlayback} aria-pressed={isPlaying} aria-label={isPlaying ? "إيقاف الفيديو مؤقتًا" : "تشغيل الفيديو"}>
+            {isPlaying ? <Pause size={17} /> : <Play size={17} />}
+          </button>
+          <input className="video-progress" type="range" min="0" max="100" step="0.1" value={progress} onChange={(event) => seek(Number(event.target.value))} aria-label="التقدم في الفيديو" />
+          <button type="button" className="video-control-button video-sound-toggle" onClick={toggleSound} aria-pressed={soundOn} aria-label={soundOn ? "إيقاف صوت الفيديو" : "تشغيل صوت الفيديو"}>
+            {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
+            <span>{soundOn ? "إيقاف الصوت" : "تشغيل الصوت"}</span>
+          </button>
+        </div></> : <div className="service-video-placeholder" aria-label={`معاينة مرئية لخدمة ${title}`} />}
       </div>
       <div className="service-video-copy">
         <span className="eyebrow"><i /> من واقع الخدمة</span>
