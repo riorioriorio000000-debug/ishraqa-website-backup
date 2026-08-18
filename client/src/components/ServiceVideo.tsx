@@ -1,18 +1,17 @@
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { Link } from "wouter";
+import VideoEngagementMeta from "@/components/VideoEngagementMeta";
 import VideoWatchDialog from "@/components/VideoWatchDialog";
 import { getServiceVideoPoster } from "@/data/serviceMedia";
-import { getVideoKey } from "@/data/workVideos";
+import { getVideoKey, type WorkVideo } from "@/data/workVideos";
 
-type ServiceVideoProps = {
-  title: string;
-  description: string;
-  src: string;
+type ServiceVideoProps = WorkVideo & {
   featured?: boolean;
   compact?: boolean;
 };
 
-export default function ServiceVideo({ title, description, src, featured = false, compact = false }: ServiceVideoProps) {
+export default function ServiceVideo({ title, description, src, serviceLabel, servicePath, featured = false, compact = false }: ServiceVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const [soundOn, setSoundOn] = useState(false);
@@ -118,6 +117,7 @@ export default function ServiceVideo({ title, description, src, featured = false
         <span className="eyebrow"><i /> من واقع الخدمة</span>
         <h3>{title}</h3>
         <p>{description}</p>
+        <div className="service-video-footer"><VideoEngagementMeta videoKey={videoKey} compact /><Link href={servicePath} className="service-video-service-link">{serviceLabel}</Link></div>
       </div>
       <VideoWatchDialog open={watchOpen} onOpenChange={setWatchOpen} title={title} description={description} src={src} poster={poster} videoKey={videoKey} />
     </article>

@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, contentReports, contentRestrictions, servicePageMetrics, siteComments, siteMetrics, siteNotifications, siteVisitors, users, videoLikes, visitorFeedback, visitorNotificationPreferences } from "../drizzle/schema";
+import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, contentReports, contentRestrictions, servicePageMetrics, siteComments, siteMetrics, siteNotifications, siteVisitors, users, videoLikes, videoViews, visitorFeedback, visitorNotificationPreferences } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -391,6 +391,10 @@ function makeVideoLikeId(videoKey: string, visitorId: string) {
   return `${videoKey}:${visitorId}`;
 }
 
+function makeVideoViewId(videoKey: string, visitorId: string) {
+  return `${videoKey}:${visitorId}`;
+}
+
 export async function getVideoLikeSummary(videoKey: string, visitorId?: string) {
   const db = await getDb();
   if (!db) return { count: 0, liked: false };
@@ -413,6 +417,28 @@ export async function toggleVideoLike(input: { videoKey: string; visitorId: stri
   }
   const summary = await getVideoLikeSummary(input.videoKey, input.visitorId);
   return { ...summary, changed: true as const };
+}
+
+export async function getVideoEngagementSummary(videoKey: string, visitorId?: string) {
+  const db = await getDb();
+  if (!db) return { views: 0, likes: 0, liked: false };
+  const [likeSummary, totalViews] = await Promise.all([
+    getVideoLikeSummary(videoKey, visitorId),
+    db.select({ count: sql<number>`count(*)` }).from(videoViews).where(eq(videoViews.videoKey, videoKey)),
+  ]);
+  return { views: Number(totalViews[0]?.count ?? 0), likes: likeSummary.count, liked: likeSummary.liked };
+}
+
+/** Records one first-party view per anonymous browser and video, guarded by a database unique index. */
+export async function recordVideoView(input: { videoKey: string; visitorId: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  await db.insert(videoViews).values({
+    id: makeVideoViewId(input.videoKey, input.visitorId),
+    videoKey: input.videoKey,
+    visitorId: input.visitorId,
+  }).onDuplicateKeyUpdate({ set: { videoKey: input.videoKey } });
+  return getVideoEngagementSummary(input.videoKey, input.visitorId);
 }
 
 type VisitorOwnedCommentInput = {

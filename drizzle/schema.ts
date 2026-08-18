@@ -90,6 +90,19 @@ export const videoLikes = mysqlTable("video_likes", {
 
 export type VideoLike = typeof videoLikes.$inferSelect;
 
+/** One view per anonymous browser and video. This prevents reloads from inflating public counts without storing an IP address. */
+export const videoViews = mysqlTable("video_views", {
+  id: varchar("id", { length: 240 }).primaryKey(),
+  videoKey: varchar("videoKey", { length: 160 }).notNull(),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  videoViewVisitorUnique: uniqueIndex("video_views_visitor_unique").on(table.videoKey, table.visitorId),
+  videoViewKeyIndex: index("video_views_key_idx").on(table.videoKey),
+}));
+
+export type VideoView = typeof videoViews.$inferSelect;
+
 /** A browser-generated anonymous ID; no IP address, telephone number, or account is stored here. */
 export const siteVisitors = mysqlTable("site_visitors", {
   visitorId: varchar("visitorId", { length: 64 }).primaryKey(),

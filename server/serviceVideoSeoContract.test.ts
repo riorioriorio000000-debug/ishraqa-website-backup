@@ -39,7 +39,7 @@ describe("فيديوهات أعمال الإشراقة", () => {
 
   it("يجمع جميع المقاطع المعتمدة في صفحة أعمالنا ضمن بطاقات صغيرة", () => {
     expect(ourWork).toContain('path="/our-work"');
-    expect(ourWork).toContain('import { workVideos } from "@/data/workVideos"');
+    expect(ourWork).toContain('from "@/data/workVideos"');
     expect(workVideos).toContain("ishraqa-upholstery-work-01_c6221152.mp4");
     expect(workVideos).toContain("ishraqa-upholstery-work-02_f51aee76.mp4");
     expect(workVideos).toContain("ishraqa-oven-work-01_28be488e.mp4");
@@ -50,6 +50,16 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(serviceMedia).toContain("ishraqa-tank-work_4c069ae7.mp4");
     expect(ourWork).toContain("compact");
     expect(meta).toContain('"/our-work"');
+  });
+
+  it("يربط كل فيديو بخدمة حقيقية ويتيح تصفية الأعمال دون بيانات تفاعل مصطنعة", () => {
+    expect(workVideos).toContain("serviceId:");
+    expect(workVideos).toContain("servicePath:");
+    expect(ourWork).toContain("workVideoServiceFilters");
+    expect(ourWork).toContain("selectedService");
+    expect(videoComponent).toContain("VideoEngagementMeta");
+    expect(videoDialog).toContain("VideoEngagementMeta");
+    expect(videoDialog).toContain("recordVideoView.mutate");
   });
 
   it("يعرّف بيانات فيديو منظمة للصفحات ذات المقاطع الحقيقية", () => {
