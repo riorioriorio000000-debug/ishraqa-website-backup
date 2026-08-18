@@ -8,10 +8,11 @@ html { scroll-behavior: smooth; background: var(--paper); }
 body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); font-family: "IBM Plex Sans Arabic", system-ui, sans-serif; }
 ::selection { background: #0f5c63; color: #fffdf8; text-shadow: none; }
 ::-moz-selection { background: #0f5c63; color: #fffdf8; text-shadow: none; }
-button, input, select { font: inherit; }
+button, input, select, textarea { min-width: 0; font: inherit; }
 a { color: inherit; text-decoration: none; }
 button { cursor: pointer; }
 a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--sand); outline-offset: 3px; }
+.site-frame :where(h1, h2, h3, p, a, button, label, small, span, li, figcaption, textarea) { overflow-wrap: anywhere; word-break: normal; }
 .shell { width: min(1240px, calc(100% - 40px)); margin-inline: auto; }
 .site-frame { min-height: 100vh; overflow: hidden; }
 .site-header { position: absolute; inset: 0 0 auto; z-index: 20; color: var(--teal-dark); }
@@ -565,6 +566,8 @@ img { -webkit-user-drag: none; user-drag: none; }
 .hero-dust-title::after { display: none; }.hero-dust-title > span, .hero-dust-title > em { background: linear-gradient(135deg, #0f5c63 0 38%, rgba(15,92,99,.72) 38% 52%, #0f5c63 52% 100%), radial-gradient(circle at 18% 30%, #c19d59 0 1px, transparent 1.7px), radial-gradient(circle at 68% 72%, rgba(193,157,89,.72) 0 1px, transparent 1.8px), radial-gradient(circle 82px at var(--dust-x, 56%) var(--dust-y, 42%), rgba(193,157,89,.65), transparent 68%); background-size: auto, 10px 10px, 13px 13px, auto; background-blend-mode: normal, screen, screen, screen; -webkit-background-clip: text; background-clip: text; color: transparent; text-shadow: none; transition: background-position 180ms cubic-bezier(.23,1,.32,1); }.hero-copy:hover .hero-dust-title::after { transform: none; }
 @media (max-width: 900px) { .featured-article-grid, .secondary-article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .featured-article-grid, .secondary-article-grid { grid-template-columns: 1fr; }.featured-article-card, .secondary-article-grid article { border-radius: 18px; }.article-actions > .button { width: 100%; margin-left: 0; justify-content: center; }.article-share-button span:not(.article-facebook-mark) { font-size: .7rem; }.article-scroll-top { left: 1rem; bottom: 5rem; }.whatsapp-float { width: 70px !important; min-height: 56px; }.whatsapp-float-icon { height: 54px; }.whatsapp-float:hover, .whatsapp-float:focus-visible { width: 78px !important; }.brand-motion-wrap { min-height: 10rem; padding-bottom: 2rem; }.brand-motion-video { width: min(100%, 340px); } }
+
+@media (max-width: 640px) { .shell { width: min(100% - 1.75rem, 1240px); }.header-inner { gap: .7rem; }.site-frame :where(h1, h2, h3) { text-wrap: balance; }.site-frame :where(p, a, button, label, small, span, li, figcaption) { text-wrap: pretty; } }
 
 /* Compressed, low-contrast interaction details added after the base style rules. */
 .comments-loading { display: grid; min-height: 88px; place-items: center; color: #607779; font-size: .92rem; text-align: center; }

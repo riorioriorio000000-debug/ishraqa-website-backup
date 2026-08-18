@@ -8,10 +8,11 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
     const meta = getSsrHeadMeta("/");
 
     expect(meta.title).toBe("شركة الاشراقة | للخدمات المنزلية في السعودية");
-    expect(meta.description).toBe("خدمات متنوعة تٌلبي كل احتياجات بيتك · نظافة الأثاث المنزلي · النظافة التأهيلية · مكافحة الحشرات · الصيانة المنزلية · تنسيق الحدائق · نقل الأثاث · خدمة التنظيف بالساعة.");
+    expect(meta.description).toBe("شركة الإشراقة للخدمات المنزلية في السعودية: تنظيف المنازل والأثاث، صيانة المكيفات، مكافحة الحشرات، تنسيق الحدائق، ونقل العفش.");
     expect(meta.canonicalPath).toBe("/");
     expect(meta.keywords).toContain("شركة تنظيف في الخرج");
     expect(meta.description).not.toMatch(/الصفحة الأولى|الأقل سعرًا|مضمون/);
+    expect(meta.description.length).toBeLessThanOrEqual(160);
   });
 
   it("ينشئ بيانات مستقلة وقابلة للفهرسة لكل مقال محلي", () => {

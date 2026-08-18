@@ -11,7 +11,8 @@ describe("ملفات SEO وبصمة العرض الخادمي", () => {
 
     expect(home.keywords).toEqual(["شركة تنظيف في السعودية", "شركة صيانة في السعودية", "تنظيف منازل", "صيانة مكيفات", "نقل عفش", "شركة تنظيف في الخرج", "خدمات منزلية"]);
     expect(home.title).toBe("شركة الاشراقة | للخدمات المنزلية في السعودية");
-    expect(home.description).toBe("خدمات متنوعة تٌلبي كل احتياجات بيتك · نظافة الأثاث المنزلي · النظافة التأهيلية · مكافحة الحشرات · الصيانة المنزلية · تنسيق الحدائق · نقل الأثاث · خدمة التنظيف بالساعة.");
+    expect(home.description).toBe("شركة الإشراقة للخدمات المنزلية في السعودية: تنظيف المنازل والأثاث، صيانة المكيفات، مكافحة الحشرات، تنسيق الحدائق، ونقل العفش.");
+    expect(home.description.length).toBeLessThanOrEqual(160);
     expect(home.canonicalPath).toBe("/");
     expect(indexHtml).toContain('"logo": "https://al-eshraqa.co/manus-storage/ishraqa-user-logo_64a160a3.png"');
     expect(indexHtml).toContain("<!--app-head-->");
