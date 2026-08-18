@@ -80,6 +80,8 @@ export const appRouter = router({
     articleFeedback: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getArticleFeedbackSummary(input.pageKey, input.visitorId)),
     articleFeedbackSummaries: publicProcedure.input(z.object({ pageKeys: z.array(z.string().trim().min(1).max(160)).min(1).max(80), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getArticleFeedbackSummaries(input.pageKeys, input.visitorId)),
     submitArticleFeedback: publicProcedure.input(z.object({ pageKey: z.string().trim().min(1).max(160), visitorId: z.string().uuid(), rating: z.number().int().min(1).max(5), isPublic: z.boolean() })).mutation(({ input }) => db.upsertArticleFeedback(input)),
+    videoLike: publicProcedure.input(z.object({ videoKey: z.string().trim().regex(/^video:[a-z0-9-]+$/).max(160), visitorId: z.string().uuid().optional() })).query(({ input }) => db.getVideoLikeSummary(input.videoKey, input.visitorId)),
+    toggleVideoLike: publicProcedure.input(z.object({ videoKey: z.string().trim().regex(/^video:[a-z0-9-]+$/).max(160), visitorId: z.string().uuid() })).mutation(({ input }) => db.toggleVideoLike(input)),
     uploadAvatar: publicProcedure.input(avatarUploadSchema).mutation(async ({ input }) => {
       const uploaded = await storagePut(`comment-avatars/${input.visitorId}/${Date.now()}-${safeUploadName(input.name)}`, decodeAvatarData(input), input.mimeType);
       return { url: uploaded.url };

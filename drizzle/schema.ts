@@ -77,6 +77,19 @@ export const articleFeedback = mysqlTable("article_feedback", {
 
 export type ArticleFeedback = typeof articleFeedback.$inferSelect;
 
+/** One heart per anonymous browser and video; the composite ID prevents duplicate likes. */
+export const videoLikes = mysqlTable("video_likes", {
+  id: varchar("id", { length: 240 }).primaryKey(),
+  videoKey: varchar("videoKey", { length: 160 }).notNull(),
+  visitorId: varchar("visitorId", { length: 64 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  videoLikeVisitorUnique: uniqueIndex("video_likes_visitor_unique").on(table.videoKey, table.visitorId),
+  videoLikeKeyIndex: index("video_likes_key_idx").on(table.videoKey),
+}));
+
+export type VideoLike = typeof videoLikes.$inferSelect;
+
 /** A browser-generated anonymous ID; no IP address, telephone number, or account is stored here. */
 export const siteVisitors = mysqlTable("site_visitors", {
   visitorId: varchar("visitorId", { length: 64 }).primaryKey(),

@@ -7,6 +7,7 @@ const articles = readFileSync(new URL("../client/src/pages/ArticleDetail.tsx", i
 const ourWork = readFileSync(new URL("../client/src/pages/OurWorkPage.tsx", import.meta.url), "utf8");
 const serviceMedia = readFileSync(new URL("../client/src/data/serviceMedia.ts", import.meta.url), "utf8");
 const videoComponent = readFileSync(new URL("../client/src/components/ServiceVideo.tsx", import.meta.url), "utf8");
+const videoDialog = readFileSync(new URL("../client/src/components/VideoWatchDialog.tsx", import.meta.url), "utf8");
 const meta = readFileSync(new URL("../client/src/ssr/meta.ts", import.meta.url), "utf8");
 const ssr = readFileSync(new URL("../server/_core/vite.ts", import.meta.url), "utf8");
 
@@ -56,5 +57,13 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(ssr).toContain('"@type": "VideoObject"');
     expect(ssr).toContain("contentUrl: absoluteUrl(meta.video.contentUrl)");
     expect(ssr).toContain("thumbnailUrl: absoluteUrl(meta.image");
+  });
+
+  it("يتيح عرض المقاطع في نافذة تفاعلية دون إظهار تعليقات أو تقييمات مصطنعة", () => {
+    expect(videoComponent).toContain("VideoWatchDialog");
+    expect(videoDialog).toContain("ArticleComments pageKey={videoKey}");
+    expect(videoDialog).toContain("showLinkedRating");
+    expect(videoDialog).toContain("toggleLike.mutate");
+    expect(videoDialog).toContain("video-watch-dialog");
   });
 });

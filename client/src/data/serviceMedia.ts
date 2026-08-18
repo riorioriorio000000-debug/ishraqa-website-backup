@@ -34,3 +34,10 @@ export function getLocalServiceMediaImage(serviceSlug: string) {
   if (serviceSlug === "home-cleaning" || serviceSlug === "sofa-cleaning") return serviceMedia.cleaning.image;
   return undefined;
 }
+
+export function getServiceVideoPoster(src: string) {
+  if (src === serviceMedia.ac.video) return serviceMedia.ac.image;
+  if (src === serviceMedia.tank.video) return serviceMedia.tank.image;
+  if (src.includes("oven")) return serviceMedia.floorCleaning.image;
+  return serviceMedia.cleaning.image;
+}

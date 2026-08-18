@@ -1,6 +1,6 @@
 import { and, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, contentReports, contentRestrictions, servicePageMetrics, siteComments, siteMetrics, siteNotifications, siteVisitors, users, visitorFeedback, visitorNotificationPreferences } from "../drizzle/schema";
+import { InsertUser, articleFeedback, assistantAnswerFeedback, commentReactions, commentReplies, commentReplyReactions, contentReports, contentRestrictions, servicePageMetrics, siteComments, siteMetrics, siteNotifications, siteVisitors, users, videoLikes, visitorFeedback, visitorNotificationPreferences } from "../drizzle/schema";
 import { makeReactionId } from "../shared/interactionHelpers";
 import { directCommentStatus, normalizeCommentSubmission, passesAutomaticCommentScreening } from "./commentSubmissionPolicy";
 import { ENV } from './_core/env';
@@ -385,6 +385,34 @@ export async function getArticleFeedbackSummaries(pageKeys: string[], visitorId?
       ownIsPublic: own?.isPublic ?? true,
     }];
   }));
+}
+
+function makeVideoLikeId(videoKey: string, visitorId: string) {
+  return `${videoKey}:${visitorId}`;
+}
+
+export async function getVideoLikeSummary(videoKey: string, visitorId?: string) {
+  const db = await getDb();
+  if (!db) return { count: 0, liked: false };
+  const [total, own] = await Promise.all([
+    db.select({ count: sql<number>`count(*)` }).from(videoLikes).where(eq(videoLikes.videoKey, videoKey)),
+    visitorId ? db.select({ id: videoLikes.id }).from(videoLikes).where(and(eq(videoLikes.videoKey, videoKey), eq(videoLikes.visitorId, visitorId))).limit(1) : Promise.resolve([]),
+  ]);
+  return { count: Number(total[0]?.count ?? 0), liked: Boolean(own[0]) };
+}
+
+export async function toggleVideoLike(input: { videoKey: string; visitorId: string }) {
+  const db = await getDb();
+  if (!db) throw new Error("قاعدة البيانات غير متاحة حاليًا");
+  const [existing] = await db.select({ id: videoLikes.id }).from(videoLikes)
+    .where(and(eq(videoLikes.videoKey, input.videoKey), eq(videoLikes.visitorId, input.visitorId))).limit(1);
+  if (existing) {
+    await db.delete(videoLikes).where(eq(videoLikes.id, existing.id));
+  } else {
+    await db.insert(videoLikes).values({ id: makeVideoLikeId(input.videoKey, input.visitorId), videoKey: input.videoKey, visitorId: input.visitorId });
+  }
+  const summary = await getVideoLikeSummary(input.videoKey, input.visitorId);
+  return { ...summary, changed: true as const };
 }
 
 type VisitorOwnedCommentInput = {
