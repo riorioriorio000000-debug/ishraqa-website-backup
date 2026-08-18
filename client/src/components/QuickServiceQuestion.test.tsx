@@ -74,6 +74,17 @@ describe("QuickServiceQuestion", () => {
     expect(screen.getByRole("link", { name: /الحجز/ }).getAttribute("href")).toBe("/booking");
   });
 
+  it("يحافظ على فواصل الخطوات العملية داخل نص الإجابة", async () => {
+    const user = userEvent.setup();
+    render(<QuickServiceQuestion />);
+
+    await user.type(screen.getByLabelText("اكتب سؤالك عن التنظيف أو الصيانة أو نقل العفش"), "كيف أنظف بيتي؟");
+    await user.click(screen.getByRole("button", { name: /اسأل الآن/ }));
+
+    const reply = await screen.findByText(/للمكيفات، ابدأ بمقال الصيانة/);
+    expect(reply.className).toContain("whitespace-pre-line");
+  });
+
   it("يغلق النافذة عند استخدام زر الإغلاق الظاهر", async () => {
     const user = userEvent.setup();
     render(<QuickServiceQuestion />);
