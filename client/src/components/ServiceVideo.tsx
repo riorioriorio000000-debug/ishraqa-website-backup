@@ -6,9 +6,10 @@ type ServiceVideoProps = {
   description: string;
   src: string;
   featured?: boolean;
+  compact?: boolean;
 };
 
-export default function ServiceVideo({ title, description, src, featured = false }: ServiceVideoProps) {
+export default function ServiceVideo({ title, description, src, featured = false, compact = false }: ServiceVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const mediaRef = useRef<HTMLDivElement>(null);
   const [soundOn, setSoundOn] = useState(false);
@@ -29,19 +30,24 @@ export default function ServiceVideo({ title, description, src, featured = false
     return () => observer.disconnect();
   }, []);
 
-  const toggleSound = () => {
+  const toggleSound = async () => {
     const video = videoRef.current;
     if (!video) return;
     const nextSoundOn = !soundOn;
     video.muted = !nextSoundOn;
     setSoundOn(nextSoundOn);
-    if (nextSoundOn) video.play().catch(() => setSoundOn(false));
+    try {
+      if (video.paused) await video.play();
+    } catch {
+      video.muted = true;
+      setSoundOn(false);
+    }
   };
 
   return (
-    <article className={`service-video-card${featured ? " featured" : ""}`}>
+    <article className={`service-video-card${featured ? " featured" : ""}${compact ? " compact" : ""}`}>
       <div ref={mediaRef} className="service-video-media">
-        {shouldLoadVideo ? <><video ref={videoRef} autoPlay loop muted playsInline preload="metadata" aria-label={`فيديو توضيحي لخدمة ${title}`}>
+        {shouldLoadVideo ? <><video ref={videoRef} muted={!soundOn} playsInline preload="metadata" controls controlsList="nodownload noplaybackrate" aria-label={`فيديو توضيحي لخدمة ${title}`}>
           <source src={src} type="video/mp4" />
         </video>
         <button type="button" className="video-sound-toggle" onClick={toggleSound} aria-pressed={soundOn} aria-label={soundOn ? "إيقاف صوت الفيديو" : "تشغيل صوت الفيديو"}>

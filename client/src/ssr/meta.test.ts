@@ -58,7 +58,7 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
 
   it("يدرج جميع الصفحات العامة والمقالات والأدلة المحلية القانونية في خريطة الموقع", () => {
     const sitemapPaths = getSitemapPaths();
-    const publicPagePaths = ["/", "/services", "/booking", "/calculator", "/articles", "/where-we-work", "/about", "/faq", "/customer-service", "/privacy"];
+    const publicPagePaths = ["/", "/services", "/our-work", "/booking", "/calculator", "/articles", "/where-we-work", "/about", "/faq", "/customer-service", "/privacy"];
 
     expect(sitemapPaths).toHaveLength(publicPagePaths.length + articleEntries.length + localServicePages.length);
     expect(sitemapPaths).toEqual(expect.arrayContaining(publicPagePaths));

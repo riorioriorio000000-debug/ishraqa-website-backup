@@ -12,6 +12,7 @@ type PageMetaProps = {
 const conciseTitlesByPath: Record<string, string> = {
   "/about": "من نحن | شركة الإشراقة للخدمات المنزلية",
   "/services": "الخدمات",
+  "/our-work": "أعمالنا",
   "/calculator": "الحاسبة التقديرية",
   "/booking": "الحجز",
   "/articles": "المقالات",
