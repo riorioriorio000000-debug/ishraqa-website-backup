@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { articleEntries } from "@/pages/ArticleDetail";
+import { getLocalServicePagePath, localServicePages } from "@/data/localServicePages";
 import { getLegacyArticleRedirectPath, getSitemapPaths, getSsrHeadMeta } from "./meta";
 
 describe("البيانات الوصفية للعرض الخادمي", () => {
@@ -51,6 +53,17 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
     expect(meta.image).toContain("/manus-storage/");
     expect(meta.ogType).toBe("article");
     expect(getSitemapPaths()).toContain(path);
+  });
+
+  it("يدرج جميع الصفحات العامة والمقالات والأدلة المحلية القانونية في خريطة الموقع", () => {
+    const sitemapPaths = getSitemapPaths();
+    const publicPagePaths = ["/", "/services", "/booking", "/calculator", "/articles", "/where-we-work", "/about", "/faq", "/customer-service", "/privacy"];
+
+    expect(sitemapPaths).toHaveLength(publicPagePaths.length + articleEntries.length + localServicePages.length);
+    expect(sitemapPaths).toEqual(expect.arrayContaining(publicPagePaths));
+    expect(sitemapPaths).toEqual(expect.arrayContaining(articleEntries.map((article) => `/articles/${article.slug}`)));
+    expect(sitemapPaths).toEqual(expect.arrayContaining(localServicePages.map((page) => getLocalServicePagePath(page.serviceSlug, page.citySlug))));
+    expect(new Set(sitemapPaths).size).toBe(sitemapPaths.length);
   });
 
   it("يحجب صفحات الإشعارات عن الفهرسة ويعيد حالة not-found للمسارات غير المعروفة", () => {
