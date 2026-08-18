@@ -2,6 +2,7 @@ import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import VideoWatchDialog from "@/components/VideoWatchDialog";
 import { getServiceVideoPoster } from "@/data/serviceMedia";
+import { getVideoKey } from "@/data/workVideos";
 
 type ServiceVideoProps = {
   title: string;
@@ -19,7 +20,7 @@ export default function ServiceVideo({ title, description, src, featured = false
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [watchOpen, setWatchOpen] = useState(false);
-  const videoKey = `video:${src.split("/").pop()?.replace(/\.[^.]+$/, "").replace(/[^a-z0-9]+/gi, "-").replace(/(^-|-$)/g, "").toLowerCase()}`;
+  const videoKey = getVideoKey(src);
   const poster = getServiceVideoPoster(src);
 
   useEffect(() => {

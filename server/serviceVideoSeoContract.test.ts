@@ -6,6 +6,7 @@ const services = readFileSync(new URL("../client/src/pages/StaticPage.tsx", impo
 const articles = readFileSync(new URL("../client/src/pages/ArticleDetail.tsx", import.meta.url), "utf8");
 const ourWork = readFileSync(new URL("../client/src/pages/OurWorkPage.tsx", import.meta.url), "utf8");
 const serviceMedia = readFileSync(new URL("../client/src/data/serviceMedia.ts", import.meta.url), "utf8");
+const workVideos = readFileSync(new URL("../client/src/data/workVideos.ts", import.meta.url), "utf8");
 const videoComponent = readFileSync(new URL("../client/src/components/ServiceVideo.tsx", import.meta.url), "utf8");
 const videoDialog = readFileSync(new URL("../client/src/components/VideoWatchDialog.tsx", import.meta.url), "utf8");
 const meta = readFileSync(new URL("../client/src/ssr/meta.ts", import.meta.url), "utf8");
@@ -38,12 +39,13 @@ describe("فيديوهات أعمال الإشراقة", () => {
 
   it("يجمع جميع المقاطع المعتمدة في صفحة أعمالنا ضمن بطاقات صغيرة", () => {
     expect(ourWork).toContain('path="/our-work"');
-    expect(ourWork).toContain("ishraqa-upholstery-work-01_c6221152.mp4");
-    expect(ourWork).toContain("ishraqa-upholstery-work-02_f51aee76.mp4");
-    expect(ourWork).toContain("ishraqa-oven-work-01_28be488e.mp4");
-    expect(ourWork).toContain("ishraqa-oven-work-02_eec8b074.mp4");
-    expect(ourWork).toContain("serviceMedia.ac.video");
-    expect(ourWork).toContain("serviceMedia.tank.video");
+    expect(ourWork).toContain('import { workVideos } from "@/data/workVideos"');
+    expect(workVideos).toContain("ishraqa-upholstery-work-01_c6221152.mp4");
+    expect(workVideos).toContain("ishraqa-upholstery-work-02_f51aee76.mp4");
+    expect(workVideos).toContain("ishraqa-oven-work-01_28be488e.mp4");
+    expect(workVideos).toContain("ishraqa-oven-work-02_eec8b074.mp4");
+    expect(workVideos).toContain("serviceMedia.ac.video");
+    expect(workVideos).toContain("serviceMedia.tank.video");
     expect(serviceMedia).toContain("ishraqa-ac-work_9f225e58.mp4");
     expect(serviceMedia).toContain("ishraqa-tank-work_4c069ae7.mp4");
     expect(ourWork).toContain("compact");
@@ -61,7 +63,7 @@ describe("فيديوهات أعمال الإشراقة", () => {
 
   it("يتيح عرض المقاطع في نافذة تفاعلية دون إظهار تعليقات أو تقييمات مصطنعة", () => {
     expect(videoComponent).toContain("VideoWatchDialog");
-    expect(videoDialog).toContain("ArticleComments pageKey={videoKey}");
+    expect(videoDialog).toContain("ArticleComments key={activeVideoKey} pageKey={activeVideoKey}");
     expect(videoDialog).toContain("showLinkedRating");
     expect(videoDialog).toContain("toggleLike.mutate");
     expect(videoDialog).toContain("video-watch-dialog");
