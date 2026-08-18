@@ -41,8 +41,22 @@ describe("التحويلات الدائمة وعرض SEO الخادمي", () => 
   it("يربط الصفحة الرئيسية وصفحة عنّا بالنطاق الرسمي وكيان الموقع المنظم", () => {
     const homeSchema = buildStructuredData(getSsrHeadMeta("/"));
     const aboutSchema = buildStructuredData(getSsrHeadMeta("/about"));
+    const organization = homeSchema["@graph"].find((item) => item["@id"] === "https://al-eshraqa.co/#organization");
+    const aboutPage = aboutSchema["@graph"].find((item) => item["@id"] === "https://al-eshraqa.co/about#webpage");
 
     expect(homeSchema["@graph"][0]).toMatchObject({ "@type": "WebSite", url: "https://al-eshraqa.co/", name: "شركة الإشراقة" });
-    expect(aboutSchema["@graph"][1]).toMatchObject({ "@type": ["WebPage", "AboutPage"], url: "https://al-eshraqa.co/about", about: { "@id": "https://al-eshraqa.co/#organization" } });
+    expect(organization).toMatchObject({
+      "@type": "Organization",
+      name: "شركة الإشراقة للخدمات المنزلية",
+      url: "https://al-eshraqa.co/",
+      telephone: "+966552610151",
+      areaServed: { name: "المملكة العربية السعودية" },
+    });
+    expect(aboutPage).toMatchObject({
+      "@type": ["WebPage", "AboutPage"],
+      url: "https://al-eshraqa.co/about",
+      publisher: { "@id": "https://al-eshraqa.co/#organization" },
+      about: { "@id": "https://al-eshraqa.co/#organization" },
+    });
   });
 });

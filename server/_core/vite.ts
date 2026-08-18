@@ -47,6 +47,25 @@ export function buildStructuredData(meta: SsrHeadMeta) {
         publisher: { "@id": organizationId },
       },
       {
+        "@type": "Organization",
+        "@id": organizationId,
+        name: "شركة الإشراقة للخدمات المنزلية",
+        alternateName: "شركة الإشراقة",
+        url: `${canonicalOrigin}/`,
+        logo: absoluteUrl("/manus-storage/ishraqa-user-logo_64a160a3.png"),
+        telephone: "+966552610151",
+        contactPoint: {
+          "@type": "ContactPoint",
+          telephone: "+966552610151",
+          contactType: "customer service",
+          availableLanguage: "ar",
+        },
+        areaServed: {
+          "@type": "Country",
+          name: "المملكة العربية السعودية",
+        },
+      },
+      {
         "@type": isAboutPage ? ["WebPage", "AboutPage"] : "WebPage",
         "@id": `${canonical}#webpage`,
         url: canonical,
@@ -54,6 +73,7 @@ export function buildStructuredData(meta: SsrHeadMeta) {
         description: meta.description,
         inLanguage: "ar-SA",
         isPartOf: { "@id": `${canonicalOrigin}/#website` },
+        publisher: { "@id": organizationId },
         primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png") },
         ...(isAboutPage ? { about: { "@id": organizationId } } : {}),
       },
