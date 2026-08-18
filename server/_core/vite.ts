@@ -77,6 +77,16 @@ export function buildStructuredData(meta: SsrHeadMeta) {
         primaryImageOfPage: { "@type": "ImageObject", url: absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png") },
         ...(isAboutPage ? { about: { "@id": organizationId } } : {}),
       },
+      ...(meta.video ? [{
+        "@type": "VideoObject",
+        name: meta.video.name,
+        description: meta.video.description,
+        contentUrl: absoluteUrl(meta.video.contentUrl),
+        uploadDate: meta.video.uploadDate,
+        inLanguage: "ar-SA",
+        publisher: { "@id": organizationId },
+        mainEntityOfPage: { "@id": `${canonical}#webpage` },
+      }] : []),
     ],
   };
 }

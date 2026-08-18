@@ -1046,3 +1046,12 @@ img { -webkit-user-drag: none; user-drag: none; }
   from { background-color: rgba(8, 54, 57, .26); -webkit-backdrop-filter: blur(9px); backdrop-filter: blur(9px); }
   to { background-color: rgba(8, 54, 57, 0); -webkit-backdrop-filter: blur(0); backdrop-filter: blur(0); }
 }
+
+/* فيديو واحد داخل المقال يبقى جزءًا هادئًا من التسلسل القرائي، لا بديلًا عن محتوى المقال. */
+.article-service-video { margin: 2.25rem 0; }
+.article-service-video .service-video-card { grid-template-columns: minmax(0, 1fr); }
+.article-service-video .service-video-media { min-height: min(56vw, 26rem); }
+@media (max-width: 640px) {
+  .article-service-video { margin: 1.5rem 0; }
+  .article-service-video .service-video-media { min-height: 15rem; }
+}

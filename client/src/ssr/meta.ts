@@ -9,6 +9,7 @@ export type SsrHeadMeta = {
   image?: string;
   imageAlt?: string;
   ogType?: "website" | "article";
+  video?: { name: string; description: string; contentUrl: string; uploadDate: string };
   noindex?: boolean;
   notFound?: boolean;
 };
@@ -23,8 +24,9 @@ const publicPages: Record<string, Omit<SsrHeadMeta, "canonicalPath">> = {
     keywords: ["شركة تنظيف في السعودية", "شركة صيانة في السعودية", "تنظيف منازل", "صيانة مكيفات", "نقل عفش", "شركة تنظيف في الخرج", "خدمات منزلية"],
     image: homeImage,
     imageAlt: "تكوين توضيحي لخدمات تنظيف وصيانة ونقل عفش من الإشراقة",
+    video: { name: "تنظيف الكنب والمجالس من واقع أعمال الإشراقة", description: "مقطع حقيقي من خدمة تنظيف كنب منزلي يوضح العناية بالتفاصيل قبل الانتهاء.", contentUrl: "/manus-storage/ishraqa-upholstery-work-01_c6221152.mp4", uploadDate: "2026-08-18" },
   },
-  "/services": { title: "الخدمات | شركة الإشراقة", description: "استكشف خدمات تنظيف المنازل والصيانة المنزلية ونقل العفش من الإشراقة، واختر نقطة البداية الأقرب لاحتياجك.", keywords: ["خدمات تنظيف", "صيانة منزلية", "نقل عفش", "شركة الإشراقة"] },
+  "/services": { title: "الخدمات | شركة الإشراقة", description: "استكشف خدمات التنظيف والصيانة ونقل العفش من الإشراقة، وشاهد لقطات قصيرة من أعمال تنظيف الكنب والأفران.", keywords: ["خدمات تنظيف", "تنظيف كنب", "تنظيف أفران", "صيانة منزلية", "نقل عفش", "شركة الإشراقة"], video: { name: "العناية بأفران الغاز من واقع أعمال الإشراقة", description: "مقطع حقيقي من عمل عناية وتنظيف فرن غاز ضمن تجهيزات المطبخ المنزلية.", contentUrl: "/manus-storage/ishraqa-oven-work-01_28be488e.mp4", uploadDate: "2026-08-18" } },
   "/booking": { title: "الحجز | شركة الإشراقة", description: "أرسل تفاصيل خدمة التنظيف أو الصيانة أو نقل العفش، ثم تابع التنسيق مع الإشراقة عبر واتساب.", keywords: ["حجز تنظيف", "حجز صيانة", "حجز نقل عفش"] },
   "/calculator": { title: "الحاسبة التقديرية | شركة الإشراقة", description: "نموذج تقديري يساعدك على ترتيب تفاصيل خدمة التنظيف أو الصيانة قبل التواصل مع فريق الإشراقة.", keywords: ["حاسبة تنظيف", "تقدير خدمة صيانة", "خدمات منزلية"] },
   "/articles": { title: "المقالات | شركة الإشراقة", description: "أدلة عملية عن التنظيف والصيانة ونقل العفش، مع موضوعات محلية تساعدك على ترتيب طلب الخدمة في المدن السعودية.", keywords: ["مقالات تنظيف", "دليل صيانة", "نقل عفش", "تنظيف السعودية"] },
@@ -73,6 +75,7 @@ export function getSsrHeadMeta(url: string): SsrHeadMeta {
         image: article.shareImage,
         imageAlt: `بطاقة مشاركة لمقال ${article.title}`,
         ogType: "article",
+        ...(article.serviceVideo ? { video: { name: article.serviceVideo.title, description: article.serviceVideo.description, contentUrl: article.serviceVideo.src, uploadDate: "2026-08-18" } } : {}),
       };
     }
   }
