@@ -662,6 +662,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 /* رابط الإشعار يصل إلى المساهمة نفسها ويبرزها مؤقتًا دون تغيير ترتيب التعليقات. */
 .comment-card, .comment-reply-card { scroll-margin-top: 7rem; }
 .comment-context-target { border-color: rgba(193, 157, 89, .72) !important; box-shadow: 0 0 0 4px rgba(193, 157, 89, .16), 0 12px 26px rgba(15,92,99,.1); }
+.field-character-count { display: block; margin-top: .28rem; color: #68817e; font-size: .7rem; font-variant-numeric: tabular-nums; text-align: end; }
 
 /* تباين الترويسة: «المزيد» يظل واضحًا بلا إطار أو هيئة زر منفصلة. */
 .nav-more-trigger { padding: .46rem .25rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
@@ -771,7 +772,7 @@ img { -webkit-user-drag: none; user-drag: none; }
 .service-page-stats-list b { display: inline-flex; align-items: center; gap: .3rem; color: #af7821; font-size: .85rem; }
 .service-page-stats-empty { display: inline-flex; align-items: center; gap: .45rem; margin: 1.3rem 0 0; color: #5d7775; font-size: .86rem; }
 
-@media (max-width: 720px) { .article-search-controls { grid-template-columns: 1fr; margin-top: 1.25rem; }.article-filter select { min-height: 3rem; }.service-page-stats { border-radius: 22px 22px 8px 22px; }.service-page-stats-list li { gap: .6rem; padding: .75rem; } }
+@media (max-width: 720px) { .article-search-controls { grid-template-columns: 1fr; gap: .68rem; margin-top: 1.25rem; }.article-search-controls .article-search { min-height: 3.2rem; }.article-filter select { min-height: 3rem; }.service-page-stats { border-radius: 22px 22px 8px 22px; }.service-page-stats-list li { gap: .6rem; padding: .75rem; } }
 
 /* طلبات القراءة والتذييل: إبقاء المعلومة المهمة في المنتصف بلا فواصل مشتتة. */
 .article-reading-step + .article-reading-step { border-top: 0 !important; }

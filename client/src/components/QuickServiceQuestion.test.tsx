@@ -59,6 +59,27 @@ afterEach(() => {
 });
 
 describe("QuickServiceQuestion", () => {
+  it("يفرض حدودًا واضحة لسؤال المساعد والمدينة وملاحظة التقييم", async () => {
+    const user = userEvent.setup();
+    render(<QuickServiceQuestion />);
+
+    const question = screen.getByLabelText("اكتب سؤالك عن التنظيف أو الصيانة أو نقل العفش") as HTMLTextAreaElement;
+    expect(question.maxLength).toBe(400);
+    expect(screen.getByText("0/400")).toBeTruthy();
+
+    await user.type(question, "كيف أجهز المنزل للتنظيف؟");
+    await user.click(screen.getByRole("button", { name: /اسأل الآن/ }));
+    await screen.findByRole("dialog");
+    const city = screen.getByLabelText("المدينة أو الحي") as HTMLInputElement;
+    expect(city.maxLength).toBe(50);
+    expect(screen.getByText("6/50")).toBeTruthy();
+
+    await user.click(screen.getByRole("radio", { name: /4 من 5 نجوم/ }));
+    const note = screen.getByLabelText(/ملاحظة إضافية/) as HTMLTextAreaElement;
+    expect(note.maxLength).toBe(300);
+    expect(screen.getByText("0/300")).toBeTruthy();
+  });
+
   it("يعرض إجابة المساعد داخل نافذة مركزية مع روابط المقالات والصفحات", async () => {
     const user = userEvent.setup();
     render(<QuickServiceQuestion />);

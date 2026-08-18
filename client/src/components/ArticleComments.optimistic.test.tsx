@@ -88,6 +88,26 @@ describe("ArticleComments", () => {
     expect(publishedAt?.textContent).not.toBe("—");
   });
 
+  it("يفرض حدودًا مختصرة ويعرض عدادًا للتعليق والاسم والبلاغ", async () => {
+    const user = userEvent.setup();
+    render(<ArticleComments pageKey="article-test" />);
+
+    const comment = screen.getByRole("textbox", { name: "تعليقك" }) as HTMLTextAreaElement;
+    expect(comment.maxLength).toBe(500);
+    expect(screen.getByText("0/500")).toBeTruthy();
+    await user.type(comment, "تعليق مناسب للاختبار");
+    expect(screen.getByText("20/500")).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: /أضف تعليقًا/ }));
+    expect((await screen.findByRole("textbox", { name: "اسم العرض" }) as HTMLInputElement).maxLength).toBe(32);
+
+    await user.click(screen.getByRole("button", { name: "إلغاء" }));
+    await user.click(screen.getByRole("button", { name: "إبلاغ" }));
+    const report = screen.getByRole("textbox", { name: "سبب الإبلاغ" }) as HTMLTextAreaElement;
+    expect(report.maxLength).toBe(350);
+    expect(screen.getByText("0/350")).toBeTruthy();
+  });
+
   it("يبدأ تفاعل القلب فور النقر ثم يرسل المزامنة في الخلفية", async () => {
     const user = userEvent.setup();
     render(<ArticleComments pageKey="article-test" />);
