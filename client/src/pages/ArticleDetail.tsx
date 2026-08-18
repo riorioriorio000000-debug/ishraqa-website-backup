@@ -11,9 +11,14 @@ import { useSiteShare } from "@/components/SiteShareDialog";
 
 const ArticleComments = lazy(() => import("@/components/ArticleComments"));
 
+function shouldEagerlyLoadComments() {
+  if (typeof window === "undefined") return false;
+  return window.location.hash === "#comments" || /^#(?:comment|reply)-\d+$/.test(window.location.hash);
+}
+
 function DeferredArticleComments({ pageKey }: { pageKey: string }) {
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [shouldLoad, setShouldLoad] = useState(() => typeof window !== "undefined" && window.location.hash === "#comments");
+  const [shouldLoad, setShouldLoad] = useState(shouldEagerlyLoadComments);
 
   useEffect(() => {
     if (shouldLoad) return;

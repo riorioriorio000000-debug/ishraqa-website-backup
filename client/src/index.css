@@ -656,8 +656,12 @@ img { -webkit-user-drag: none; user-drag: none; }
 .site-header .nav-more-menu { z-index: 260 !important; border-color: rgba(15, 92, 99, .22); background: rgba(255, 255, 255, .995) !important; box-shadow: 0 20px 42px rgba(6, 57, 60, .24); }
 .site-header .nav-more-menu a { color: #073f45 !important; }
 .brand-motion-wrap { background: transparent; isolation: isolate; }
-.brand-motion-wrap::before { pointer-events: none; background: radial-gradient(circle, rgba(247, 245, 239, .96) 0%, rgba(247, 245, 239, 0) 72%); }
+.brand-motion-wrap::before { display: none; content: none; }
 .brand-motion-video { mix-blend-mode: normal; filter: none; }
+
+/* رابط الإشعار يصل إلى المساهمة نفسها ويبرزها مؤقتًا دون تغيير ترتيب التعليقات. */
+.comment-card, .comment-reply-card { scroll-margin-top: 7rem; }
+.comment-context-target { border-color: rgba(193, 157, 89, .72) !important; box-shadow: 0 0 0 4px rgba(193, 157, 89, .16), 0 12px 26px rgba(15,92,99,.1); }
 
 /* تباين الترويسة: «المزيد» يظل واضحًا بلا إطار أو هيئة زر منفصلة. */
 .nav-more-trigger { padding: .46rem .25rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }

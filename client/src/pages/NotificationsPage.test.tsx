@@ -61,5 +61,6 @@ describe("مركز الإشعارات", () => {
     fireEvent.click(screen.getByRole("button", { name: /فتح الإشعار/ }));
     await waitFor(() => expect(mocks.markReadMutate).toHaveBeenCalledWith({ visitorId: "f4ee2f36-6d7f-4e29-8cd9-c6a1e53d4a65", ids: [7] }));
     expect(screen.getByRole("button", { name: /إخفاء التفاصيل/ })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /عرض السياق/ }).getAttribute("href")).toBe("/articles/ac#reply-14");
   });
 });

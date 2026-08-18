@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import React from "react";
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import ArticleComments from "./ArticleComments";
@@ -74,6 +74,8 @@ afterEach(() => {
   setCommentsData.mockClear();
   toastSuccess.mockClear();
   localStorage.clear();
+  window.history.replaceState(null, "", "/");
+  vi.unstubAllGlobals();
 });
 
 describe("ArticleComments", () => {
@@ -182,6 +184,21 @@ describe("ArticleComments", () => {
 
     expect(within(commentCard!).getByText("رد سابق ملتصق بالتعليق")).toBeTruthy();
     expect(document.querySelector(".comment-reply-threads")).toBeNull();
+  });
+
+  it("يفتح ويبرز الرد المقصود عند الوصول إليه من رابط سياق مباشر", async () => {
+    const scrollIntoView = vi.fn();
+    vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => { callback(0); return 1; });
+    vi.stubGlobal("cancelAnimationFrame", vi.fn());
+    vi.stubGlobal("matchMedia", vi.fn(() => ({ matches: true })));
+    Object.defineProperty(Element.prototype, "scrollIntoView", { configurable: true, value: scrollIntoView });
+    window.history.replaceState(null, "", "#reply-25");
+
+    render(<ArticleComments pageKey="article-test" />);
+
+    await waitFor(() => expect(document.getElementById("reply-25")).not.toBeNull());
+    await waitFor(() => expect(document.getElementById("reply-25")?.className).toContain("comment-context-target"));
+    expect(scrollIntoView).toHaveBeenCalled();
   });
 
   it("يلغي محرر الرد المفتوح ويمسح النص عند التراجع", async () => {
