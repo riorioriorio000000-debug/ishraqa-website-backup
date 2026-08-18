@@ -5,6 +5,7 @@ const home = readFileSync(new URL("../client/src/pages/Home.tsx", import.meta.ur
 const services = readFileSync(new URL("../client/src/pages/StaticPage.tsx", import.meta.url), "utf8");
 const articles = readFileSync(new URL("../client/src/pages/ArticleDetail.tsx", import.meta.url), "utf8");
 const ourWork = readFileSync(new URL("../client/src/pages/OurWorkPage.tsx", import.meta.url), "utf8");
+const serviceMedia = readFileSync(new URL("../client/src/data/serviceMedia.ts", import.meta.url), "utf8");
 const videoComponent = readFileSync(new URL("../client/src/components/ServiceVideo.tsx", import.meta.url), "utf8");
 const meta = readFileSync(new URL("../client/src/ssr/meta.ts", import.meta.url), "utf8");
 const ssr = readFileSync(new URL("../server/_core/vite.ts", import.meta.url), "utf8");
@@ -40,6 +41,10 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(ourWork).toContain("ishraqa-upholstery-work-02_f51aee76.mp4");
     expect(ourWork).toContain("ishraqa-oven-work-01_28be488e.mp4");
     expect(ourWork).toContain("ishraqa-oven-work-02_eec8b074.mp4");
+    expect(ourWork).toContain("serviceMedia.ac.video");
+    expect(ourWork).toContain("serviceMedia.tank.video");
+    expect(serviceMedia).toContain("ishraqa-ac-work_9f225e58.mp4");
+    expect(serviceMedia).toContain("ishraqa-tank-work_4c069ae7.mp4");
     expect(ourWork).toContain("compact");
     expect(meta).toContain('"/our-work"');
   });
@@ -50,5 +55,6 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(meta).toContain('"/manus-storage/ishraqa-oven-work-01_28be488e.mp4"');
     expect(ssr).toContain('"@type": "VideoObject"');
     expect(ssr).toContain("contentUrl: absoluteUrl(meta.video.contentUrl)");
+    expect(ssr).toContain("thumbnailUrl: absoluteUrl(meta.image");
   });
 });

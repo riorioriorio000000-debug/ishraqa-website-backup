@@ -82,6 +82,7 @@ export function buildStructuredData(meta: SsrHeadMeta) {
         name: meta.video.name,
         description: meta.video.description,
         contentUrl: absoluteUrl(meta.video.contentUrl),
+        thumbnailUrl: absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png"),
         uploadDate: meta.video.uploadDate,
         inLanguage: "ar-SA",
         publisher: { "@id": organizationId },

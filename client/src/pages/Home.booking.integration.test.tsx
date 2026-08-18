@@ -63,7 +63,7 @@ describe("نموذج الحجز", () => {
     render(<Home />);
 
     const images = screen.getAllByRole("img");
-    expect(images).toHaveLength(6);
+    expect(images).toHaveLength(8);
     images.forEach((image) => expect(image.getAttribute("alt")?.trim()).not.toBe(""));
     images.forEach((image) => expect(image.getAttribute("srcset")).toMatch(/\b\d{3}w\b/));
     images.forEach((image) => expect(image.getAttribute("sizes")?.trim()).not.toBe(""));

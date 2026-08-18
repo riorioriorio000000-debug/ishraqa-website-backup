@@ -1,4 +1,5 @@
-import { articleShareImages } from "@/data/articleShareImages";
+import { articleShareImages } from "./articleShareImages";
+import { getLocalServiceMediaImage } from "./serviceMedia";
 
 export type LocalServicePage = {
   readonly serviceSlug: string;
@@ -87,7 +88,7 @@ export const localServicePages: readonly LocalServicePage[] = services.flatMap((
     cityDetail: city.detail,
     serviceDetail: service.detail,
     preparation: service.preparation,
-    image: articleShareImages[`${city.slug}-service-guide`] ?? "/manus-storage/ishraqa-home-open-graph_7b7b6db0.jpg",
+    image: getLocalServiceMediaImage(service.slug) ?? articleShareImages[`${city.slug}-service-guide`] ?? "/manus-storage/ishraqa-home-open-graph_7b7b6db0.jpg",
     faq: [
       { question: `كيف أرتب طلب ${service.name} في ${city.name}؟`, answer: `ابدأ برسالة تتضمن الحي بصورة عامة، ونوع المكان، والمساحات أو النقاط ذات الأولوية، والوقت المناسب للتواصل. تُراجع الإمكانات بعد معرفة التفاصيل، ولا يعني ذكر المدينة تأكيد توفر أو موعد تلقائي.` },
       { question: `هل تخدمون جميع أحياء ${city.name}؟`, answer: `اذكر الحي وطريقة الوصول عند التواصل. يُراجع نطاق الخدمة وإمكانية الوصول بحسب الطلب والوقت والموقع؛ لذلك لا ينشر الموقع وعدًا عامًا قبل التحقق من التفاصيل الفعلية.` },
