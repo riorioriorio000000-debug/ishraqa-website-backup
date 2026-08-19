@@ -701,6 +701,12 @@ img { -webkit-user-drag: none; user-drag: none; }
 .site-header-on-dark .nav-more-trigger:hover { color: #f2d292 !important; background: transparent; }
 .site-header-on-dark .nav-more-trigger:focus-visible { color: #fffdf8 !important; background: transparent; outline-color: rgba(242,210,146,.72); }
 
+/* «المزيد» في الهاتف امتداد هادئ للتنقل، لا زر داخل إطار منفصل. */
+.mobile-nav-more { border: 0; border-radius: 0; background: transparent; }
+.mobile-nav-more summary { padding-block: .5rem; }
+.mobile-nav-more summary:hover { background: transparent; }
+.mobile-nav-more summary:focus-visible { border-radius: .55rem; outline: 3px solid rgba(15,92,99,.25); outline-offset: 3px; }
+
 /* هوية «الرئيسية» مرسومة داخل الحروف نفسها، لا بخط سفلي منفصل. */
 .nav-home-link { display: inline-block; background: linear-gradient(100deg, var(--teal) 0 52%, var(--sand) 52% 100%); -webkit-background-clip: text; background-clip: text; color: transparent !important; font-weight: 900; text-shadow: none; }
 .site-header-on-dark .nav-home-link { background-image: linear-gradient(100deg, #84d3c6 0 52%, #f2d292 52% 100%); }

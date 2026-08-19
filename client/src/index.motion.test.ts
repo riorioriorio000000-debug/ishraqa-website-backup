@@ -16,6 +16,11 @@ describe("الحركة المخففة", () => {
     expect(css).toContain(".hero-caddy-art:hover img");
   });
 
+  it("يبقي عنصر المزيد في الهاتف بلا إطار مع مؤشر تركيز واضح", () => {
+    expect(css).toMatch(/\.mobile-nav-more\s*\{[^}]*border:\s*0[^}]*background:\s*transparent/);
+    expect(css).toContain(".mobile-nav-more summary:focus-visible");
+  });
+
   it("يمنح بطاقات الخدمات حركة تحويم هادئة ويوقفها عند تفضيل تقليل الحركة", () => {
     expect(css).toContain(".inner-service-card:hover,.inner-service-card:focus-within");
     expect(css).toContain("@media (hover:hover)");
