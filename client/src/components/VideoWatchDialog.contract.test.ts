@@ -20,6 +20,8 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
   it("يستخدم تفاعلات حقيقية مرتبطة بالفيديو ولا يضيف تقييماً أو تعليقاً صوريًا", () => {
     expect(dialog).toContain("ArticleComments key={activeVideoKey} pageKey={activeVideoKey}");
     expect(dialog).toContain("showLinkedRating");
+    expect(dialog).toContain("اكتب تعليقًا");
+    expect(dialog).toContain('querySelector<HTMLTextAreaElement>("textarea")?.focus');
     expect(dialog).toContain("toggleLike.mutate");
     expect(dialog).toContain("readVisitorId");
     expect(schema).toContain("videoLikes");

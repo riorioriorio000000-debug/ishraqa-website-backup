@@ -101,6 +101,17 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
     recordVideoView.mutate({ videoKey: activeVideoKey, visitorId });
   }, [activeVideoKey, open, recordVideoView, visitorId]);
 
+  useEffect(() => {
+    if (!commentsOpen) return;
+    const frame = window.requestAnimationFrame(() => {
+      const comments = document.getElementById(`${activeVideoKey}-comments`);
+      if (!comments) return;
+      comments.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      comments.querySelector<HTMLTextAreaElement>("textarea")?.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeVideoKey, commentsOpen]);
+
   const close = () => {
     videoRef.current?.pause();
     onOpenChange(false);
@@ -169,7 +180,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       <div className="video-watch-actions" aria-label="التفاعل مع الفيديو">
         <button type="button" className={`video-heart${engagement.data?.liked ? " active" : ""}${likePulse ? " is-reacting" : ""}`} onClick={handleLike} disabled={!visitorId || toggleLike.isPending} aria-pressed={engagement.data?.liked ?? false}><span aria-hidden="true">♥</span> {engagement.data?.liked ? "أعجبك الفيديو" : "أعجبني"}<small>{engagement.data?.likes ?? 0}</small></button>
         <button type="button" className="video-share-toggle" onClick={() => setShareOpen((value) => !value)} aria-expanded={shareOpen} aria-controls={`${activeVideoKey}-share`}><Share2 size={16} aria-hidden="true" /> مشاركة</button>
-        <button type="button" className="video-comments-toggle" onClick={() => setCommentsOpen(value => !value)} aria-expanded={commentsOpen} aria-controls={`${activeVideoKey}-comments`}>{commentsOpen ? "إخفاء التعليقات والتقييم" : "عرض التعليقات والتقييم"}</button>
+        <button type="button" className="video-comments-toggle" onClick={() => setCommentsOpen(value => !value)} aria-expanded={commentsOpen} aria-controls={`${activeVideoKey}-comments`}><MessageCircle size={16} aria-hidden="true" /> {commentsOpen ? "إخفاء التعليقات" : "اكتب تعليقًا"}</button>
       </div>
       {shareOpen && <div id={`${activeVideoKey}-share`} className="video-share-menu" aria-label="خيارات مشاركة الفيديو">
         <button type="button" onClick={() => void copyShareLink()}>{copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}<span>{copied ? "تم النسخ" : "نسخ الرابط"}</span></button>
