@@ -23,10 +23,12 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(articles).toContain("ishraqa-oven-work-02_eec8b074.mp4");
   });
 
-  it("يحافظ على تحميل خفيف ويستأنف التشغيل عند تفعيل الصوت", () => {
+  it("يحافظ على تحميل خفيف ويعرض إطار معاينة ويستأنف التشغيل عند تفعيل الصوت", () => {
     expect(videoComponent).toContain('preload="metadata"');
     expect(videoComponent).toContain("playsInline");
     expect(videoComponent).toContain("IntersectionObserver");
+    expect(videoComponent).toContain("showPreviewFrame");
+    expect(videoComponent).toContain("video.currentTime = Math.min(0.1, duration)");
     expect(videoComponent).toContain("muted={!soundOn}");
     expect(videoComponent).toContain("video.defaultMuted = false");
     expect(videoComponent).toContain("video.volume = 1");

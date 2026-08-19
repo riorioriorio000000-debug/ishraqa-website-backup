@@ -74,11 +74,21 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
     expect(serviceVideo).toContain("VideoWatchDialog");
     expect(serviceVideo).toContain("setWatchOpen(true)");
     expect(serviceVideo).toContain('preload="metadata"');
+    expect(serviceVideo).toContain("showPreviewFrame");
     expect(serviceVideo).not.toContain(" controls ");
     expect(serviceVideo).not.toContain("poster=");
     expect(serviceVideo).toContain("video.defaultMuted = false");
     expect(serviceVideo).toContain("video.volume = 1");
     expect(dialog).not.toContain("poster=");
     expect(dialog).toContain("video.defaultMuted = false");
+  });
+
+  it("يعرض الفيديوهات داخل إطار أفقي متوازن بخلفية سوداء ويحتوي المقطع كاملًا", () => {
+    const styles = readFileSync(new URL("../index.css", import.meta.url), "utf8");
+    expect(styles).toContain(".service-video-media {");
+    expect(styles).toContain("aspect-ratio: 16 / 9");
+    expect(styles).toContain("background: #000");
+    expect(styles).toContain("object-fit: contain");
+    expect(styles).toContain(".our-work-video-grid .service-video-media");
   });
 });

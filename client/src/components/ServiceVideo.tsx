@@ -43,16 +43,22 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
       const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
       setProgress(duration ? (video.currentTime / duration) * 100 : 0);
     };
+    const showPreviewFrame = () => {
+      const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+      if (duration && video.currentTime === 0) video.currentTime = Math.min(0.1, duration);
+    };
     const syncPlaying = () => setIsPlaying(!video.paused && !video.ended);
 
     video.addEventListener("timeupdate", syncProgress);
     video.addEventListener("loadedmetadata", syncProgress);
+    video.addEventListener("loadedmetadata", showPreviewFrame);
     video.addEventListener("play", syncPlaying);
     video.addEventListener("pause", syncPlaying);
     video.addEventListener("ended", syncPlaying);
     return () => {
       video.removeEventListener("timeupdate", syncProgress);
       video.removeEventListener("loadedmetadata", syncProgress);
+      video.removeEventListener("loadedmetadata", showPreviewFrame);
       video.removeEventListener("play", syncPlaying);
       video.removeEventListener("pause", syncPlaying);
       video.removeEventListener("ended", syncPlaying);
