@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
 import VideoEngagementMeta from "@/components/VideoEngagementMeta";
 import VideoWatchDialog from "@/components/VideoWatchDialog";
-import { getServiceVideoPoster } from "@/data/serviceMedia";
 import { getVideoKey, type WorkVideo } from "@/data/workVideos";
 
 type ServiceVideoProps = WorkVideo & {
@@ -20,7 +19,6 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
   const [progress, setProgress] = useState(0);
   const [watchOpen, setWatchOpen] = useState(false);
   const videoKey = getVideoKey(src);
-  const poster = getServiceVideoPoster(src);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -78,11 +76,17 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
   const toggleSound = async () => {
     const video = videoRef.current;
     if (!video) return;
-    const nextSoundOn = !soundOn;
-    video.muted = !nextSoundOn;
-    setSoundOn(nextSoundOn);
+    if (!video.muted) {
+      video.muted = true;
+      setSoundOn(false);
+      return;
+    }
+    video.muted = false;
+    video.defaultMuted = false;
+    video.volume = 1;
     try {
-      if (video.paused) await video.play();
+      await video.play();
+      setSoundOn(true);
     } catch {
       video.muted = true;
       setSoundOn(false);
@@ -99,7 +103,7 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
   return (
     <article className={`service-video-card${featured ? " featured" : ""}${compact ? " compact" : ""}`}>
       <div ref={mediaRef} className="service-video-media" role="button" tabIndex={0} onClick={() => setWatchOpen(true)} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setWatchOpen(true); } }} aria-label={`فتح نافذة مشاهدة فيديو ${title}`}>
-        {shouldLoadVideo ? <><video ref={videoRef} poster={poster} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو توضيحي لخدمة ${title}`}>
+        {shouldLoadVideo ? <><video ref={videoRef} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو توضيحي لخدمة ${title}`}>
           <source src={src} type="video/mp4" />
         </video>
         <div className="video-controls" aria-label={`عناصر تحكم فيديو ${title}`}>
@@ -111,7 +115,7 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
             {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
             <span>{soundOn ? "إيقاف الصوت" : "تشغيل الصوت"}</span>
           </button>
-        </div><span className="video-watch-hint" aria-hidden="true">افتح الفيديو والتفاعل</span></> : <div className="service-video-placeholder" style={{ backgroundImage: `url(${poster})` }} aria-label={`معاينة مرئية لخدمة ${title}`} />}
+        </div><span className="video-watch-hint" aria-hidden="true">افتح الفيديو والتفاعل</span></> : <div className="service-video-placeholder" aria-label={`يُحمّل فيديو خدمة ${title}`} />}
       </div>
       <div className="service-video-copy">
         <span className="eyebrow"><i /> من واقع الخدمة</span>
@@ -119,7 +123,7 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
         <p>{description}</p>
         <div className="service-video-footer"><VideoEngagementMeta videoKey={videoKey} compact /><Link href={servicePath} className="service-video-service-link">{serviceLabel}</Link></div>
       </div>
-      <VideoWatchDialog open={watchOpen} onOpenChange={setWatchOpen} title={title} description={description} src={src} poster={poster} videoKey={videoKey} />
+      <VideoWatchDialog open={watchOpen} onOpenChange={setWatchOpen} title={title} description={description} src={src} videoKey={videoKey} />
     </article>
   );
 }

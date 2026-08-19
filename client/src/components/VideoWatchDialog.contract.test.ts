@@ -31,7 +31,8 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
   it("يعرض اقتراحات حقيقية ومشاركة مختصرة دون بيانات أو روابط مصطنعة", () => {
     expect(dialog).toContain("فيديوهات ذات صلة");
     expect(dialog).toContain("workVideos.filter");
-    expect(dialog).toContain("getServiceVideoPoster(relatedVideo.src)");
+    expect(dialog).toContain("relatedVideos.map");
+    expect(dialog).not.toContain("getServiceVideoPoster");
     expect(dialog).toContain("نسخ الرابط");
     expect(dialog).toContain('buildPlatformShareUrl("whatsapp"');
     expect(dialog).toContain('buildPlatformShareUrl("facebook"');
@@ -51,5 +52,10 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
     expect(serviceVideo).toContain("setWatchOpen(true)");
     expect(serviceVideo).toContain('preload="metadata"');
     expect(serviceVideo).not.toContain(" controls ");
+    expect(serviceVideo).not.toContain("poster=");
+    expect(serviceVideo).toContain("video.defaultMuted = false");
+    expect(serviceVideo).toContain("video.volume = 1");
+    expect(dialog).not.toContain("poster=");
+    expect(dialog).toContain("video.defaultMuted = false");
   });
 });

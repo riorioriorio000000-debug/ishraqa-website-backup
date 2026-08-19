@@ -28,7 +28,9 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(videoComponent).toContain("playsInline");
     expect(videoComponent).toContain("IntersectionObserver");
     expect(videoComponent).toContain("muted={!soundOn}");
-    expect(videoComponent).toContain("if (video.paused) await video.play()");
+    expect(videoComponent).toContain("video.defaultMuted = false");
+    expect(videoComponent).toContain("video.volume = 1");
+    expect(videoComponent).toContain("await video.play()");
     expect(videoComponent).not.toContain(" controls ");
     expect(videoComponent).not.toContain("controlsList");
     expect(videoComponent).toContain('className="video-controls"');

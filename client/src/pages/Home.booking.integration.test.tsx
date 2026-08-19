@@ -65,10 +65,13 @@ describe("نموذج الحجز", () => {
     const images = screen.getAllByRole("img");
     expect(images).toHaveLength(8);
     images.forEach((image) => expect(image.getAttribute("alt")?.trim()).not.toBe(""));
-    images.forEach((image) => expect(image.getAttribute("srcset")).toMatch(/\b\d{3}w\b/));
     images.forEach((image) => expect(image.getAttribute("sizes")?.trim()).not.toBe(""));
+    const coverageMap = screen.getByAltText("خريطة مدن تغطية شركة الإشراقة في السعودية");
+    expect(coverageMap.getAttribute("src")).toContain("ishraqa-coverage-map-transparent-user_48fec9cb.webp");
+    expect(coverageMap.getAttribute("srcset")).toBeNull();
+    images.filter((image) => image !== coverageMap).forEach((image) => expect(image.getAttribute("srcset")).toMatch(/\b\d{3}w\b/));
     expect(screen.getByAltText("رسم شفاف لصندوق أدوات تنظيف الإشراقة")).toBeTruthy();
-    expect(screen.getByAltText("خريطة مدن تغطية شركة الإشراقة في السعودية")).toBeTruthy();
+    expect(coverageMap).toBeTruthy();
   });
 
   it("يفصل عنوان الترويسة إلى سطرين واضحين بدل تداخل النص", () => {

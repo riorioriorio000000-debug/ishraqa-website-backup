@@ -6,7 +6,6 @@ import ArticleComments from "@/components/ArticleComments";
 import VideoEngagementMeta from "@/components/VideoEngagementMeta";
 import { trpc } from "@/lib/trpc";
 import { buildPlatformShareUrl, buildShareText, getOfficialShareUrl } from "@/components/SiteShareDialog";
-import { getServiceVideoPoster } from "@/data/serviceMedia";
 import { getVideoKey, workVideos } from "@/data/workVideos";
 
 type VideoWatchDialogProps = {
@@ -15,7 +14,6 @@ type VideoWatchDialogProps = {
   title: string;
   description: string;
   src: string;
-  poster: string;
   videoKey: string;
 };
 
@@ -28,7 +26,7 @@ function readVisitorId() {
   return created;
 }
 
-export default function VideoWatchDialog({ open, onOpenChange, title, description, src, poster, videoKey }: VideoWatchDialogProps) {
+export default function VideoWatchDialog({ open, onOpenChange, title, description, src, videoKey }: VideoWatchDialogProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [visitorId, setVisitorId] = useState<string>();
   const [isPlaying, setIsPlaying] = useState(false);
@@ -40,7 +38,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
   const [likePulse, setLikePulse] = useState(false);
   const [isMounted, setIsMounted] = useState(open);
   const [isClosing, setIsClosing] = useState(false);
-  const [activeVideo, setActiveVideo] = useState({ title, description, src, poster, videoKey });
+  const [activeVideo, setActiveVideo] = useState({ title, description, src, videoKey });
   const activeVideoKey = getVideoKey(activeVideo.src);
   const engagement = trpc.interactions.videoEngagement.useQuery({ videoKey: activeVideoKey, visitorId });
   const toggleLike = trpc.interactions.toggleVideoLike.useMutation({ onSuccess: () => void engagement.refetch() });
@@ -54,7 +52,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
 
   useEffect(() => {
     if (open) {
-      setActiveVideo({ title, description, src, poster, videoKey });
+      setActiveVideo({ title, description, src, videoKey });
       setIsMounted(true);
       setIsClosing(false);
       return;
@@ -66,7 +64,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       setIsClosing(false);
     }, 190);
     return () => window.clearTimeout(timer);
-  }, [description, isMounted, open, poster, src, title, videoKey]);
+  }, [description, isMounted, open, src, title, videoKey]);
 
   useEffect(() => {
     if (!open) return;
@@ -110,7 +108,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
 
   const chooseRelatedVideo = (nextVideo: typeof workVideos[number]) => {
     videoRef.current?.pause();
-    setActiveVideo({ ...nextVideo, poster: getServiceVideoPoster(nextVideo.src), videoKey: getVideoKey(nextVideo.src) });
+    setActiveVideo({ ...nextVideo, videoKey: getVideoKey(nextVideo.src) });
     setIsPlaying(false);
     setSoundOn(false);
     setProgress(0);
@@ -142,10 +140,11 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
   const toggleSound = async () => {
     const video = videoRef.current;
     if (!video) return;
-    const nextSoundOn = !soundOn;
-    video.muted = !nextSoundOn;
-    setSoundOn(nextSoundOn);
-    if (video.paused) { try { await video.play(); } catch { video.muted = true; setSoundOn(false); } }
+    if (!video.muted) { video.muted = true; setSoundOn(false); return; }
+    video.muted = false;
+    video.defaultMuted = false;
+    video.volume = 1;
+    try { await video.play(); setSoundOn(true); } catch { video.muted = true; setSoundOn(false); }
   };
   const seek = (value: number) => {
     const video = videoRef.current;
@@ -160,7 +159,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       <button type="button" className="video-watch-close" onClick={close} aria-label="إغلاق مشاهدة الفيديو">×</button>
       <div className="video-watch-head"><span className="eyebrow"><i /> أعمال الإشراقة</span><h2 id={`${activeVideoKey}-title`}>{activeVideo.title}</h2><p>{activeVideo.description}</p></div>
       <div className="video-watch-stage">
-        <video ref={videoRef} poster={activeVideo.poster} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو ${activeVideo.title}`}><source src={activeVideo.src} type="video/mp4" /></video>
+        <video ref={videoRef} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو ${activeVideo.title}`}><source src={activeVideo.src} type="video/mp4" /></video>
         <div className="video-watch-controls" aria-label={`عناصر تحكم فيديو ${activeVideo.title}`}>
           <button type="button" onClick={togglePlayback} aria-pressed={isPlaying}>{isPlaying ? "إيقاف" : "تشغيل"}</button>
           <input type="range" min="0" max="100" step="0.1" value={progress} onChange={(event) => seek(Number(event.target.value))} aria-label="التقدم في الفيديو" />
@@ -179,7 +178,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       </div>}
       <section className="video-watch-related" aria-labelledby={`${activeVideoKey}-related`}>
         <div className="video-watch-related-heading"><span className="eyebrow"><i /> استكشف المزيد</span><h3 id={`${activeVideoKey}-related`}>فيديوهات ذات صلة</h3></div>
-        <div className="video-watch-related-list">{relatedVideos.map((relatedVideo) => <article key={relatedVideo.src}><button type="button" onClick={() => chooseRelatedVideo(relatedVideo)} aria-label={`مشاهدة فيديو مرتبط: ${relatedVideo.title}`}><img src={getServiceVideoPoster(relatedVideo.src)} alt="" loading="lazy" /><span>{relatedVideo.title}</span></button><div className="video-watch-related-meta"><VideoEngagementMeta videoKey={getVideoKey(relatedVideo.src)} compact /><Link href={relatedVideo.servicePath} onClick={(event) => event.stopPropagation()}>{relatedVideo.serviceLabel} <ArrowLeft size={13} aria-hidden="true" /></Link></div></article>)}</div>
+        <div className="video-watch-related-list">{relatedVideos.map((relatedVideo) => <article key={relatedVideo.src}><button type="button" onClick={() => chooseRelatedVideo(relatedVideo)} aria-label={`مشاهدة فيديو مرتبط: ${relatedVideo.title}`}><span>{relatedVideo.title}</span></button><div className="video-watch-related-meta"><VideoEngagementMeta videoKey={getVideoKey(relatedVideo.src)} compact /><Link href={relatedVideo.servicePath} onClick={(event) => event.stopPropagation()}>{relatedVideo.serviceLabel} <ArrowLeft size={13} aria-hidden="true" /></Link></div></article>)}</div>
       </section>
       {commentsOpen && <div id={`${activeVideoKey}-comments`} className="video-watch-comments"><ArticleComments key={activeVideoKey} pageKey={activeVideoKey} showLinkedRating sectionId={`${activeVideoKey}-comments`} /></div>}
     </section>
