@@ -16,8 +16,12 @@ describe("صفحات الخدمة والمدينة", () => {
 
   it("يحافظ على أسئلة شائعة ومعلومات حقيقية قابلة للقراءة في كل صفحة", () => {
     const page = getLocalServicePage("pest-control", "abha");
-    expect(page?.faq).toHaveLength(3);
+    expect(page?.faq).toHaveLength(5);
     expect(page?.neighbourhoods.length).toBeGreaterThanOrEqual(4);
+    expect(page?.serviceSteps).toHaveLength(3);
+    expect(page?.cityTips).toHaveLength(3);
+    expect(page?.image).toBe("/manus-storage/ishraqa-pest-control-service_78beaf48.jpg");
+    expect(page?.imageAlt).toContain("مكافحة حشرات");
     expect(page?.description).not.toMatch(/الأرخص|مضمون|الأولى/);
   });
 

@@ -25,6 +25,10 @@ export const serviceMedia = {
     image: "/manus-storage/ishraqa-plumbing-maintenance_dd3ce02a.png",
     alt: "أدوات صيانة سباكة منزلية مرتبة لفحص نقطة خدمة",
   },
+  pestControl: {
+    image: "/manus-storage/ishraqa-pest-control-service_78beaf48.jpg",
+    alt: "أدوات مكافحة حشرات منزلية مرتبة في مطبخ حديث بدون أشخاص",
+  },
 } as const;
 
 export function getLocalServiceMediaImage(serviceSlug: string) {
@@ -32,6 +36,19 @@ export function getLocalServiceMediaImage(serviceSlug: string) {
   if (serviceSlug === "tank-cleaning" || serviceSlug === "insulation") return serviceMedia.tank.image;
   if (serviceSlug === "home-maintenance") return serviceMedia.plumbing.image;
   if (serviceSlug === "home-cleaning" || serviceSlug === "sofa-cleaning") return serviceMedia.cleaning.image;
+  if (serviceSlug === "pest-control") return serviceMedia.pestControl.image;
+  if (serviceSlug === "furniture-moving") return serviceMedia.floorCleaning.image;
+  if (serviceSlug === "painting") return serviceMedia.plumbing.image;
+  return undefined;
+}
+
+export function getLocalServiceMediaAlt(serviceSlug: string) {
+  if (serviceSlug === "ac-maintenance") return serviceMedia.ac.alt;
+  if (serviceSlug === "tank-cleaning" || serviceSlug === "insulation") return serviceMedia.tank.alt;
+  if (serviceSlug === "home-maintenance" || serviceSlug === "painting") return serviceMedia.plumbing.alt;
+  if (serviceSlug === "home-cleaning" || serviceSlug === "sofa-cleaning") return serviceMedia.cleaning.alt;
+  if (serviceSlug === "pest-control") return serviceMedia.pestControl.alt;
+  if (serviceSlug === "furniture-moving") return serviceMedia.floorCleaning.alt;
   return undefined;
 }
 
