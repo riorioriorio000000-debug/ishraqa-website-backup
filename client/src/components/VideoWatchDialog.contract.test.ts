@@ -42,6 +42,15 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
     expect(comments).toContain("openReply(comment.id");
   });
 
+  it("يضع تأكيد نشر تعليق الفيديو الصغير فوق المشغل بدل رسالة عامة", () => {
+    expect(dialog).toContain("video-comment-success-notice");
+    expect(dialog).toContain('role="status"');
+    expect(dialog).toContain("onCommentPublished={handleVideoCommentPublished}");
+    expect(dialog).toContain("suppressSuccessToast");
+    expect(comments).toContain("suppressSuccessToast = false");
+    expect(comments).toContain("onCommentPublished?.()");
+  });
+
   it("يعرض اقتراحات حقيقية ومشاركة مختصرة دون بيانات أو روابط مصطنعة", () => {
     expect(dialog).toContain("فيديوهات ذات صلة");
     expect(dialog).toContain("workVideos.filter");

@@ -62,7 +62,7 @@ function AvatarArt({ kind, className }: { kind: AvatarKind; className?: string }
   return <svg className={className} viewBox="0 0 64 64" aria-hidden="true">{shapes[kind]}</svg>;
 }
 
-export default function ArticleComments({ pageKey, showLinkedRating = true, sectionId = "comments", showSortControls = false }: { pageKey: string; showLinkedRating?: boolean; sectionId?: string; showSortControls?: boolean }) {
+export default function ArticleComments({ pageKey, showLinkedRating = true, sectionId = "comments", showSortControls = false, onCommentPublished, suppressSuccessToast = false }: { pageKey: string; showLinkedRating?: boolean; sectionId?: string; showSortControls?: boolean; onCommentPublished?: () => void; suppressSuccessToast?: boolean }) {
   const [visitorId, setVisitorId] = useState<string>();
   const [displayName, setDisplayName] = useState("");
   const [body, setBody] = useState("");
@@ -102,9 +102,10 @@ export default function ArticleComments({ pageKey, showLinkedRating = true, sect
       clearEditor();
       setProfileOpen(false);
       setStatus("تم نشر تعليقك.");
+      onCommentPublished?.();
       void comments.refetch();
       void feedback.refetch();
-      if (result.commentId && visitorId) {
+      if (result.commentId && visitorId && !suppressSuccessToast) {
         toast.success("تم نشر تعليقك.", { action: { label: "تراجع", onClick: () => {
           setUndoingCommentId(result.commentId ?? undefined);
           undoPublishedComment.mutate({ commentId: result.commentId!, visitorId });

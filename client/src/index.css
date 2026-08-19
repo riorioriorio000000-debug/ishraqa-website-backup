@@ -896,6 +896,9 @@ img { -webkit-user-drag: none; user-drag: none; }
 .toaster [data-sonner-toast] [data-title] { color: #0f5c63 !important; font-weight: 900; }
 .toaster [data-sonner-toast] [data-description] { color: #4f6d69 !important; }
 
+.video-comment-success-notice { position: absolute; z-index: 4; top: .8rem; right: 1rem; max-width: calc(100% - 2rem); padding: .42rem .66rem; border: 1px solid rgba(255,255,255,.5); border-radius: 999px; background: rgba(7, 76, 78, .9); box-shadow: 0 8px 18px rgba(0,0,0,.18); color: #fff; font-size: .74rem; font-weight: 800; line-height: 1.25; pointer-events: none; }
+@media (max-width: 620px) { .video-comment-success-notice { top: .55rem; right: .55rem; max-width: calc(100% - 1.1rem); padding: .36rem .55rem; font-size: .68rem; } }
+
 /* ترويسة الإشعارات: الجرس ظاهر في التنقل، والشارة الحمراء تبقى مقروءة فوقه. */
 .header-actions { gap: .5rem; }
 .header-actions .notification-bell { width: 2.3rem; height: 2.3rem; border-color: rgba(15,92,99,.18); background: rgba(255,253,248,.92); box-shadow: 0 5px 14px rgba(15,92,99,.07); }

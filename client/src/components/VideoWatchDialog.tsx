@@ -36,6 +36,8 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [likePulse, setLikePulse] = useState(false);
+  const [commentPublishedNotice, setCommentPublishedNotice] = useState(false);
+  const commentNoticeTimer = useRef<number>();
   const [isMounted, setIsMounted] = useState(open);
   const [isClosing, setIsClosing] = useState(false);
   const [activeVideo, setActiveVideo] = useState({ title, description, src, videoKey });
@@ -76,6 +78,10 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
     document.addEventListener("keydown", closeOnEscape);
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener("keydown", closeOnEscape); };
   }, [open, onOpenChange]);
+
+  useEffect(() => () => {
+    if (commentNoticeTimer.current) window.clearTimeout(commentNoticeTimer.current);
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -144,6 +150,11 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
     window.setTimeout(() => setLikePulse(false), 360);
     toggleLike.mutate({ videoKey: activeVideoKey, visitorId });
   };
+  const handleVideoCommentPublished = () => {
+    if (commentNoticeTimer.current) window.clearTimeout(commentNoticeTimer.current);
+    setCommentPublishedNotice(true);
+    commentNoticeTimer.current = window.setTimeout(() => setCommentPublishedNotice(false), 2200);
+  };
   const togglePlayback = async () => {
     const video = videoRef.current;
     if (!video) return;
@@ -172,6 +183,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       <div className="video-watch-head"><span className="eyebrow"><i /> أعمال الإشراقة</span><h2 id={`${activeVideoKey}-title`}>{activeVideo.title}</h2><p>{activeVideo.description}</p></div>
       <div className="video-watch-stage">
         <video ref={videoRef} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو ${activeVideo.title}`}><source src={activeVideo.src} type="video/mp4" /></video>
+        {commentPublishedNotice && <div className="video-comment-success-notice" role="status" aria-live="polite">تم إرسال تعليقك</div>}
         <div className="video-watch-controls" aria-label={`عناصر تحكم فيديو ${activeVideo.title}`}>
           <button type="button" onClick={togglePlayback} aria-pressed={isPlaying}>{isPlaying ? "إيقاف" : "تشغيل"}</button>
           <input type="range" min="0" max="100" step="0.1" value={progress} onChange={(event) => seek(Number(event.target.value))} aria-label="التقدم في الفيديو" />
@@ -192,7 +204,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
         <div className="video-watch-related-heading"><span className="eyebrow"><i /> استكشف المزيد</span><h3 id={`${activeVideoKey}-related`}>فيديوهات ذات صلة</h3></div>
         <div className="video-watch-related-list">{relatedVideos.map((relatedVideo) => <article key={relatedVideo.src}><button type="button" onClick={() => chooseRelatedVideo(relatedVideo)} aria-label={`مشاهدة فيديو مرتبط: ${relatedVideo.title}`}><span>{relatedVideo.title}</span></button><div className="video-watch-related-meta"><VideoEngagementMeta videoKey={getVideoKey(relatedVideo.src)} compact /><Link href={relatedVideo.servicePath} onClick={(event) => event.stopPropagation()}>{relatedVideo.serviceLabel} <ArrowLeft size={13} aria-hidden="true" /></Link></div></article>)}</div>
       </section>
-      {commentsOpen && <div id={`${activeVideoKey}-comments`} className="video-watch-comments"><ArticleComments key={activeVideoKey} pageKey={activeVideoKey} showLinkedRating sectionId={`${activeVideoKey}-comments`} showSortControls /></div>}
+      {commentsOpen && <div id={`${activeVideoKey}-comments`} className="video-watch-comments"><ArticleComments key={activeVideoKey} pageKey={activeVideoKey} showLinkedRating sectionId={`${activeVideoKey}-comments`} showSortControls onCommentPublished={handleVideoCommentPublished} suppressSuccessToast /></div>}
     </section>
   </div>, document.body);
 }
