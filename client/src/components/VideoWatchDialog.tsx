@@ -41,6 +41,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
   const [activeVideo, setActiveVideo] = useState({ title, description, src, videoKey });
   const activeVideoKey = getVideoKey(activeVideo.src);
   const engagement = trpc.interactions.videoEngagement.useQuery({ videoKey: activeVideoKey, visitorId });
+  const videoComments = trpc.interactions.listComments.useQuery({ pageKey: activeVideoKey, visitorId });
   const toggleLike = trpc.interactions.toggleVideoLike.useMutation({ onSuccess: () => void engagement.refetch() });
   const recordVideoView = trpc.interactions.recordVideoView.useMutation({ onSuccess: () => void engagement.refetch() });
   const relatedVideos = useMemo(() => workVideos.filter((video) => video.src !== activeVideo.src).slice(0, 3), [activeVideo.src]);
@@ -180,7 +181,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       <div className="video-watch-actions" aria-label="التفاعل مع الفيديو">
         <button type="button" className={`video-heart${engagement.data?.liked ? " active" : ""}${likePulse ? " is-reacting" : ""}`} onClick={handleLike} disabled={!visitorId || toggleLike.isPending} aria-pressed={engagement.data?.liked ?? false}><span aria-hidden="true">♥</span> {engagement.data?.liked ? "أعجبك الفيديو" : "أعجبني"}<small>{engagement.data?.likes ?? 0}</small></button>
         <button type="button" className="video-share-toggle" onClick={() => setShareOpen((value) => !value)} aria-expanded={shareOpen} aria-controls={`${activeVideoKey}-share`}><Share2 size={16} aria-hidden="true" /> مشاركة</button>
-        <button type="button" className="video-comments-toggle" onClick={() => setCommentsOpen(value => !value)} aria-expanded={commentsOpen} aria-controls={`${activeVideoKey}-comments`}><MessageCircle size={16} aria-hidden="true" /> {commentsOpen ? "إخفاء التعليقات" : "اكتب تعليقًا"}</button>
+        <button type="button" className="video-comments-toggle" onClick={() => setCommentsOpen(value => !value)} aria-expanded={commentsOpen} aria-controls={`${activeVideoKey}-comments`}><MessageCircle size={16} aria-hidden="true" /> {commentsOpen ? "إخفاء التعليقات" : "اكتب تعليقًا"}<small aria-label={`${videoComments.data?.length ?? 0} تعليقًا`}>{videoComments.data?.length ?? 0}</small></button>
       </div>
       {shareOpen && <div id={`${activeVideoKey}-share`} className="video-share-menu" aria-label="خيارات مشاركة الفيديو">
         <button type="button" onClick={() => void copyShareLink()}>{copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}<span>{copied ? "تم النسخ" : "نسخ الرابط"}</span></button>
@@ -191,7 +192,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
         <div className="video-watch-related-heading"><span className="eyebrow"><i /> استكشف المزيد</span><h3 id={`${activeVideoKey}-related`}>فيديوهات ذات صلة</h3></div>
         <div className="video-watch-related-list">{relatedVideos.map((relatedVideo) => <article key={relatedVideo.src}><button type="button" onClick={() => chooseRelatedVideo(relatedVideo)} aria-label={`مشاهدة فيديو مرتبط: ${relatedVideo.title}`}><span>{relatedVideo.title}</span></button><div className="video-watch-related-meta"><VideoEngagementMeta videoKey={getVideoKey(relatedVideo.src)} compact /><Link href={relatedVideo.servicePath} onClick={(event) => event.stopPropagation()}>{relatedVideo.serviceLabel} <ArrowLeft size={13} aria-hidden="true" /></Link></div></article>)}</div>
       </section>
-      {commentsOpen && <div id={`${activeVideoKey}-comments`} className="video-watch-comments"><ArticleComments key={activeVideoKey} pageKey={activeVideoKey} showLinkedRating sectionId={`${activeVideoKey}-comments`} /></div>}
+      {commentsOpen && <div id={`${activeVideoKey}-comments`} className="video-watch-comments"><ArticleComments key={activeVideoKey} pageKey={activeVideoKey} showLinkedRating sectionId={`${activeVideoKey}-comments`} showSortControls /></div>}
     </section>
   </div>, document.body);
 }

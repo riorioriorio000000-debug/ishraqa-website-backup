@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const dialog = readFileSync(new URL("./VideoWatchDialog.tsx", import.meta.url), "utf8");
 const serviceVideo = readFileSync(new URL("./ServiceVideo.tsx", import.meta.url), "utf8");
+const comments = readFileSync(new URL("./ArticleComments.tsx", import.meta.url), "utf8");
 const schema = readFileSync(new URL("../../../drizzle/schema.ts", import.meta.url), "utf8");
 const router = readFileSync(new URL("../../../server/routers.ts", import.meta.url), "utf8");
 
@@ -28,6 +29,17 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
     expect(schema).toContain("video_likes_visitor_unique");
     expect(router).toContain("toggleVideoLike");
     expect(router).toContain("videoLike");
+  });
+
+  it("يعرض عداد التعليقات ويدعم فرزها والردود المباشرة داخل نافذة الفيديو", () => {
+    expect(dialog).toContain("videoComments.data?.length ?? 0");
+    expect(dialog).toContain("showSortControls");
+    expect(comments).toContain('showSortControls = false');
+    expect(comments).toContain('setSortOrder("newest")');
+    expect(comments).toContain('setSortOrder("engagement")');
+    expect(comments).toContain("الأكثر تفاعلًا");
+    expect(comments).toContain("comment-reply-action");
+    expect(comments).toContain("openReply(comment.id");
   });
 
   it("يعرض اقتراحات حقيقية ومشاركة مختصرة دون بيانات أو روابط مصطنعة", () => {
