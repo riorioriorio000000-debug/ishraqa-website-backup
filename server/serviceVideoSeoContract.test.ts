@@ -54,6 +54,13 @@ describe("فيديوهات أعمال الإشراقة", () => {
     expect(meta).toContain('"/our-work"');
   });
 
+  it("يبدأ ترتيب أعمالنا بخدمات التكييف والكنب الأعلى أولوية قبل المطبخ والخزانات", () => {
+    const registry = workVideos.slice(workVideos.indexOf("export const workVideos"));
+    const serviceOrder = [...registry.matchAll(/serviceId: "([^\"]+)"/g)].map((match) => match[1]);
+
+    expect(serviceOrder).toEqual(["ac", "upholstery", "upholstery", "kitchen", "kitchen", "tanks"]);
+  });
+
   it("يربط كل فيديو بخدمة حقيقية ويتيح تصفية الأعمال دون بيانات تفاعل مصطنعة", () => {
     expect(workVideos).toContain("serviceId:");
     expect(workVideos).toContain("servicePath:");
