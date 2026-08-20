@@ -52,6 +52,19 @@ describe("بحث مكتبة المقالات", () => {
     expect(container.querySelectorAll(".secondary-article-grid article")).toHaveLength(58);
   });
 
+  it("يعرض الصورة الخاصة بكل دليل محلي مع نص بديل بدل رسم عام متكرر", () => {
+    const { container } = render(<ArticlesPage />);
+    const localArticle = articleEntries.find((article) => article.slug === "cleaning-al-kharj");
+    const localImage = Array.from(container.querySelectorAll<HTMLImageElement>(".local-article-grid .secondary-article-visual img")).find(
+      (image) => image.getAttribute("src") === localArticle?.image,
+    );
+
+    expect(localArticle?.image).toBeTruthy();
+    expect(localImage).toBeTruthy();
+    expect(localImage?.getAttribute("alt")).toBe(localArticle?.imageAlt);
+    expect(localImage?.getAttribute("loading")).toBe("lazy");
+  });
+
   it("يعطي صورة أول دليل أولوية تحميل حتى لا تتأخر عن ظهور البطاقة", () => {
     const { container } = render(<ArticlesPage />);
     const [firstImage, secondImage] = Array.from(container.querySelectorAll<HTMLImageElement>(".featured-article-media img"));

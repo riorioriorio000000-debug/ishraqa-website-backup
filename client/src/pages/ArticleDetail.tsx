@@ -150,12 +150,20 @@ const localArticleVisuals: Readonly<Record<string, { readonly src: string; reado
   "khamis-mushait": { src: "/manus-storage/article-visual-exterior-care_8deeb043.webp", alt: "واجهة منزل مرتبة وأدوات عناية خارجية" },
 };
 
+const localArticleServiceVisuals = {
+  cleaning: { src: serviceMedia.cleaning.image, alt: serviceMedia.cleaning.alt },
+  "ac-maintenance": { src: serviceMedia.ac.image, alt: serviceMedia.ac.alt },
+  moving: { src: serviceMedia.floorCleaning.image, alt: serviceMedia.floorCleaning.alt },
+  "kitchen-cleaning": { src: serviceMedia.floorCleaning.image, alt: serviceMedia.floorCleaning.alt },
+  "home-services": { src: serviceMedia.cleaning.image, alt: serviceMedia.cleaning.alt },
+} as const;
+
 const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index) => {
   const service = localServices[localServiceOverrides[slug] ?? index % localServices.length];
   const focus = service.focus;
   const title = priorityLocalTitles[slug] ?? service.title(city);
   const legacySlug = `${slug}-service-guide`;
-  const visual = localArticleVisuals[slug];
+  const visual = localArticleVisuals[slug] ?? localArticleServiceVisuals[service.slugPrefix];
   return {
     slug: `${service.slugPrefix}-${slug}`,
     title,

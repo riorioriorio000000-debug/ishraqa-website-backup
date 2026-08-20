@@ -31,7 +31,9 @@ describe("مكتبة المقالات وSEO", () => {
     ];
 
     const illustratedLocalArticles = articleEntries.filter((article) => article.category === "دليل محلي" && article.image);
-    expect(illustratedLocalArticles).toHaveLength(expectedVisuals.length);
+    const localArticles = articleEntries.filter((article) => article.category === "دليل محلي");
+
+    expect(illustratedLocalArticles).toHaveLength(localArticles.length);
     expect(illustratedLocalArticles.map((article) => article.image)).toEqual(expect.arrayContaining(expectedVisuals));
     illustratedLocalArticles.forEach((article) => expect(article.imageAlt?.trim()).not.toBe(""));
   });
