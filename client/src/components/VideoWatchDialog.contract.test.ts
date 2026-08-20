@@ -91,4 +91,13 @@ describe("نافذة فيديو أعمال الإشراقة", () => {
     expect(styles).toContain("object-fit: contain");
     expect(styles).toContain(".our-work-video-grid .service-video-media");
   });
+
+  it("يرفع محرر بيانات التعليق وتعتيـمه فوق نافذة الفيديو عند فتحهما معًا", () => {
+    const styles = readFileSync(new URL("../index.css", import.meta.url), "utf8");
+    expect(comments).toContain('className="comment-profile-dialog"');
+    expect(styles).toContain("body:has(.video-watch-dialog)");
+    expect(styles).toContain("comment-profile-dialog");
+    expect(styles).toContain("z-index: 140");
+    expect(styles).toContain("z-index: 141");
+  });
 });

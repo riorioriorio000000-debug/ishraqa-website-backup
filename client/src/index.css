@@ -1131,3 +1131,9 @@ img { -webkit-user-drag: none; user-drag: none; }
 .service-city-local-tips li { display: flex; gap: .65rem; align-items: flex-start; color: #506f6e; line-height: 1.85; }
 .service-city-local-tips li svg { flex: 0 0 auto; margin-top: .28rem; color: #0f7779; }
 @media (max-width: 760px) { .service-city-workflow ol { grid-template-columns: 1fr; }.service-city-workflow, .service-city-local-tips { border-radius: 1.15rem; }.service-city-workflow li { padding: .9rem; } }
+
+/* Keep comment profile/report dialogs above the video viewer when both are open. */
+body:has(.video-watch-dialog) [data-slot="dialog-overlay"]:has(+ [data-slot="dialog-content"].comment-profile-dialog),
+body:has(.video-watch-dialog) [data-slot="dialog-overlay"]:has(+ [data-slot="dialog-content"].comment-report-dialog) { z-index: 140; }
+body:has(.video-watch-dialog) [data-slot="dialog-content"].comment-profile-dialog,
+body:has(.video-watch-dialog) [data-slot="dialog-content"].comment-report-dialog { z-index: 141; }
