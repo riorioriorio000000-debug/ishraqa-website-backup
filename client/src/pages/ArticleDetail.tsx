@@ -102,6 +102,24 @@ const editorialAdditions = {
   ],
 } satisfies Record<string, readonly ArticleSection[]>;
 
+const localServiceGuidance = {
+  cleaning: [
+    ["رتّب جولة المكان قبل طلب التنظيف", "في طلب تنظيف المنزل، تساعدك جولة قصيرة في المكان على تسمية الغرف أو الأسطح التي تحتاج الأولوية، مثل المطبخ أو دورة المياه أو المفروشات. اذكر ما إذا كان هدفك عناية دورية أو تنظيفًا أعمق بعد مناسبة أو انتقال، واذكر أي خامة حساسة بدل تجربة مواد غير معروفة عليها. بهذه التفاصيل يصبح طلبك أقرب إلى احتياج المكان الفعلي."],
+  ],
+  "ac-maintenance": [
+    ["دوّن علامة التكييف كما ظهرت", "قبل طلب فحص أو صيانة التكييف، سجّل الملاحظة البارزة كما تراها: ضعف في التبريد، تغير في تدفق الهواء، صوت غير معتاد، أو رائحة مقلقة. لا يلزمك تشخيص سبب المشكلة أو فتح الجهاز؛ يكفي وصف وقت ظهورها ونوع المكيف إن كان معروفًا. هذا الوصف يساعد على بدء تنسيق مسؤول ويقلل المحاولات الارتجالية غير الآمنة."],
+  ],
+  moving: [
+    ["افصل قائمة القطع الحساسة عن بقية النقل", "رتّب قائمة قصيرة بالقطع الكبيرة أو القابلة للكسر أو التي تحتاج تغليفًا خاصًا، ثم اذكر الطابق والمصعد والمداخل وموقف التحميل إن وُجد. لا تحتاج إلى تقدير أوزان أو أحجام بدقة؛ الصور أو الوصف الواضح للقطع الاستثنائية يكفيان لبدء نقاش منظم. وأبقِ الوثائق والأدوية والأغراض الشخصية الصغيرة معك قبل يوم النقل."],
+  ],
+  "kitchen-cleaning": [
+    ["حدّد السطح أو الجهاز قبل اختيار طريقة العناية", "عند طلب تنظيف المطبخ، اذكر إن كانت الأولوية للفرن أو حول الموقد أو الخزائن أو سطح محدد، وما إذا كانت هناك دهون متراكمة أو خامة حساسة. تجنب خلط المنتجات أو استعمال أدوات خشنة على سطح لا تعرف مدى تحمله. الوصف المبكر يقلل التخمين ويجعل الخطوة التالية مناسبة لنوع المنطقة بدل التعامل مع المطبخ كله بالطريقة نفسها."],
+  ],
+  "home-services": [
+    ["قسّم الاحتياج المنزلي إلى ملاحظات قابلة للمتابعة", "إذا كان لديك أكثر من احتياج منزلي، ابدأ بما يمنع الاستخدام الطبيعي للمكان أو يحتاج انتباهًا أقرب، ثم اذكر بقية الملاحظات في نقاط قصيرة. أرفق وصفًا أو صورة لما يمكن رؤيته، مع التنبيه إلى أي مساحة خاصة أو صعوبة وصول. هذا التنظيم لا يضمن نتيجة أو موعدًا، لكنه يجعل التواصل الأول أوضح وأسهل للمراجعة."],
+  ],
+} satisfies Record<string, readonly ArticleSection[]>;
+
 const mainArticles: readonly ArticleEntry[] = [
   { slug: "home-cleaning-guide", title: "دليل تنظيف المنزل: من أول رسالة إلى ترتيب النتيجة", intro: "دليل طويل وعملي لتحديد احتياج التنظيف المنزلي، ترتيب الأولويات، وكتابة رسالة حجز واضحة بلا أسعار ثابتة أو وعود مبالغ فيها.", category: "دليل رئيسي", image: serviceMedia.cleaning.image, imageAlt: serviceMedia.cleaning.alt, shareImage: `https://al-eshraqa.co${serviceMedia.cleaning.image}`, keywords: ["تنظيف منازل", "تنظيف عميق", "خدمات تنظيف", "حجز تنظيف"], sections: [...longGuideSections("منزلك", "تنظيف المنزل", "إذا كنت في مدينة أخرى، اكتب اسمها وحيّك في الرسالة."), ...editorialAdditions.home] },
   { slug: "ac-maintenance-guide", title: "دليل صيانة التكييف: الإشارات المبكرة وخطوات التنسيق", intro: "كيف تصف ملاحظة التكييف بوضوح، ومتى تتجنب الحلول الارتجالية، وما الذي يسهّل ترتيب فحص مناسب.", category: "دليل رئيسي", image: serviceMedia.ac.image, imageAlt: serviceMedia.ac.alt, shareImage: `https://al-eshraqa.co${serviceMedia.ac.image}`, keywords: ["صيانة تكييف", "فحص مكيف", "ضعف تبريد", "خدمة صيانة"], serviceVideo: { title: serviceMedia.ac.videoTitle, description: serviceMedia.ac.videoDescription, src: serviceMedia.ac.video }, sections: [...longGuideSections("موقعك", "فحص وصيانة التكييف", "اذكر إن كانت المشكلة في تدفق الهواء أو التبريد أو الصوت أو الرائحة."), ...editorialAdditions.ac] },
@@ -184,7 +202,7 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
     imageAlt: visual?.alt,
     shareImage: articleShareImages[legacySlug],
     keywords: [`${focus} ${city}`, title, `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
-    sections: longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`),
+    sections: [...longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`), ...localServiceGuidance[service.slugPrefix]],
     localServiceSlug: localArticleServicePageSlugs[service.slugPrefix],
     localCitySlug: slug,
   };
