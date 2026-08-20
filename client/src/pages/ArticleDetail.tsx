@@ -8,6 +8,7 @@ import ArticleStructuredData from "@/components/ArticleStructuredData";
 import ServiceVideo from "@/components/ServiceVideo";
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from "@/components/ui/breadcrumb";
 import { articleShareImages } from "@/data/articleShareImages";
+import { getLocalServicePage, getLocalServicePagePath } from "@/data/localServicePages";
 import { serviceMedia } from "@/data/serviceMedia";
 import { useSiteShare } from "@/components/SiteShareDialog";
 
@@ -53,6 +54,8 @@ export type ArticleEntry = {
   keywords: readonly string[];
   sections: readonly ArticleSection[];
   serviceVideo?: { title: string; description: string; src: string };
+  localServiceSlug?: string;
+  localCitySlug?: string;
 };
 
 const longGuideSections = (place: string, focus: string, note: string): readonly ArticleSection[] => [
@@ -158,6 +161,14 @@ const localArticleServiceVisuals = {
   "home-services": { src: serviceMedia.cleaning.image, alt: serviceMedia.cleaning.alt },
 } as const;
 
+const localArticleServicePageSlugs: Readonly<Record<keyof typeof localArticleServiceVisuals, string>> = {
+  cleaning: "home-cleaning",
+  "ac-maintenance": "ac-maintenance",
+  moving: "furniture-moving",
+  "kitchen-cleaning": "home-cleaning",
+  "home-services": "home-maintenance",
+};
+
 const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index) => {
   const service = localServices[localServiceOverrides[slug] ?? index % localServices.length];
   const focus = service.focus;
@@ -174,6 +185,8 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
     shareImage: articleShareImages[legacySlug],
     keywords: [`${focus} ${city}`, title, `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
     sections: longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`),
+    localServiceSlug: localArticleServicePageSlugs[service.slugPrefix],
+    localCitySlug: slug,
   };
 });
 
@@ -192,6 +205,11 @@ export function resolveLegacyArticleSlug(slug: string) {
   return legacyArticleSlugAliases[slug] ?? slug;
 }
 
+export function getRelatedLocalServicePage(article: ArticleEntry) {
+  if (!article.localServiceSlug || !article.localCitySlug) return undefined;
+  return getLocalServicePage(article.localServiceSlug, article.localCitySlug);
+}
+
 export default function ArticleDetailPage() {
   const [, params] = useRoute("/articles/:slug");
   const [, navigate] = useLocation();
@@ -205,9 +223,10 @@ export default function ArticleDetailPage() {
   if (!article) return <SiteShell><main className="article-detail" dir="rtl"><div className="shell"><h1>المقال غير متاح</h1><Link href="/articles" className="button">العودة إلى المقالات <ArrowLeft size={16} /></Link></div></main></SiteShell>;
   const articleUrl = `https://al-eshraqa.co/articles/${article.slug}`;
   const relatedArticles = articleEntries.filter((entry) => entry.slug !== article.slug && (entry.category === article.category || entry.keywords.some((keyword) => article.keywords.includes(keyword)))).slice(0, 3);
+  const relatedLocalService = getRelatedLocalServicePage(article);
   const articleTone = (articleEntries.indexOf(article) % 5) + 1;
   return <SiteShell>
-    <PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} />
+    <PageMeta title={article.title} description={article.intro} keywords={[...article.keywords, "شركة الإشراقة"]} path={`/articles/${article.slug}`} image={article.shareImage} imageAlt={`بطاقة مشاركة لمقال ${article.title}`} ogType="article" />
     <ArticleStructuredData article={article} />
     <main className={`article-detail article-tone-${articleTone}`} dir="rtl">
       <header className="article-hero"><div className="shell article-hero-copy"><Breadcrumb className="seo-breadcrumbs"><BreadcrumbList><BreadcrumbItem><BreadcrumbLink asChild><Link href="/">الرئيسية</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbLink asChild><Link href="/articles">المقالات</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbPage>{article.title}</BreadcrumbPage></BreadcrumbItem></BreadcrumbList></Breadcrumb><Link href="/articles" className="back-link">كل المقالات <ArrowLeft size={15} /></Link><span className="eyebrow"><i /> قراءة إرشادية من الإشراقة</span><h1>{article.title}</h1><p>{article.intro}</p><div className="article-keywords" aria-label="موضوعات المقال">{article.keywords.map((keyword) => <span key={keyword}>{keyword}</span>)}</div></div></header>
@@ -216,6 +235,7 @@ export default function ArticleDetailPage() {
         {article.serviceVideo ? <section className="article-service-video" aria-label="فيديو من واقع الخدمة"><ServiceVideo title={article.serviceVideo.title} description={article.serviceVideo.description} src={article.serviceVideo.src} /></section> : null}
         {article.sections.map(([heading, body]) => <section className="article-reading-step" key={heading}><div><h2>{heading}</h2><p>{body}</p></div></section>)}
         <aside><Sparkles size={22} /><div><strong>هل تحتاج ترتيب الخطوة التالية؟</strong><p>يمكنك سؤال مساعد الإشراقة عن هذه المقالة أو فتح واتساب لشرح احتياجك.</p></div><Link href="/customer-service" className="text-link">اسأل المساعد <ArrowLeft size={15} /></Link></aside>
+        {relatedLocalService ? <section className="article-related article-related-service" aria-label={`دليل ${relatedLocalService.serviceName} في ${relatedLocalService.cityName}`}><h2>دليل الخدمة في مدينتك</h2><div><Link href={getLocalServicePagePath(relatedLocalService.serviceSlug, relatedLocalService.citySlug)}>{relatedLocalService.title} <ArrowLeft size={15} /></Link></div></section> : null}
         <section className="article-related" aria-label="مقالات ذات صلة"><h2>اقرأ أيضًا من أدلة الإشراقة</h2><div>{relatedArticles.map((related) => <Link href={`/articles/${related.slug}`} key={related.title}>{related.title} <ArrowLeft size={15} /></Link>)}</div></section>
         <div className="article-actions"><button className="article-share-button article-share-more" type="button" onClick={() => openShare({ title: article.title, description: article.intro, url: articleUrl })} aria-label="مشاركة المقال"><Share2 size={18} /><span>مشاركة المقال</span></button></div>
         <section id="comments" className="article-feedback-hub" aria-label="تقييم وتعليقات القرّاء"><ArticleRating articleTitle={article.title} pageKey={article.slug} /><DeferredArticleComments pageKey={article.slug} /></section>

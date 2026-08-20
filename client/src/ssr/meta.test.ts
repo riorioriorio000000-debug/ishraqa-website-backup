@@ -67,6 +67,30 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
     expect(new Set(sitemapPaths).size).toBe(sitemapPaths.length);
   });
 
+  it("يوفّر لكل مسار قابل للفهرسة عنوانًا ووصفًا وcanonical صالحين", () => {
+    const sitemapPaths = getSitemapPaths();
+    const titleByPath = sitemapPaths.map((path) => [path, getSsrHeadMeta(path)] as const);
+
+    for (const [path, meta] of titleByPath) {
+      expect(meta.notFound, `${path} يجب أن يكون صفحة فعلية`).not.toBe(true);
+      expect(meta.noindex, `${path} لا ينبغي أن يُحجب من الفهرسة`).not.toBe(true);
+      expect(meta.canonicalPath, `${path} يحتاج رابطًا قانونيًا`).toMatch(/^\//);
+      expect(meta.title.trim(), `${path} يحتاج عنوانًا`).not.toHaveLength(0);
+      expect(meta.description.trim(), `${path} يحتاج وصفًا`).not.toHaveLength(0);
+      expect(meta.description.length, `${path} يحتاج وصفًا ذا معنى`).toBeGreaterThan(30);
+      expect(meta.description.length, `${path} لا ينبغي أن يملك وصفًا مقتضبًا بصورة مفرطة`).toBeLessThanOrEqual(160);
+    }
+  });
+
+  it("يحافظ على فرادة العناوين والأوصاف بين الصفحات القانونية المفهرسة", () => {
+    const allMeta = getSitemapPaths().map((path) => getSsrHeadMeta(path));
+    const titles = allMeta.map((meta) => meta.title);
+    const descriptions = allMeta.map((meta) => meta.description);
+
+    expect(new Set(titles).size).toBe(titles.length);
+    expect(new Set(descriptions).size).toBe(descriptions.length);
+  });
+
   it("يحجب صفحات الإشعارات عن الفهرسة ويعيد حالة not-found للمسارات غير المعروفة", () => {
     expect(getSsrHeadMeta("/notification-preferences").noindex).toBe(true);
     expect(getSsrHeadMeta("/not-a-page")).toMatchObject({ noindex: true, notFound: true });

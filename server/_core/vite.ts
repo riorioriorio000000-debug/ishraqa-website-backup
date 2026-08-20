@@ -81,6 +81,24 @@ export function buildStructuredData(meta: SsrHeadMeta) {
           "@type": "Country",
           name: "المملكة العربية السعودية",
         },
+        hasOfferCatalog: {
+          "@type": "OfferCatalog",
+          name: "خدمات الإشراقة المنزلية",
+          itemListElement: [
+            "تنظيف المنازل",
+            "تنظيف الكنب والمفروشات",
+            "تنظيف المكيفات",
+            "صيانة المكيفات",
+            "تنظيف الخزانات",
+            "تنظيف المطابخ والأفران",
+            "مكافحة الحشرات",
+            "الصيانة المنزلية",
+            "نقل العفش",
+          ].map((name) => ({
+            "@type": "Offer",
+            itemOffered: { "@type": "Service", name },
+          })),
+        },
       },
       {
         "@type": isAboutPage ? ["WebPage", "AboutPage"] : "WebPage",
@@ -118,7 +136,7 @@ function sendDynamicSitemap(_req: Request, res: Response) {
 export function buildHead(meta: SsrHeadMeta) {
   const canonical = `${canonicalOrigin}${meta.canonicalPath}`;
   const image = absoluteUrl(meta.image ?? "/manus-storage/ishraqa-user-logo_64a160a3.png");
-  const robots = meta.noindex ? "noindex, nofollow" : "index, follow, max-image-preview:large";
+  const robots = meta.noindex ? "noindex, nofollow, noarchive" : "index, follow, max-image-preview:large";
   const keywords = meta.keywords.join(", ");
   const structuredData = JSON.stringify(buildStructuredData(meta)).replace(/</g, "\\u003c");
   return `<title>${escapeHtml(meta.title)}</title><meta name="description" content="${escapeHtml(meta.description)}" />${keywords ? `<meta name="keywords" content="${escapeHtml(keywords)}" />` : ""}<meta name="robots" content="${robots}" /><link rel="canonical" href="${escapeHtml(canonical)}" /><link rel="alternate" hreflang="ar-SA" href="${escapeHtml(canonical)}" /><meta property="og:locale" content="ar_SA" /><meta property="og:type" content="${meta.ogType ?? "website"}" /><meta property="og:title" content="${escapeHtml(meta.title)}" /><meta property="og:description" content="${escapeHtml(meta.description)}" /><meta property="og:url" content="${escapeHtml(canonical)}" /><meta property="og:site_name" content="شركة الإشراقة" /><meta property="og:image" content="${escapeHtml(image)}" /><meta property="og:image:alt" content="${escapeHtml(meta.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش")}" /><meta name="twitter:card" content="${meta.image ? "summary_large_image" : "summary"}" /><meta name="twitter:title" content="${escapeHtml(meta.title)}" /><meta name="twitter:description" content="${escapeHtml(meta.description)}" /><meta name="twitter:image" content="${escapeHtml(image)}" /><script type="application/ld+json">${structuredData}</script>`;

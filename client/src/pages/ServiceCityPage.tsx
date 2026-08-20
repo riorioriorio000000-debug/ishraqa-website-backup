@@ -30,17 +30,24 @@ function QuickWhatsappForm({ serviceName, cityName }: { serviceName: string; cit
   </section>;
 }
 
+export function getRelatedArticlesForLocalService(page: NonNullable<ReturnType<typeof getLocalServicePage>>) {
+  const directMatches = articleEntries.filter((article) => article.localServiceSlug === page.serviceSlug && article.localCitySlug === page.citySlug);
+  const keywordMatches = articleEntries.filter((article) => article.keywords.some((keyword) => keyword.includes(page.cityName) || keyword.includes(page.serviceName) || page.keywords.includes(keyword)));
+  const directSlugs = new Set(directMatches.map((article) => article.slug));
+  const keywordSlugs = new Set(keywordMatches.map((article) => article.slug));
+  return [...directMatches, ...keywordMatches.filter((article) => !directSlugs.has(article.slug)), ...articleEntries.filter((article) => !directSlugs.has(article.slug) && !keywordSlugs.has(article.slug))].slice(0, 5);
+}
+
 export default function ServiceCityPage() {
   const [, params] = useRoute("/services/:serviceSlug/:citySlug");
   const page = getLocalServicePage(params?.serviceSlug, params?.citySlug);
   if (!page) return <SiteShell><main className="service-city-page service-city-not-found" dir="rtl"><div className="shell"><h1>صفحة الخدمة غير متاحة</h1><p>يمكنك العودة إلى صفحة الخدمات أو استكشاف الأدلة المنشورة.</p><Link href="/services" className="button">عرض الخدمات <ArrowLeft size={16} /></Link></div></main></SiteShell>;
 
-  const matchingArticles = articleEntries.filter((article) => article.keywords.some((keyword) => keyword.includes(page.cityName) || keyword.includes(page.serviceName) || page.keywords.includes(keyword)));
-  const related = [...matchingArticles, ...articleEntries.filter((article) => !matchingArticles.some((match) => match.slug === article.slug))].slice(0, 5);
+  const related = getRelatedArticlesForLocalService(page);
   const nearby = localServicePages.filter((entry) => entry.citySlug === page.citySlug && entry.serviceSlug !== page.serviceSlug).slice(0, 4);
   const whatsappText = `أرغب في ${page.serviceName} في ${page.cityName}. الحي: …، نوع المكان: …، والأولوية: …`;
   return <SiteShell>
-    <PageMeta title={page.title} description={page.description} keywords={[...page.keywords]} path={getLocalServicePagePath(page.serviceSlug, page.citySlug)} image={page.image} imageAlt={page.imageAlt} />
+    <PageMeta title={page.title} description={page.description} keywords={[...page.keywords]} path={getLocalServicePagePath(page.serviceSlug, page.citySlug)} image={page.image} imageAlt={page.imageAlt} ogType="article" />
     <LocalServiceSchema page={page} />
     <main className="service-city-page" dir="rtl">
       <header className="service-city-hero"><div className="shell"><Breadcrumb className="seo-breadcrumbs"><BreadcrumbList><BreadcrumbItem><BreadcrumbLink asChild><Link href="/">الرئيسية</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbLink asChild><Link href="/services">الخدمات</Link></BreadcrumbLink></BreadcrumbItem><BreadcrumbSeparator /><BreadcrumbItem><BreadcrumbPage>{page.serviceName} في {page.cityName}</BreadcrumbPage></BreadcrumbItem></BreadcrumbList></Breadcrumb><span className="eyebrow"><i /> دليل خدمة محلي</span><h1>{page.title}</h1><p>{page.description}</p><div className="service-city-hero-actions"><a className="button" href={`https://wa.me/966552610151?text=${encodeURIComponent(whatsappText)}`} target="_blank" rel="noreferrer"><MessageCircle size={18} /> اشرح احتياجك عبر واتساب</a><Link className="button button-ghost" href="/articles">استكشف الأدلة <ArrowLeft size={16} /></Link></div></div></header>

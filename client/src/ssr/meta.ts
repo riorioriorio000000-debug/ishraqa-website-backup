@@ -1,5 +1,6 @@
 import { articleEntries, resolveLegacyArticleSlug } from "@/pages/ArticleDetail";
 import { getLocalServicePage, getLocalServicePagePath, localServicePages, resolveLocalServiceSlug } from "@/data/localServicePages";
+import { siteFaqs } from "@/data/siteFaq";
 
 export type SsrBreadcrumb = { name: string; path: string };
 export type SsrFaq = { question: string; answer: string };
@@ -30,6 +31,7 @@ const publicPages: Record<string, Omit<SsrHeadMeta, "canonicalPath">> = {
     image: homeImage,
     imageAlt: "تكوين توضيحي لخدمات تنظيف وصيانة ونقل عفش من الإشراقة",
     video: { name: "تنظيف الكنب والمجالس من واقع أعمال الإشراقة", description: "مقطع حقيقي من خدمة تنظيف كنب منزلي يوضح العناية بالتفاصيل قبل الانتهاء.", contentUrl: "/manus-storage/ishraqa-upholstery-work-01_c6221152.mp4", uploadDate: "2026-08-18" },
+    faq: siteFaqs,
   },
   "/services": { title: "الخدمات | شركة الإشراقة", description: "استكشف خدمات التنظيف والصيانة ونقل العفش من الإشراقة، وشاهد لقطات قصيرة من أعمال تنظيف الكنب والأفران.", keywords: ["خدمات تنظيف", "تنظيف كنب", "تنظيف أفران", "صيانة منزلية", "نقل عفش", "شركة الإشراقة"], video: { name: "العناية بأفران الغاز من واقع أعمال الإشراقة", description: "مقطع حقيقي من عمل عناية وتنظيف فرن غاز ضمن تجهيزات المطبخ المنزلية.", contentUrl: "/manus-storage/ishraqa-oven-work-01_28be488e.mp4", uploadDate: "2026-08-18" } },
   "/our-work": { title: "أعمالنا | شركة الإشراقة", description: "شاهد مقاطع قصيرة من أعمال الإشراقة الحقيقية في تنظيف الكنب والمفروشات والأفران والتكييف والخزانات المنزلية.", keywords: ["أعمال تنظيف كنب", "تنظيف مفروشات", "تنظيف أفران الغاز", "صيانة تكييف", "تنظيف خزانات", "شركة الإشراقة", "خدمات منزلية"], video: { name: "فحص وحدة تكييف من واقع العمل", description: "مقطع حقيقي قصير يوضح سياق فحص وحدة تكييف منزلية وتجهيز منطقة العمل دون إظهار أشخاص.", contentUrl: "/manus-storage/ishraqa-ac-work_9f225e58.mp4", uploadDate: "2026-08-19" } },

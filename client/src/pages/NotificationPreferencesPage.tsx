@@ -59,6 +59,7 @@ export default function NotificationPreferencesPage() {
       description="تحكم في تنبيهات التفاعل الخاصة بهوية زائرك المجهولة في موقع الإشراقة، مع استمرار تنبيهات الردود المهمة."
       keywords={["تفضيلات الإشعارات", "إشعارات التعليقات", "خصوصية الزائر", "الإشراقة"]}
       path="/notification-preferences"
+      noindex
     />
     <main className="inner-page notification-preferences-page" dir="rtl">
       <section className="inner-hero notification-preferences-hero">

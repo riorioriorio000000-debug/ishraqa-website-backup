@@ -35,4 +35,11 @@ describe("PageMeta", () => {
     expect(document.title).toBe("من نحن | شركة الإشراقة للخدمات المنزلية");
     expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:title"]')?.content).toBe("من نحن | شركة الإشراقة للخدمات المنزلية");
   });
+
+  it("يبقي الصفحات الخاصة خارج الفهرسة ولا يبدّل نوع المقال عند انتقال العميل", () => {
+    render(<PageMeta title="مقال تجريبي" description="وصف تجريبي" keywords={["تنظيف"]} path="/articles/example" ogType="article" noindex />);
+
+    expect(document.head.querySelector<HTMLMetaElement>('meta[name="robots"]')?.content).toBe("noindex, nofollow, noarchive");
+    expect(document.head.querySelector<HTMLMetaElement>('meta[property="og:type"]')?.content).toBe("article");
+  });
 });

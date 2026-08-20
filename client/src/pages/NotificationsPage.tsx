@@ -79,7 +79,7 @@ export default function NotificationsPage() {
     if (visitorId && unreadIds.length && !markRead.isPending) markRead.mutate({ visitorId, ids: unreadIds });
   };
 
-  return <SiteShell><PageMeta title="الإشعارات" description="اطلع على تحديثات تعليقاتك وقرارات مراجعة البلاغات داخل موقع الإشراقة." keywords={["إشعارات الإشراقة", "بلاغات التعليقات", "ردود التعليقات"]} path="/notifications" />
+  return <SiteShell><PageMeta title="الإشعارات" description="اطلع على تحديثات تعليقاتك وقرارات مراجعة البلاغات داخل موقع الإشراقة." keywords={["إشعارات الإشراقة", "بلاغات التعليقات", "ردود التعليقات"]} path="/notifications" noindex />
     <main className="notifications-page" dir="rtl">
       <section className="inner-hero notification-hero"><div className="shell inner-hero-grid"><div><span className="eyebrow"><i /> متابعة التفاعل</span><h1>مركز <em>الإشعارات.</em></h1><p>تابع الردود والتفاعلات ونتائج مراجعة البلاغات من مكان واحد، دون إنشاء حساب أو إدخال بيانات شخصية.</p></div><div className="inner-hero-mark" aria-hidden="true"><BellRing size={54} /></div></div><div className="inner-wave" /></section>
       <section className="section section-paper"><div className="shell notifications-shell">

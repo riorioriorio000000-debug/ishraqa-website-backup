@@ -7,6 +7,8 @@ type PageMetaProps = {
   path: string;
   image?: string;
   imageAlt?: string;
+  ogType?: "website" | "article";
+  noindex?: boolean;
 };
 
 const conciseTitlesByPath: Record<string, string> = {
@@ -31,7 +33,7 @@ function setMeta(attribute: "name" | "property", key: string, content: string) {
   element.content = content;
 }
 
-export default function PageMeta({ title, description, keywords, path, image, imageAlt }: PageMetaProps) {
+export default function PageMeta({ title, description, keywords, path, image, imageAlt, ogType = "website", noindex = false }: PageMetaProps) {
   useEffect(() => {
     const pageTitle = conciseTitlesByPath[path] ?? title;
     const fullTitle = path === "/" || pageTitle.includes("شركة الإشراقة") ? pageTitle : `${pageTitle} | شركة الإشراقة`;
@@ -42,7 +44,7 @@ export default function PageMeta({ title, description, keywords, path, image, im
     setMeta("property", "og:title", fullTitle);
     setMeta("property", "og:description", description);
     setMeta("property", "og:url", canonicalUrl);
-    setMeta("property", "og:type", "website");
+    setMeta("property", "og:type", ogType);
     setMeta("property", "og:locale", "ar_SA");
     const shareImage = image ?? "https://al-eshraqa.co/manus-storage/ishraqa-user-logo_64a160a3.png";
     setMeta("property", "og:image", shareImage);
@@ -51,7 +53,7 @@ export default function PageMeta({ title, description, keywords, path, image, im
     setMeta("name", "twitter:card", image ? "summary_large_image" : "summary");
     setMeta("name", "twitter:title", fullTitle);
     setMeta("name", "twitter:description", description);
-    setMeta("name", "robots", "index, follow, max-image-preview:large");
+    setMeta("name", "robots", noindex ? "noindex, nofollow, noarchive" : "index, follow, max-image-preview:large");
     let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
     if (!canonical) {
       canonical = document.createElement("link");
@@ -59,7 +61,7 @@ export default function PageMeta({ title, description, keywords, path, image, im
       document.head.appendChild(canonical);
     }
     canonical.href = canonicalUrl;
-  }, [description, image, imageAlt, keywords, path, title]);
+  }, [description, image, imageAlt, keywords, noindex, ogType, path, title]);
 
   return null;
 }
