@@ -1,10 +1,10 @@
-import { AIChatBox, type ChatAttachmentUpload, type Message } from "@/components/AIChatBox";
+import type { ChatAttachmentUpload, Message } from "@/components/AIChatBox";
 import SiteShell from "@/components/SiteShell";
 import PageMeta from "@/components/PageMeta";
 import { browseFailureMessage } from "@/lib/chatMessages";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, BookOpen, CalendarCheck, MapPin, ShieldCheck, Sparkles } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { Link } from "wouter";
 
 const prompts = [
@@ -13,6 +13,8 @@ const prompts = [
   "كيف أرتب طلب نقل العفش؟",
   "أحتاج رابط دليل صيانة منزلية",
 ];
+
+const AIChatBox = lazy(() => import("@/components/AIChatBox").then(({ AIChatBox: ChatBox }) => ({ default: ChatBox })));
 
 type ChatMessage = Omit<Message, "role"> & { role: "user" | "assistant" };
 const publicUrlPattern = /https?:\/\/[^\s<>"'`\])}]+/i;
@@ -119,20 +121,22 @@ export default function CustomerService() {
           <div className="shell assistant-workspace-grid">
             <div className="assistant-chat-panel">
               <div className="assistant-panel-heading"><div><span>الإشراقة AI</span><h2>كيف أساعدك اليوم؟</h2></div><Sparkles size={23} /></div>
-              <AIChatBox
-                messages={messages}
-                onSendMessage={sendMessage}
-                isLoading={activeRequest !== null}
-                height="610px"
-                placeholder="اسأل عن الخدمات أو ألصق رابط صفحة عامة لتلخيصها…"
-                emptyStateMessage="اسأل عن الخدمة، المدن، التحضير للحجز أو المقالات. يمكنك أيضًا لصق رابط صفحة عامة لتلخيصه هنا."
-                suggestedPrompts={prompts}
-                quickActions={[{ label: "ابحث داخل الموقع", prompt: "ابحث في الموقع عن " }]}
-                onEditMessage={editMessage}
-                onClearConversation={() => setMessages([])}
-                onShareCurrentPage={shareCurrentPage}
-                className="assistant-chatbox"
-              />
+              <Suspense fallback={<div className="assistant-chatbox" role="status" aria-live="polite">جارٍ تجهيز المحادثة…</div>}>
+                <AIChatBox
+                  messages={messages}
+                  onSendMessage={sendMessage}
+                  isLoading={activeRequest !== null}
+                  height="610px"
+                  placeholder="اسأل عن الخدمات أو ألصق رابط صفحة عامة لتلخيصها…"
+                  emptyStateMessage="اسأل عن الخدمة، المدن، التحضير للحجز أو المقالات. يمكنك أيضًا لصق رابط صفحة عامة لتلخيصه هنا."
+                  suggestedPrompts={prompts}
+                  quickActions={[{ label: "ابحث داخل الموقع", prompt: "ابحث في الموقع عن " }]}
+                  onEditMessage={editMessage}
+                  onClearConversation={() => setMessages([])}
+                  onShareCurrentPage={shareCurrentPage}
+                  className="assistant-chatbox"
+                />
+              </Suspense>
               <p className="assistant-privacy-note"><ShieldCheck size={17} /> <strong>خصوصيتك مهمة:</strong> يُرسل نص السؤال الذي تكتبه فقط لمعالجة الرد. إذا أرفقت ملفًا، يُرسل هذا الملف وحده مع السؤال لتحليله. عند لصق رابط عام، تُقرأ الصفحة المتاحة فقط لتلخيصها. لا يُرسل نموذج الحجز أو رقم هاتفك تلقائيًا؛ لذا تجنّب إدخال أي بيانات حساسة في المحادثة.</p>
               {chat.error && <p className="assistant-error">تعذر الرد الآن. يمكنك التواصل عبر واتساب مباشرة.</p>}
             </div>

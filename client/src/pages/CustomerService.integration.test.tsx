@@ -82,7 +82,7 @@ describe("CustomerService", () => {
     const user = userEvent.setup();
     render(<CustomerService />);
 
-    await user.click(screen.getByRole("button", { name: "أرسل رابطًا غير مسموح" }));
+    await user.click(await screen.findByRole("button", { name: "أرسل رابطًا غير مسموح" }));
 
     expect(await screen.findByText(/تعذر تلخيص الرابط الآن\. لا يمكن فتح عنوان محلي\./)).toBeTruthy();
   });
@@ -91,7 +91,7 @@ describe("CustomerService", () => {
     const user = userEvent.setup();
     render(<CustomerService />);
 
-    await user.click(screen.getByRole("button", { name: "اسأل عن التنظيف" }));
+    await user.click(await screen.findByRole("button", { name: "اسأل عن التنظيف" }));
 
     expect((await screen.findByRole("link", { name: "تنظيف المنازل" })).getAttribute("href")).toBe("/services");
     expect(screen.getByRole("link", { name: "دليل تنظيف المنزل" }).getAttribute("href")).toBe("/articles/home-cleaning-guide");
@@ -102,7 +102,7 @@ describe("CustomerService", () => {
     const user = userEvent.setup();
     render(<CustomerService />);
 
-    await user.click(screen.getByRole("button", { name: "اسأل عن التنظيف" }));
+    await user.click(await screen.findByRole("button", { name: "اسأل عن التنظيف" }));
 
     expect(chatMutate).toHaveBeenCalledWith(expect.objectContaining({
       pageContext: { title: "خدمة العملاء الذكية", url: "/customer-service" },
@@ -115,7 +115,7 @@ describe("CustomerService", () => {
     const user = userEvent.setup();
     render(<CustomerService />);
 
-    await user.click(screen.getByRole("button", { name: "اسأل عن التنظيف" }));
+    await user.click(await screen.findByRole("button", { name: "اسأل عن التنظيف" }));
     expect(await screen.findByText("هذه المسارات المناسبة لطلب تنظيف الشقة.")).toBeTruthy();
     await user.click(screen.getByRole("button", { name: "احذف السجل" }));
 

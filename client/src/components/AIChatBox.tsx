@@ -3,8 +3,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, BookOpen, CalendarCheck, Check, Edit3, FileText, Link2, ListChecks, Loader2, Paperclip, Play, Send, Sparkles, Trash2, User, Wrench, X } from "lucide-react";
-import React, { useState, useEffect, useRef } from "react";
-import { Streamdown } from "streamdown";
+import React, { lazy, Suspense, useState, useEffect, useRef } from "react";
+
+const Streamdown = lazy(() => import("streamdown").then(({ Streamdown: MarkdownRenderer }) => ({ default: MarkdownRenderer })));
 
 /**
  * Message type matching server-side LLM Message interface
@@ -391,7 +392,9 @@ export function AIChatBox({
                             </aside>
                           )}
                           <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <Streamdown>{message.content}</Streamdown>
+                            <Suspense fallback={<p>{message.content}</p>}>
+                              <Streamdown>{message.content}</Streamdown>
+                            </Suspense>
                           </div>
                           {message.contentCards && message.contentCards.length > 0 && (
                             <div className="mt-4 grid gap-2" aria-label="روابط مقترحة من موقع الإشراقة">
