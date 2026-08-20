@@ -34,6 +34,23 @@ export function buildStructuredData(meta: SsrHeadMeta) {
   const canonical = `${canonicalOrigin}${meta.canonicalPath}`;
   const organizationId = `${canonicalOrigin}/#organization`;
   const isAboutPage = meta.canonicalPath === "/about";
+  const breadcrumbNode = meta.breadcrumbs && meta.breadcrumbs.length > 1 ? {
+    "@type": "BreadcrumbList",
+    itemListElement: meta.breadcrumbs.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  } : undefined;
+  const faqNode = meta.faq?.length ? {
+    "@type": "FAQPage",
+    mainEntity: meta.faq.map((item) => ({
+      "@type": "Question",
+      name: item.question,
+      acceptedAnswer: { "@type": "Answer", text: item.answer },
+    })),
+  } : undefined;
   return {
     "@context": "https://schema.org",
     "@graph": [
@@ -88,6 +105,8 @@ export function buildStructuredData(meta: SsrHeadMeta) {
         publisher: { "@id": organizationId },
         mainEntityOfPage: { "@id": `${canonical}#webpage` },
       }] : []),
+      ...(breadcrumbNode ? [breadcrumbNode] : []),
+      ...(faqNode ? [faqNode] : []),
     ],
   };
 }

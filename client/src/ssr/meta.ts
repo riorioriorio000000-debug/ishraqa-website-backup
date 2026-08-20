@@ -1,6 +1,9 @@
 import { articleEntries, resolveLegacyArticleSlug } from "@/pages/ArticleDetail";
 import { getLocalServicePage, getLocalServicePagePath, localServicePages, resolveLocalServiceSlug } from "@/data/localServicePages";
 
+export type SsrBreadcrumb = { name: string; path: string };
+export type SsrFaq = { question: string; answer: string };
+
 export type SsrHeadMeta = {
   title: string;
   description: string;
@@ -10,6 +13,8 @@ export type SsrHeadMeta = {
   imageAlt?: string;
   ogType?: "website" | "article";
   video?: { name: string; description: string; contentUrl: string; uploadDate: string };
+  breadcrumbs?: readonly SsrBreadcrumb[];
+  faq?: readonly SsrFaq[];
   noindex?: boolean;
   notFound?: boolean;
 };
@@ -76,6 +81,7 @@ export function getSsrHeadMeta(url: string): SsrHeadMeta {
         image: article.shareImage,
         imageAlt: `بطاقة مشاركة لمقال ${article.title}`,
         ogType: "article",
+        breadcrumbs: [{ name: "الرئيسية", path: "/" }, { name: "المقالات", path: "/articles" }, { name: article.title, path: `/articles/${article.slug}` }],
         ...(article.serviceVideo ? { video: { name: article.serviceVideo.title, description: article.serviceVideo.description, contentUrl: article.serviceVideo.src, uploadDate: "2026-08-18" } } : {}),
       };
     }
@@ -83,10 +89,32 @@ export function getSsrHeadMeta(url: string): SsrHeadMeta {
   const serviceMatch = path.match(/^\/services\/([^/]+)\/([^/]+)$/);
   if (serviceMatch) {
     const page = getLocalServicePage(serviceMatch[1], serviceMatch[2]);
-    if (page) return { title: page.title, description: page.description, keywords: page.keywords, canonicalPath: getLocalServicePagePath(page.serviceSlug, page.citySlug), image: page.image, imageAlt: `صورة مشاركة لخدمة ${page.serviceName} في ${page.cityName}`, ogType: "article" };
+    if (page) {
+      const canonicalPath = getLocalServicePagePath(page.serviceSlug, page.citySlug);
+      return {
+        title: page.title,
+        description: page.description,
+        keywords: page.keywords,
+        canonicalPath,
+        image: page.image,
+        imageAlt: `صورة مشاركة لخدمة ${page.serviceName} في ${page.cityName}`,
+        ogType: "article",
+        breadcrumbs: [{ name: "الرئيسية", path: "/" }, { name: "الخدمات", path: "/services" }, { name: `${page.serviceName} في ${page.cityName}`, path: canonicalPath }],
+        faq: page.faq,
+      };
+    }
   }
   const page = publicPages[path] ?? privatePages[path];
-  if (page) return { ...page, canonicalPath: path, image: page.image ?? defaultImage, imageAlt: page.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش" };
+  if (page) {
+    const pageLabel = page.title.split(" | ")[0] ?? page.title;
+    return {
+      ...page,
+      canonicalPath: path,
+      image: page.image ?? defaultImage,
+      imageAlt: page.imageAlt ?? "شعار شركة الإشراقة للتنظيف والصيانة ونقل العفش",
+      ...(path === "/" ? {} : { breadcrumbs: [{ name: "الرئيسية", path: "/" }, { name: pageLabel, path }] }),
+    };
+  }
   return {
     title: "الصفحة غير متاحة | شركة الإشراقة",
     description: "الصفحة المطلوبة غير متاحة. يمكنك العودة إلى الصفحة الرئيسية لموقع الإشراقة.",
