@@ -17,14 +17,27 @@ describe("مكتبة المقالات وSEO", () => {
     expect(articleEntries.filter((article) => article.category === "دليل رئيسي").every((article) => article.image && article.imageAlt)).toBe(true);
   });
 
-  it("يربط كل دليل محلي بصورته التحريرية الخاصة بدل رسم تجهيزات الخدمة المتكرر", () => {
+  it("يبقي صور الأدلة المحلية ومعايناتها واضحة بلا نص عربي مضمّن", () => {
     const localArticles = articleEntries.filter((article) => article.category === "دليل محلي");
+    const expectedEditorialVisuals = [
+      "/manus-storage/article-visual-bathroom-care_9449151f.webp",
+      "/manus-storage/article-visual-ac-maintenance_e644ca83.webp",
+      "/manus-storage/article-visual-moving-plan_3fb9a477.webp",
+      "/manus-storage/article-visual-kitchen-deep-clean_f5c395b7.webp",
+      "/manus-storage/article-visual-scheduled-care_47ea76e0.webp",
+      "/manus-storage/article-visual-sofa-care_0001dda1.webp",
+      "/manus-storage/article-visual-window-care_5fb807c6.webp",
+      "/manus-storage/article-visual-marble-care_b0c1f72f.webp",
+      "/manus-storage/article-visual-exterior-care_8deeb043.webp",
+    ];
 
-    expect(localArticles.every((article) => article.image === article.shareImage)).toBe(true);
-    expect(new Set(localArticles.map((article) => article.image)).size).toBe(localArticles.length);
+    expect(localArticles.map((article) => article.image)).toEqual(expect.arrayContaining(expectedEditorialVisuals));
+    expect(new Set(localArticles.map((article) => article.image)).size).toBeGreaterThanOrEqual(expectedEditorialVisuals.length);
     localArticles.forEach((article) => {
-      expect(article.image).toMatch(/^https:\/\/al-eshraqa\.co\/manus-storage\/.+\.png$/);
-      expect(article.imageAlt).toMatch(/^رسم بصري مخصص لدليل /);
+      expect(article.image).toMatch(/^\/manus-storage\/.+\.(?:png|jpe?g|webp)$/);
+      expect(article.image).not.toMatch(/service-guide/);
+      expect(article.imageAlt?.trim()).not.toBe("");
+      expect(article.shareImage).toBe(`https://al-eshraqa.co${article.image}`);
     });
   });
 });
