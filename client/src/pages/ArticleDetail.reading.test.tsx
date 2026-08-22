@@ -27,7 +27,7 @@ describe("قارئ المقالات", () => {
     expect(screen.queryByText("تمهيد المقال")).toBeNull();
     expect(document.querySelector(".article-reading-intro")).toBeNull();
     expect(document.querySelector(".article-detail")?.className).toMatch(/article-tone-[1-5]/);
-    expect(document.querySelector<HTMLImageElement>(".article-feature-image img")?.getAttribute("fetchpriority")).toBe("high");
+    expect(document.querySelector(".article-feature-image")).toBeNull();
     expect(document.querySelector(".article-feedback-hub")?.id).toBe("comments");
   });
 });

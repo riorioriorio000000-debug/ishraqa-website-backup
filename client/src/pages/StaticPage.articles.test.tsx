@@ -44,41 +44,20 @@ describe("بحث مكتبة المقالات", () => {
     expect(screen.queryByText(/شركة نقل عفش مكة المكرمة/)).toBeNull();
   });
 
-  it("يعرض اثني عشر دليلًا رئيسيًا مع صور معتمدة ويبقي المقالات المحلية داخل المكتبة", () => {
+  it("يعرض اثني عشر دليلًا رئيسيًا ويبقي المقالات المحلية داخل المكتبة بلا صور أو رسومات", () => {
     const { container } = render(<ArticlesPage />);
 
     expect(container.querySelectorAll(".featured-article-card")).toHaveLength(12);
-    expect(container.querySelectorAll(".featured-article-media img")).toHaveLength(12);
     expect(container.querySelectorAll(".secondary-article-grid article")).toHaveLength(58);
+    expect(container.querySelectorAll(".featured-article-media, .secondary-article-visual")).toHaveLength(0);
+    expect(container.querySelectorAll("img")).toHaveLength(0);
   });
 
-  it("يعرض الصورة الخاصة بكل دليل محلي مع نص بديل بدل رسم عام متكرر", () => {
-    const { container } = render(<ArticlesPage />);
-    const localArticle = articleEntries.find((article) => article.slug === "cleaning-al-kharj");
-    const localImage = Array.from(container.querySelectorAll<HTMLImageElement>(".local-article-grid .secondary-article-visual img")).find(
-      (image) => image.getAttribute("src") === localArticle?.image,
-    );
-
-    expect(localArticle?.image).toBeTruthy();
-    expect(localImage).toBeTruthy();
-    expect(localImage?.getAttribute("alt")).toBe(localArticle?.imageAlt);
-    expect(localImage?.getAttribute("loading")).toBe("lazy");
-  });
-
-  it("يعطي صورة أول دليل أولوية تحميل حتى لا تتأخر عن ظهور البطاقة", () => {
-    const { container } = render(<ArticlesPage />);
-    const [firstImage, secondImage] = Array.from(container.querySelectorAll<HTMLImageElement>(".featured-article-media img"));
-
-    expect(firstImage.getAttribute("loading")).toBe("eager");
-    expect(firstImage.getAttribute("fetchpriority")).toBe("high");
-    expect(secondImage.getAttribute("loading")).toBe("lazy");
-  });
-
-  it("يضم صورًا وملاحظات تحريرية مواءمة داخل الأدلة الرئيسية من دون الاسم السابق", () => {
+  it("يحتفظ ببيانات الصور الوصفية للمشاركة المنظمة دون عرضها داخل البطاقات", () => {
     const mainArticles = articleEntries.filter((article) => article.category === "دليل رئيسي");
 
     expect(mainArticles).toHaveLength(12);
-    expect(mainArticles.every((article) => article.image && article.imageAlt)).toBe(true);
+    expect(mainArticles.every((article) => article.shareImage)).toBe(true);
     expect(mainArticles.flatMap((article) => article.sections).map(([, body]) => body).join(" ")).not.toContain("الخيال كلين");
     expect(mainArticles.find((article) => article.slug === "kitchen-care-guide")?.sections.map(([heading]) => heading)).toContain("الدهون المتراكمة تحتاج تدرجًا");
   });

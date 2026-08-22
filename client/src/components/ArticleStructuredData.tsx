@@ -40,6 +40,5 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
     ],
   };
 
-  const visual = article.image ? { src: article.image, alt: article.imageAlt ?? `صورة مرتبطة بمقال ${article.title}` } : null;
-  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbPayload) }} />{visual && <figure className="article-visual"><img src={visual.src} srcSet={`${visual.src} 720w`} sizes="(max-width: 640px) 76vw, 420px" alt={`${article.title}: ${visual.alt}`} loading="lazy" decoding="async" /><figcaption>صورة مرتبطة بموضوع المقال من خدمات الإشراقة</figcaption></figure>}</>;
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(payload) }} /><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbPayload) }} /></>;
 }
