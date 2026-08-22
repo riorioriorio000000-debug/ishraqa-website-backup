@@ -17,24 +17,14 @@ describe("مكتبة المقالات وSEO", () => {
     expect(articleEntries.filter((article) => article.category === "دليل رئيسي").every((article) => article.image && article.imageAlt)).toBe(true);
   });
 
-  it("يربط الصور التحريرية المضغوطة بالتسعة مقالات المحلية المختارة", () => {
-    const expectedVisuals = [
-      "/manus-storage/article-visual-bathroom-care_9449151f.webp",
-      "/manus-storage/article-visual-ac-maintenance_e644ca83.webp",
-      "/manus-storage/article-visual-moving-plan_3fb9a477.webp",
-      "/manus-storage/article-visual-kitchen-deep-clean_f5c395b7.webp",
-      "/manus-storage/article-visual-scheduled-care_47ea76e0.webp",
-      "/manus-storage/article-visual-sofa-care_0001dda1.webp",
-      "/manus-storage/article-visual-window-care_5fb807c6.webp",
-      "/manus-storage/article-visual-marble-care_b0c1f72f.webp",
-      "/manus-storage/article-visual-exterior-care_8deeb043.webp",
-    ];
-
-    const illustratedLocalArticles = articleEntries.filter((article) => article.category === "دليل محلي" && article.image);
+  it("يربط كل دليل محلي بصورته التحريرية الخاصة بدل رسم تجهيزات الخدمة المتكرر", () => {
     const localArticles = articleEntries.filter((article) => article.category === "دليل محلي");
 
-    expect(illustratedLocalArticles).toHaveLength(localArticles.length);
-    expect(illustratedLocalArticles.map((article) => article.image)).toEqual(expect.arrayContaining(expectedVisuals));
-    illustratedLocalArticles.forEach((article) => expect(article.imageAlt?.trim()).not.toBe(""));
+    expect(localArticles.every((article) => article.image === article.shareImage)).toBe(true);
+    expect(new Set(localArticles.map((article) => article.image)).size).toBe(localArticles.length);
+    localArticles.forEach((article) => {
+      expect(article.image).toMatch(/^https:\/\/al-eshraqa\.co\/manus-storage\/.+\.png$/);
+      expect(article.imageAlt).toMatch(/^رسم بصري مخصص لدليل /);
+    });
   });
 });

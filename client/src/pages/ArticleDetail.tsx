@@ -159,27 +159,7 @@ const priorityLocalTitles: Readonly<Record<string, string>> = {
   khobar: "شركة تنظيف في الخبر",
   "al-kharj": "شركة تنظيف في الخرج",
 };
-const localArticleVisuals: Readonly<Record<string, { readonly src: string; readonly alt: string }>> = {
-  riyadh: { src: "/manus-storage/article-visual-bathroom-care_9449151f.webp", alt: "حمام مرتب بأدوات عناية منزلية هادئة" },
-  jeddah: { src: "/manus-storage/article-visual-ac-maintenance_e644ca83.webp", alt: "وحدة تكييف نظيفة وأدوات صيانة مرتبة" },
-  makkah: { src: "/manus-storage/article-visual-moving-plan_3fb9a477.webp", alt: "خطة منظمة لتغليف ونقل الأثاث" },
-  madinah: { src: "/manus-storage/article-visual-kitchen-deep-clean_f5c395b7.webp", alt: "سطح مطبخ نظيف وأدوات تنظيف عميق" },
-  dammam: { src: "/manus-storage/article-visual-scheduled-care_47ea76e0.webp", alt: "جدول هادئ لتنظيم العناية المنزلية" },
-  khobar: { src: "/manus-storage/article-visual-sofa-care_0001dda1.webp", alt: "كنب مرتب وتجهيزات عناية بالأقمشة" },
-  unaizah: { src: "/manus-storage/article-visual-window-care_5fb807c6.webp", alt: "نافذة مضيئة وأدوات عناية بالزجاج" },
-  jubail: { src: "/manus-storage/article-visual-marble-care_b0c1f72f.webp", alt: "سطح رخامي نظيف وتجهيزات عناية لطيفة" },
-  "khamis-mushait": { src: "/manus-storage/article-visual-exterior-care_8deeb043.webp", alt: "واجهة منزل مرتبة وأدوات عناية خارجية" },
-};
-
-const localArticleServiceVisuals = {
-  cleaning: { src: serviceMedia.cleaning.image, alt: serviceMedia.cleaning.alt },
-  "ac-maintenance": { src: serviceMedia.ac.image, alt: serviceMedia.ac.alt },
-  moving: { src: serviceMedia.floorCleaning.image, alt: serviceMedia.floorCleaning.alt },
-  "kitchen-cleaning": { src: serviceMedia.floorCleaning.image, alt: serviceMedia.floorCleaning.alt },
-  "home-services": { src: serviceMedia.cleaning.image, alt: serviceMedia.cleaning.alt },
-} as const;
-
-const localArticleServicePageSlugs: Readonly<Record<keyof typeof localArticleServiceVisuals, string>> = {
+const localArticleServicePageSlugs: Readonly<Record<(typeof localServices)[number]["slugPrefix"], string>> = {
   cleaning: "home-cleaning",
   "ac-maintenance": "ac-maintenance",
   moving: "furniture-moving",
@@ -192,15 +172,15 @@ const localArticleEntries: ArticleEntry[] = localCities.map(([city, slug], index
   const focus = service.focus;
   const title = priorityLocalTitles[slug] ?? service.title(city);
   const legacySlug = `${slug}-service-guide`;
-  const visual = localArticleVisuals[slug] ?? localArticleServiceVisuals[service.slugPrefix];
+  const shareImage = articleShareImages[legacySlug];
   return {
     slug: `${service.slugPrefix}-${slug}`,
     title,
     intro: `دليل محلي لسكان ${city} يوضح المعلومات المفيدة عند طلب ${focus}، من الحي إلى تفاصيل المكان، لتسهيل بدء التواصل عبر واتساب.`,
     category: "دليل محلي",
-    image: visual?.src,
-    imageAlt: visual?.alt,
-    shareImage: articleShareImages[legacySlug],
+    image: shareImage,
+    imageAlt: `رسم بصري مخصص لدليل ${title}`,
+    shareImage,
     keywords: [`${focus} ${city}`, title, `خدمات ${city}`, "شركة الإشراقة", "حجز واتساب"],
     sections: [...longGuideSections(city, focus, `في ${city}، ابدأ دائمًا بذكر الحي والعنوان التقريبي وطريقة الوصول المناسبة.`), ...localServiceGuidance[service.slugPrefix]],
     localServiceSlug: localArticleServicePageSlugs[service.slugPrefix],
