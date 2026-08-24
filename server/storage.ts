@@ -1,8 +1,64 @@
 // Preconfigured storage helpers for Manus WebDev templates
-// Uploads via Forge Server presigned URL to S3 (PUT direct).
-// Downloads return /manus-storage/{key} paths served via 307 redirect.
+// Supports the current Forge storage as well as an opt-in external S3-compatible
+// bucket. Both drivers retain /manus-storage/{key} so existing article/media links
+// remain valid while the external migration is tested.
 
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { ENV } from "./_core/env";
+
+export type StorageDriver = "forge" | "s3";
+
+function normalizeKey(relKey: string): string {
+  return relKey.replace(/^\/+/, "");
+}
+
+export function storagePublicPath(relKey: string): string {
+  return `/manus-storage/${encodeURIComponent(normalizeKey(relKey)).replace(/%2F/g, "/")}`;
+}
+
+function getS3Config() {
+  const { s3Bucket, s3AccessKeyId, s3SecretAccessKey } = ENV;
+  if (!s3Bucket || !s3AccessKeyId || !s3SecretAccessKey) {
+    throw new Error(
+      "S3 storage config missing: set S3_BUCKET, S3_ACCESS_KEY_ID and S3_SECRET_ACCESS_KEY",
+    );
+  }
+
+  return {
+    bucket: s3Bucket,
+    accessKeyId: s3AccessKeyId,
+    secretAccessKey: s3SecretAccessKey,
+    endpoint: ENV.s3Endpoint || undefined,
+    region: ENV.s3Region || "auto",
+    forcePathStyle: ENV.s3ForcePathStyle,
+  };
+}
+
+export function getStorageDriver(): StorageDriver {
+  if (ENV.storageDriver === "forge") return "forge";
+  if (ENV.storageDriver === "s3") {
+    getS3Config();
+    return "s3";
+  }
+  throw new Error(`Unsupported STORAGE_DRIVER: ${ENV.storageDriver}`);
+}
+
+function getS3Client() {
+  const config = getS3Config();
+  return {
+    bucket: config.bucket,
+    client: new S3Client({
+      region: config.region,
+      endpoint: config.endpoint,
+      forcePathStyle: config.forcePathStyle,
+      credentials: {
+        accessKeyId: config.accessKeyId,
+        secretAccessKey: config.secretAccessKey,
+      },
+    }),
+  };
+}
 
 function getForgeConfig() {
   const forgeUrl = ENV.forgeApiUrl;
@@ -17,10 +73,6 @@ function getForgeConfig() {
   return { forgeUrl: forgeUrl.replace(/\/+$/, ""), forgeKey };
 }
 
-function normalizeKey(relKey: string): string {
-  return relKey.replace(/^\/+/, "");
-}
-
 function appendHashSuffix(relKey: string): string {
   const hash = crypto.randomUUID().replace(/-/g, "").slice(0, 8);
   const lastDot = relKey.lastIndexOf(".");
@@ -33,8 +85,22 @@ export async function storagePut(
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
+
+  if (getStorageDriver() === "s3") {
+    const { bucket, client } = getS3Client();
+    await client.send(
+      new PutObjectCommand({
+        Bucket: bucket,
+        Key: key,
+        Body: data,
+        ContentType: contentType,
+      }),
+    );
+    return { key, url: storagePublicPath(key) };
+  }
+
+  const { forgeUrl, forgeKey } = getForgeConfig();
 
   // 1. Get presigned PUT URL from Forge
   const presignUrl = new URL("v1/storage/presign/put", forgeUrl + "/");
@@ -68,17 +134,25 @@ export async function storagePut(
     throw new Error(`Storage upload to S3 failed (${uploadResp.status})`);
   }
 
-  return { key, url: `/manus-storage/${key}` };
+  return { key, url: storagePublicPath(key) };
 }
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
   const key = normalizeKey(relKey);
-  return { key, url: `/manus-storage/${key}` };
+  return { key, url: storagePublicPath(key) };
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
-  const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
+
+  if (getStorageDriver() === "s3") {
+    const { bucket, client } = getS3Client();
+    return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), {
+      expiresIn: 60 * 10,
+    });
+  }
+
+  const { forgeUrl, forgeKey } = getForgeConfig();
 
   const getUrl = new URL("v1/storage/presign/get", forgeUrl + "/");
   getUrl.searchParams.set("path", key);

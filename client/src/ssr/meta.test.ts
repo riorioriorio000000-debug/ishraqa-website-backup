@@ -11,8 +11,12 @@ describe("البيانات الوصفية للعرض الخادمي", () => {
     expect(meta.description).toBe("شركة الإشراقة للخدمات المنزلية في السعودية: تنظيف المنازل والأثاث، صيانة المكيفات، مكافحة الحشرات، تنسيق الحدائق، ونقل العفش.");
     expect(meta.canonicalPath).toBe("/");
     expect(meta.keywords).toContain("شركة تنظيف في الخرج");
+    expect([...meta.title].length).toBeGreaterThanOrEqual(30);
+    expect([...meta.title].length).toBeLessThanOrEqual(60);
+    expect([...meta.description].length).toBeGreaterThanOrEqual(50);
     expect(meta.description).not.toMatch(/الصفحة الأولى|الأقل سعرًا|مضمون/);
     expect(meta.description.length).toBeLessThanOrEqual(160);
+    expect(meta.keywords).toHaveLength(8);
   });
 
   it("ينشئ بيانات مستقلة وقابلة للفهرسة لكل مقال محلي", () => {
