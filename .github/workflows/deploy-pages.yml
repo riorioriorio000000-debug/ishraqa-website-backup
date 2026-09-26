@@ -26,8 +26,6 @@ jobs:
           node-version: 22
       - name: تثبيت pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
       - name: تثبيت الاعتماديات
         run: pnpm install --frozen-lockfile
       - name: بناء الموقع
