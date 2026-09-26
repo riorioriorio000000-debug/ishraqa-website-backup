@@ -1,0 +1,50 @@
+name: نشر الموقع الثابت
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: جلب المستودع
+        uses: actions/checkout@v4
+      - name: إعداد Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: تثبيت pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - name: تثبيت الاعتماديات
+        run: pnpm install --frozen-lockfile
+      - name: بناء الموقع
+        run: pnpm run build
+      - name: دعم مسارات GitHub Pages
+        run: cp dist/public/index.html dist/public/404.html
+      - name: رفع الموقع
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/public
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: نشر GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
