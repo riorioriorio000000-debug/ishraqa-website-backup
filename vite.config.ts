@@ -154,6 +154,8 @@ const plugins = [react(), tailwindcss()];
 
 export default defineConfig({
   plugins,
+  // GitHub Pages serves this project from a subpath; keep local/custom-domain builds at root.
+  base: process.env.GITHUB_ACTIONS ? "/ishraqa-website-backup/" : "/",
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
