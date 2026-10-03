@@ -18,13 +18,13 @@ type NotificationItem = {
 };
 
 function NotificationAvatar({ type, actorDisplayName, actorAvatarKind, actorAvatarUrl }: Pick<NotificationItem, "type" | "actorDisplayName" | "actorAvatarKind" | "actorAvatarUrl">) {
-  if (type === "report_review") return <div className="notification-avatar is-ai"><img src="/manus-storage/ai-review-notification-avatar_b4a653c2.png" alt="مساعد المراجعة الذكي" loading="lazy" /></div>;
+  if (type === "report_review") return <div className="notification-avatar is-ai"><img src="/ishraqa-website-backup/media/sofa.jpg" alt="مساعد المراجعة الذكي" loading="lazy" /></div>;
   if (type === "reply" || type === "reaction") {
     const actorName = actorDisplayName || "زائر";
     const avatarMark = actorAvatarKind === "star" ? "★" : actorAvatarKind === "leaf" ? "❦" : actorAvatarKind === "spark" ? "✦" : "〰";
     return <div className="notification-avatar is-visitor" aria-label={`صورة ${actorName}`}>{actorAvatarUrl ? <img src={actorAvatarUrl} alt={`صورة ${actorName}`} loading="lazy" /> : <span aria-hidden="true">{avatarMark}</span>}</div>;
   }
-  return <div className="notification-avatar is-system"><img src="/manus-storage/system-notification-avatar_ddf070fb.png" alt="نظام الإشراقة" loading="lazy" /></div>;
+  return <div className="notification-avatar is-system"><img src="/ishraqa-website-backup/media/sofa.jpg" alt="نظام الإشراقة" loading="lazy" /></div>;
 }
 
 function formatNotificationDate(value: Date | string) {

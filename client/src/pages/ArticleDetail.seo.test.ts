@@ -20,15 +20,15 @@ describe("مكتبة المقالات وSEO", () => {
   it("يبقي صور الأدلة المحلية ومعايناتها واضحة بلا نص عربي مضمّن", () => {
     const localArticles = articleEntries.filter((article) => article.category === "دليل محلي");
     const expectedEditorialVisuals = [
-      "/manus-storage/article-visual-bathroom-care_9449151f.webp",
-      "/manus-storage/article-visual-ac-maintenance_e644ca83.webp",
-      "/manus-storage/article-visual-moving-plan_3fb9a477.webp",
-      "/manus-storage/article-visual-kitchen-deep-clean_f5c395b7.webp",
-      "/manus-storage/article-visual-scheduled-care_47ea76e0.webp",
-      "/manus-storage/article-visual-sofa-care_0001dda1.webp",
-      "/manus-storage/article-visual-window-care_5fb807c6.webp",
-      "/manus-storage/article-visual-marble-care_b0c1f72f.webp",
-      "/manus-storage/article-visual-exterior-care_8deeb043.webp",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
+      "/ishraqa-website-backup/media/sofa.jpg",
     ];
 
     expect(localArticles.map((article) => article.image)).toEqual(expect.arrayContaining(expectedEditorialVisuals));

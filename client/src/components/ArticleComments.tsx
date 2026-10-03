@@ -9,14 +9,14 @@ import { toast } from "sonner";
 const avatarKinds = ["wave", "spark", "leaf", "star"] as const;
 const COMMENT_PROFILE_STORAGE_KEY = "ishraqa-comment-profile";
 const readyAvatarOptions = [
-  { url: "/manus-storage/saudi-flag-riyadh_2e59cf4a.jpg", label: "أعلام السعودية في الرياض" },
-  { url: "/manus-storage/saudi-traveler_31726f72.jpg", label: "مسافر سعودي" },
-  { url: "/manus-storage/saudi-portrait-bw_78e11ff7.jpg", label: "صورة شخصية سعودية بالأبيض والأسود" },
-  { url: "/manus-storage/desert-profile_5a61b5b1.jpg", label: "مشهد صحراوي سعودي" },
-  { url: "/manus-storage/heritage-portrait_85fda9b1.jpg", label: "صورة تراثية سعودية" },
-  { url: "/manus-storage/saudi-emblem_3ec6d2c3.jpg", label: "شعار نخلة وسيفين" },
-  { url: "/manus-storage/saudi-map-portrait_1fad012b.jpg", label: "رسم سعودي بخلفية خضراء" },
-  { url: "/manus-storage/neutral-silhouette_230b7d3c.png", label: "صورة رمزية محايدة" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "أعلام السعودية في الرياض" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "مسافر سعودي" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "صورة شخصية سعودية بالأبيض والأسود" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "مشهد صحراوي سعودي" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "صورة تراثية سعودية" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "شعار نخلة وسيفين" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "رسم سعودي بخلفية خضراء" },
+  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "صورة رمزية محايدة" },
 ] as const;
 type AvatarKind = typeof avatarKinds[number];
 type ProfileMode = "comment" | "reply" | "rating-settings";

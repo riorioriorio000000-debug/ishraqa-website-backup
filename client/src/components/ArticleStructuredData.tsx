@@ -26,7 +26,7 @@ export default function ArticleStructuredData({ article }: { article: ArticleEnt
       url: "https://al-eshraqa.co/",
       logo: {
         "@type": "ImageObject",
-        url: "https://al-eshraqa.co/manus-storage/ishraqa-user-logo_64a160a3.png",
+        url: "https://al-eshraqa.co/ishraqa-website-backup/media/sofa.jpg",
       },
     },
   };

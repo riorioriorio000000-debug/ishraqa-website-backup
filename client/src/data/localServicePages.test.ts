@@ -20,7 +20,7 @@ describe("صفحات الخدمة والمدينة", () => {
     expect(page?.neighbourhoods.length).toBeGreaterThanOrEqual(4);
     expect(page?.serviceSteps).toHaveLength(3);
     expect(page?.cityTips).toHaveLength(3);
-    expect(page?.image).toBe("/manus-storage/ishraqa-pest-control-service_78beaf48.jpg");
+    expect(page?.image).toBe("/ishraqa-website-backup/media/sofa.jpg");
     expect(page?.imageAlt).toContain("مكافحة حشرات");
     expect(page?.description).not.toMatch(/الأرخص|مضمون|الأولى/);
   });

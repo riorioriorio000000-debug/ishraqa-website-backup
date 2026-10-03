@@ -38,7 +38,7 @@ describe("مركز الإشعارات", () => {
   it("يفلتر حالة القراءة ويفتح الإشعار مع تعليم غير المقروء كمقروء", async () => {
     mocks.listNotificationsUseQuery.mockReturnValue({
       data: [
-        { id: 7, type: "reply", title: "رد جديد على تعليقك", message: "سارة كتبت ردًا مفيدًا على تعليقك حول تنظيف المكيفات.", targetPath: "/articles/ac", entityType: "reply", entityId: 14, isRead: false, createdAt: new Date("2026-08-16T10:00:00Z"), actorDisplayName: "سارة", actorAvatarKind: "leaf", actorAvatarUrl: "/manus-storage/sara-avatar.png" },
+        { id: 7, type: "reply", title: "رد جديد على تعليقك", message: "سارة كتبت ردًا مفيدًا على تعليقك حول تنظيف المكيفات.", targetPath: "/articles/ac", entityType: "reply", entityId: 14, isRead: false, createdAt: new Date("2026-08-16T10:00:00Z"), actorDisplayName: "سارة", actorAvatarKind: "leaf", actorAvatarUrl: "/ishraqa-website-backup/media/sofa.jpg" },
         { id: 8, type: "reaction", title: "تفاعل جديد على تعليقك", message: "أحمد أبدى إعجابه بتعليقك.", targetPath: "/articles/jeddah", entityType: "comment", entityId: 9, isRead: true, createdAt: new Date("2026-08-15T10:00:00Z"), actorDisplayName: "أحمد", actorAvatarKind: "star", actorAvatarUrl: null },
       ],
       isLoading: false,
@@ -50,7 +50,7 @@ describe("مركز الإشعارات", () => {
     expect(await screen.findByText("رد جديد على تعليقك")).toBeTruthy();
     expect(screen.getByText("تفاعل جديد على تعليقك")).toBeTruthy();
     expect(screen.getByText("سارة")).toBeTruthy();
-    expect(screen.getByAltText("صورة سارة").getAttribute("src")).toBe("/manus-storage/sara-avatar.png");
+    expect(screen.getByAltText("صورة سارة").getAttribute("src")).toBe("/ishraqa-website-backup/media/sofa.jpg");
     expect(screen.getByText("أحمد")).toBeTruthy();
     expect(screen.getByLabelText("صورة أحمد")).toBeTruthy();
 

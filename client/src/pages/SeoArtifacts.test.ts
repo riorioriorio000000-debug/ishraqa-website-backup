@@ -14,7 +14,7 @@ describe("ملفات SEO وبصمة العرض الخادمي", () => {
     expect(home.description).toBe("شركة الإشراقة للخدمات المنزلية في السعودية: تنظيف المنازل والأثاث، صيانة المكيفات، مكافحة الحشرات، تنسيق الحدائق، ونقل العفش.");
     expect(home.description.length).toBeLessThanOrEqual(160);
     expect(home.canonicalPath).toBe("/");
-    expect(indexHtml).toContain('"logo": "https://al-eshraqa.co/manus-storage/ishraqa-user-logo_64a160a3.png"');
+    expect(indexHtml).toContain('"logo": "https://al-eshraqa.co/ishraqa-website-backup/media/sofa.jpg"');
     expect(indexHtml).toContain("<!--app-head-->");
   });
 

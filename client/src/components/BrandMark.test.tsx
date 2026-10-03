@@ -7,6 +7,6 @@ describe("BrandMark", () => {
   it("يستخدم الشعار الذي اعتمده المستخدم في واجهة الموقع", () => {
     render(<BrandMark size={54} />);
 
-    expect(screen.getByRole("img", { name: "شعار الإشراقة" }).getAttribute("src")).toContain("/manus-storage/ishraqa-user-logo_64a160a3.png");
+    expect(screen.getByRole("img", { name: "شعار الإشراقة" }).getAttribute("src")).toContain("/ishraqa-website-backup/media/sofa.jpg");
   });
 });
