@@ -36,6 +36,14 @@ const mutationResult = (): StaticMutationResult => ({
   reset: () => undefined,
 });
 
+// Some legacy components call trpc.useUtils() to invalidate server data.
+// On the static GitHub build there is no server cache, so return a recursive
+// no-op object instead of throwing during the initial render.
+const staticUtils: any = new Proxy(() => undefined, {
+  get: () => staticUtils,
+  apply: () => undefined,
+});
+
 /**
  * نسخة ثابتة من عميل tRPC. تحفظ واجهة المكونات القديمة حتى تعمل صفحات
  * المقالات والخدمات على GitHub Pages دون قاعدة بيانات أو API خارجي.
@@ -52,5 +60,5 @@ const staticProcedure = new Proxy({}, {
 });
 
 export const trpc = new Proxy({}, {
-  get: () => staticProcedure,
+  get: (_target, property) => property === "useUtils" ? () => staticUtils : staticProcedure,
 }) as any;
