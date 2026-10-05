@@ -8,6 +8,7 @@ import { trpc } from "@/lib/trpc";
 import { buildPlatformShareUrl, buildShareText, getOfficialShareUrl } from "@/components/SiteShareDialog";
 import { getVideoKey, workVideos } from "@/data/workVideos";
 
+import { createClientId } from "@/lib/uuid";
 type VideoWatchDialogProps = {
   open: boolean;
   onOpenChange: (next: boolean) => void;
@@ -21,7 +22,7 @@ function readVisitorId() {
   const storageKey = "ishraqa-anonymous-visitor";
   const saved = window.localStorage.getItem(storageKey);
   if (saved) return saved;
-  const created = crypto.randomUUID();
+  const created = createClientId();
   window.localStorage.setItem(storageKey, created);
   return created;
 }

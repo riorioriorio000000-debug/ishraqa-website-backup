@@ -2,11 +2,12 @@ import { Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 
+import { createClientId } from "@/lib/uuid";
 function getVisitorId() {
   const key = "ishraqa-anonymous-visitor";
   const known = localStorage.getItem(key);
   if (known) return known;
-  const created = crypto.randomUUID();
+  const created = createClientId();
   localStorage.setItem(key, created);
   return created;
 }

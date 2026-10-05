@@ -1,5 +1,6 @@
 import { OAUTH_STATE_COOKIE, encodeOAuthState } from "@shared/const";
 
+import { createClientId } from "@/lib/uuid";
 export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 
 // Start the Manus OAuth login. Call this from an event handler or effect at the
@@ -17,7 +18,7 @@ export const startLogin = () => {
   const appId = import.meta.env.VITE_APP_ID;
   const redirectUri = `${window.location.origin}/api/oauth/callback`;
 
-  const nonce = crypto.randomUUID();
+  const nonce = createClientId();
   document.cookie = `${OAUTH_STATE_COOKIE}=${nonce}; Path=/; Max-Age=600; SameSite=None; Secure`;
   const state = encodeOAuthState({ redirectUri, nonce });
 

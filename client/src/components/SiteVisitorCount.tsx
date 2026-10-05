@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 
+import { createClientId } from "@/lib/uuid";
 const VISITOR_STORAGE_KEY = "ishraqa-anonymous-visitor";
 
 function getVisitorId() {
   const known = localStorage.getItem(VISITOR_STORAGE_KEY);
   if (known) return known;
-  const created = crypto.randomUUID();
+  const created = createClientId();
   localStorage.setItem(VISITOR_STORAGE_KEY, created);
   return created;
 }

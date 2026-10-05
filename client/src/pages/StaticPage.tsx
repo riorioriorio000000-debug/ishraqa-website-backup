@@ -11,6 +11,7 @@ import QuickServiceQuestion from "@/components/QuickServiceQuestion";
 import ServicePageStats from "@/components/ServicePageStats";
 import { getLocalServicePagePath, localServicePages } from "@/data/localServicePages";
 
+import { createClientId } from "@/lib/uuid";
 const serviceRows = [
   [HomeIcon, "تنظيف المنازل", "تنظيف دوري أو عميق للمنازل والشقق، مع ترتيب الأولويات من المطبخ حتى المساحات التي تستقبل يومك."],
   [Wrench, "الصيانة المنزلية", "تنسيق أعمال الصيانة الأساسية بشرح واضح لما يحتاجه المكان، من التكييف إلى التفاصيل التي لا تحتمل التأجيل."],
@@ -82,7 +83,7 @@ export function ArticlesPage() {
   useEffect(() => {
     const key = "ishraqa-anonymous-visitor";
     const known = localStorage.getItem(key);
-    const nextVisitorId = known || crypto.randomUUID();
+    const nextVisitorId = known || createClientId();
     if (!known) localStorage.setItem(key, nextVisitorId);
     setVisitorId(nextVisitorId);
   }, []);

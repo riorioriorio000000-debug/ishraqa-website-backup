@@ -6,6 +6,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { nextReaction } from "@shared/interactionHelpers";
 import { toast } from "sonner";
 
+import { createClientId } from "@/lib/uuid";
 const avatarKinds = ["wave", "spark", "leaf", "star"] as const;
 const COMMENT_PROFILE_STORAGE_KEY = "ishraqa-comment-profile";
 const readyAvatarOptions = [
@@ -37,7 +38,7 @@ function getVisitorId() {
   const key = "ishraqa-anonymous-visitor";
   const known = localStorage.getItem(key);
   if (known) return known;
-  const created = crypto.randomUUID();
+  const created = createClientId();
   localStorage.setItem(key, created);
   return created;
 }

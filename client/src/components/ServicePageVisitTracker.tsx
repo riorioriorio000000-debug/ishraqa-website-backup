@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 
+import { createClientId } from "@/lib/uuid";
 const visitorStorageKey = "ishraqa-anonymous-visitor";
 const trackedPaths = new Set(["/services", "/calculator", "/booking", "/customer-service"]);
 
 function visitorId() {
   const saved = localStorage.getItem(visitorStorageKey);
   if (saved) return saved;
-  const created = crypto.randomUUID();
+  const created = createClientId();
   localStorage.setItem(visitorStorageKey, created);
   return created;
 }

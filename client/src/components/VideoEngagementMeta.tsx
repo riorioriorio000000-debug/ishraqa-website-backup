@@ -2,12 +2,13 @@ import { Eye, Heart } from "lucide-react";
 import { useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 
+import { createClientId } from "@/lib/uuid";
 const visitorStorageKey = "ishraqa-anonymous-visitor";
 
 function getVisitorId() {
   const saved = localStorage.getItem(visitorStorageKey);
   if (saved) return saved;
-  const created = crypto.randomUUID();
+  const created = createClientId();
   localStorage.setItem(visitorStorageKey, created);
   return created;
 }
