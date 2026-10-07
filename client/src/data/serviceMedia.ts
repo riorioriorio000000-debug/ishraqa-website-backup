@@ -14,20 +14,20 @@ export const serviceMedia = {
     videoDescription: "مقطع حقيقي قصير من تجهيز والعناية بخزان مياه منزلي دون إظهار أشخاص.",
   },
   cleaning: {
-    image: "/media/sofa.jpg",
-    alt: "مستلزمات تنظيف منزلية مرتبة بجوار أسطح قابلة للعناية",
+    image: "/media/cleaning-tools.png",
+    alt: "معدات تنظيف منزلية مرتبة للعناية بالأسطح دون ظهور أشخاص",
   },
   floorCleaning: {
-    image: "/media/sofa.jpg",
-    alt: "أدوات تنظيف أرضيات منزلية مرتبة للاستخدام المنظم",
+    image: "/media/sofa-work.jpg",
+    alt: "سطح أريكة منزلي أثناء العناية والتنظيف دون ظهور أشخاص",
   },
   plumbing: {
     image: "/media/ac.jpg",
-    alt: "أدوات صيانة سباكة منزلية مرتبة لفحص نقطة خدمة",
+    alt: "وحدة تكييف منزلية وأجزاء فحص صيانة مرتبة دون ظهور أشخاص",
   },
   pestControl: {
-    image: "/media/sofa.jpg",
-    alt: "أدوات مكافحة حشرات منزلية مرتبة في مطبخ حديث بدون أشخاص",
+    image: "/media/pest-control.png",
+    alt: "معدات مكافحة آفات منزلية وعبوة رش مرتبة دون ظهور أشخاص",
   },
 } as const;
 

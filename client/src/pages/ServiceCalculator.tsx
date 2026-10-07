@@ -51,7 +51,7 @@ export default function ServiceCalculator() {
     <SiteShell>
       <PageMeta title="الحاسبة التقديرية" description="احصل على تقدير أولي توضيحي لخدمة التنظيف أو الصيانة أو نقل العفش قبل التواصل مع فريق الإشراقة." keywords={["حاسبة خدمة", "تقدير تنظيف", "تقدير صيانة", "نقل عفش الإشراقة"]} path="/calculator" />
       <main className="calculator-page" dir="rtl">
-        <section className="calculator-hero" style={{ backgroundImage: "linear-gradient(90deg, rgba(11,64,70,.94), rgba(11,64,70,.78)), url('/media/sofa.jpg')" }}>
+        <section className="calculator-hero" style={{ backgroundImage: "linear-gradient(90deg, rgba(11,64,70,.94), rgba(11,64,70,.78)), url('/media/cleaning-tools.png')" }}>
           <div className="shell calculator-hero-inner">
             <span className="eyebrow eyebrow-light"><i /> حاسبة الخدمة</span>
             <h1>تقدير أولي يبدأ من التفاصيل.</h1>
