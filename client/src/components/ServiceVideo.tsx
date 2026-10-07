@@ -1,9 +1,8 @@
 import { Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link } from "wouter";
-import VideoEngagementMeta from "@/components/VideoEngagementMeta";
 import VideoWatchDialog from "@/components/VideoWatchDialog";
-import { getVideoKey, type WorkVideo } from "@/data/workVideos";
+import type { WorkVideo } from "@/data/workVideos";
 
 type ServiceVideoProps = WorkVideo & {
   featured?: boolean;
@@ -18,7 +17,6 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [watchOpen, setWatchOpen] = useState(false);
-  const videoKey = getVideoKey(src);
 
   useEffect(() => {
     const media = mediaRef.current;
@@ -121,15 +119,15 @@ export default function ServiceVideo({ title, description, src, serviceLabel, se
             {soundOn ? <Volume2 size={17} /> : <VolumeX size={17} />}
             <span>{soundOn ? "إيقاف الصوت" : "تشغيل الصوت"}</span>
           </button>
-        </div><span className="video-watch-hint" aria-hidden="true">افتح الفيديو والتفاعل</span></> : <div className="service-video-placeholder" aria-label={`يُحمّل فيديو خدمة ${title}`} />}
+        </div><span className="video-watch-hint" aria-hidden="true">فتح الفيديو</span></> : <div className="service-video-placeholder" aria-label={`يُحمّل فيديو خدمة ${title}`} />}
       </div>
       <div className="service-video-copy">
         <span className="eyebrow"><i /> من واقع الخدمة</span>
         <h3>{title}</h3>
         <p>{description}</p>
-        <div className="service-video-footer"><VideoEngagementMeta videoKey={videoKey} compact /><Link href={servicePath} className="service-video-service-link">{serviceLabel}</Link></div>
+        <div className="service-video-footer"><Link href={servicePath} className="service-video-service-link">{serviceLabel}</Link></div>
       </div>
-      <VideoWatchDialog open={watchOpen} onOpenChange={setWatchOpen} title={title} description={description} src={src} videoKey={videoKey} />
+      <VideoWatchDialog open={watchOpen} onOpenChange={setWatchOpen} title={title} description={description} src={src} />
     </article>
   );
 }

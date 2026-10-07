@@ -20,15 +20,15 @@ describe("مكتبة المقالات وSEO", () => {
   it("يبقي صور الأدلة المحلية ومعايناتها واضحة بلا نص عربي مضمّن", () => {
     const localArticles = articleEntries.filter((article) => article.category === "دليل محلي");
     const expectedEditorialVisuals = [
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
-      "/ishraqa-website-backup/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
+      "/media/sofa.jpg",
     ];
 
     expect(localArticles.map((article) => article.image)).toEqual(expect.arrayContaining(expectedEditorialVisuals));

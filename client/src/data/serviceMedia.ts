@@ -1,32 +1,32 @@
 export const serviceMedia = {
   ac: {
-    image: "/ishraqa-website-backup/media/ac.jpg",
+    image: "/media/ac.jpg",
     alt: "وحدة تكييف منزلية مع أدوات فحص وصيانة مرتبة",
-    video: "/ishraqa-website-backup/media/ac.mp4",
+    video: "/media/ac.mp4",
     videoTitle: "فحص وحدة تكييف من واقع العمل",
     videoDescription: "مقطع حقيقي قصير يوضح سياق فحص وحدة تكييف منزلية وتجهيز منطقة العمل دون إظهار أشخاص.",
   },
   tank: {
-    image: "/ishraqa-website-backup/media/tank.jpg",
+    image: "/media/tank.jpg",
     alt: "خزان مياه منزلي جاهز للعناية والتنظيف",
-    video: "/ishraqa-website-backup/media/tank.mp4",
+    video: "/media/tank.mp4",
     videoTitle: "العناية بخزان مياه من واقع العمل",
     videoDescription: "مقطع حقيقي قصير من تجهيز والعناية بخزان مياه منزلي دون إظهار أشخاص.",
   },
   cleaning: {
-    image: "/ishraqa-website-backup/media/sofa.jpg",
+    image: "/media/sofa.jpg",
     alt: "مستلزمات تنظيف منزلية مرتبة بجوار أسطح قابلة للعناية",
   },
   floorCleaning: {
-    image: "/ishraqa-website-backup/media/sofa.jpg",
+    image: "/media/sofa.jpg",
     alt: "أدوات تنظيف أرضيات منزلية مرتبة للاستخدام المنظم",
   },
   plumbing: {
-    image: "/ishraqa-website-backup/media/ac.jpg",
+    image: "/media/ac.jpg",
     alt: "أدوات صيانة سباكة منزلية مرتبة لفحص نقطة خدمة",
   },
   pestControl: {
-    image: "/ishraqa-website-backup/media/sofa.jpg",
+    image: "/media/sofa.jpg",
     alt: "أدوات مكافحة حشرات منزلية مرتبة في مطبخ حديث بدون أشخاص",
   },
 } as const;

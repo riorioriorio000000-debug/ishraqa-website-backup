@@ -6,7 +6,7 @@ const manifest = readFileSync(new URL("../public/site.webmanifest", import.meta.
 
 describe("هوية الشعار في الأصول العامة", () => {
   it("يوحد أيقونة الرابط وApple Touch Icon وPWA مع الشعار المعتمد", () => {
-    const logoPath = "/ishraqa-website-backup/media/sofa.jpg";
+    const logoPath = "/media/sofa.jpg";
 
     expect(indexHtml).toContain(`<link rel="icon" href="${logoPath}"`);
     expect(indexHtml).toContain(`<link rel="apple-touch-icon" href="${logoPath}"`);

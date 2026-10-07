@@ -31,7 +31,7 @@ export const workVideos: readonly WorkVideo[] = [
   {
     title: "تنظيف الكنب والمجالس",
     description: "لقطة حقيقية من العناية بكنب منزلي، مع تركيز على سطح المفروشات والتفاصيل القريبة.",
-    src: "/ishraqa-website-backup/media/sofa-1.mp4",
+    src: "/media/sofa-1.mp4",
     serviceId: "upholstery",
     serviceLabel: "خدمة تنظيف الكنب",
     servicePath: "/services/sofa-cleaning/riyadh",
@@ -39,7 +39,7 @@ export const workVideos: readonly WorkVideo[] = [
   {
     title: "تنظيف المفروشات المنزلية",
     description: "مقطع ثانٍ من عمل تنظيف مفروشات يوضح التعامل الهادئ مع المقعد قبل نهاية الخدمة.",
-    src: "/ishraqa-website-backup/media/sofa-2.mp4",
+    src: "/media/sofa-2.mp4",
     serviceId: "upholstery",
     serviceLabel: "خدمة تنظيف الكنب",
     servicePath: "/services/sofa-cleaning/riyadh",
@@ -47,7 +47,7 @@ export const workVideos: readonly WorkVideo[] = [
   {
     title: "العناية بأفران الغاز",
     description: "مقطع من عمل فعلي يوضح العناية بتنظيف فرن غاز ضمن تجهيزات المطبخ المنزلية.",
-    src: "/ishraqa-website-backup/media/oven-1.mp4",
+    src: "/media/oven-1.mp4",
     serviceId: "kitchen",
     serviceLabel: "خدمة تنظيف المنازل",
     servicePath: "/services/home-cleaning/riyadh",
@@ -55,7 +55,7 @@ export const workVideos: readonly WorkVideo[] = [
   {
     title: "فرن الغاز بعد العناية",
     description: "لقطة من نتيجة عمل على فرن غاز منزلي بعد إتمام العناية الأساسية ضمن المطبخ.",
-    src: "/ishraqa-website-backup/media/oven-2.mp4",
+    src: "/media/oven-2.mp4",
     serviceId: "kitchen",
     serviceLabel: "خدمة تنظيف المنازل",
     servicePath: "/services/home-cleaning/riyadh",

@@ -10,14 +10,14 @@ import { createClientId } from "@/lib/uuid";
 const avatarKinds = ["wave", "spark", "leaf", "star"] as const;
 const COMMENT_PROFILE_STORAGE_KEY = "ishraqa-comment-profile";
 const readyAvatarOptions = [
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "أعلام السعودية في الرياض" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "مسافر سعودي" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "صورة شخصية سعودية بالأبيض والأسود" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "مشهد صحراوي سعودي" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "صورة تراثية سعودية" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "شعار نخلة وسيفين" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "رسم سعودي بخلفية خضراء" },
-  { url: "/ishraqa-website-backup/media/sofa.jpg", label: "صورة رمزية محايدة" },
+  { url: "/media/sofa.jpg", label: "أعلام السعودية في الرياض" },
+  { url: "/media/sofa.jpg", label: "مسافر سعودي" },
+  { url: "/media/sofa.jpg", label: "صورة شخصية سعودية بالأبيض والأسود" },
+  { url: "/media/sofa.jpg", label: "مشهد صحراوي سعودي" },
+  { url: "/media/sofa.jpg", label: "صورة تراثية سعودية" },
+  { url: "/media/sofa.jpg", label: "شعار نخلة وسيفين" },
+  { url: "/media/sofa.jpg", label: "رسم سعودي بخلفية خضراء" },
+  { url: "/media/sofa.jpg", label: "صورة رمزية محايدة" },
 ] as const;
 type AvatarKind = typeof avatarKinds[number];
 type ProfileMode = "comment" | "reply" | "rating-settings";

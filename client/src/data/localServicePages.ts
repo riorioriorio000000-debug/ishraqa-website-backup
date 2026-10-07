@@ -104,7 +104,7 @@ function getCityTips(city: CityProfile) {
 export const localServicePages: readonly LocalServicePage[] = services.flatMap((service) => cities.map((city) => {
   const title = buildTitle(service, city);
   const description = buildDescription(service, city);
-  const image = getLocalServiceMediaImage(service.slug) ?? articleShareImages[`${city.slug}-service-guide`] ?? "/ishraqa-website-backup/media/sofa.jpg";
+  const image = getLocalServiceMediaImage(service.slug) ?? articleShareImages[`${city.slug}-service-guide`] ?? "/media/sofa.jpg";
   return {
     serviceSlug: service.slug,
     citySlug: city.slug,

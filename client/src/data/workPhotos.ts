@@ -11,7 +11,7 @@ export const workPhotos: readonly WorkPhoto[] = [
   {
     title: "تنظيف داخل خزان مياه",
     description: "لقطة ميدانية لداخل خزان ماء أثناء مرحلة التنظيف، من دون ظهور أشخاص.",
-    src: "/ishraqa-website-backup/media/tank.jpg",
+    src: "/media/tank.jpg",
     alt: "داخل خزان مياه منزلي أثناء التنظيف مع خرطوم ماء، دون ظهور أشخاص",
     servicePath: "/services/tank-cleaning/riyadh",
   },

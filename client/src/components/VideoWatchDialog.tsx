@@ -2,51 +2,29 @@ import { ArrowLeft, Check, Copy, MessageCircle, Share2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "wouter";
-import ArticleComments from "@/components/ArticleComments";
-import VideoEngagementMeta from "@/components/VideoEngagementMeta";
-import { trpc } from "@/lib/trpc";
 import { buildPlatformShareUrl, buildShareText, getOfficialShareUrl } from "@/components/SiteShareDialog";
 import { getVideoKey, workVideos } from "@/data/workVideos";
 
-import { createClientId } from "@/lib/uuid";
 type VideoWatchDialogProps = {
   open: boolean;
   onOpenChange: (next: boolean) => void;
   title: string;
   description: string;
   src: string;
-  videoKey: string;
 };
 
-function readVisitorId() {
-  const storageKey = "ishraqa-anonymous-visitor";
-  const saved = window.localStorage.getItem(storageKey);
-  if (saved) return saved;
-  const created = createClientId();
-  window.localStorage.setItem(storageKey, created);
-  return created;
-}
 
 export default function VideoWatchDialog({ open, onOpenChange, title, description, src, videoKey }: VideoWatchDialogProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [visitorId, setVisitorId] = useState<string>();
   const [isPlaying, setIsPlaying] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [commentsOpen, setCommentsOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [likePulse, setLikePulse] = useState(false);
-  const [commentPublishedNotice, setCommentPublishedNotice] = useState(false);
-  const commentNoticeTimer = useRef<number>();
   const [isMounted, setIsMounted] = useState(open);
   const [isClosing, setIsClosing] = useState(false);
-  const [activeVideo, setActiveVideo] = useState({ title, description, src, videoKey });
+  const [activeVideo, setActiveVideo] = useState({ title, description, src });
   const activeVideoKey = getVideoKey(activeVideo.src);
-  const engagement = trpc.interactions.videoEngagement.useQuery({ videoKey: activeVideoKey, visitorId });
-  const videoComments = trpc.interactions.listComments.useQuery({ pageKey: activeVideoKey, visitorId });
-  const toggleLike = trpc.interactions.toggleVideoLike.useMutation({ onSuccess: () => void engagement.refetch() });
-  const recordVideoView = trpc.interactions.recordVideoView.useMutation({ onSuccess: () => void engagement.refetch() });
   const relatedVideos = useMemo(() => workVideos.filter((video) => video.src !== activeVideo.src).slice(0, 3), [activeVideo.src]);
   const shareRequest = useMemo(() => ({
     title: activeVideo.title,
@@ -56,23 +34,19 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
 
   useEffect(() => {
     if (open) {
-      setActiveVideo({ title, description, src, videoKey });
+      setActiveVideo({ title, description, src });
       setIsMounted(true);
       setIsClosing(false);
       return;
     }
     if (!isMounted) return;
     setIsClosing(true);
-    const timer = window.setTimeout(() => {
-      setIsMounted(false);
-      setIsClosing(false);
-    }, 190);
+    const timer = window.setTimeout(() => { setIsMounted(false); setIsClosing(false); }, 190);
     return () => window.clearTimeout(timer);
-  }, [description, isMounted, open, src, title, videoKey]);
+  }, [description, isMounted, open, src, title]);
 
   useEffect(() => {
     if (!open) return;
-    setVisitorId(readVisitorId());
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") onOpenChange(false); };
@@ -80,9 +54,6 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
     return () => { document.body.style.overflow = previousOverflow; document.removeEventListener("keydown", closeOnEscape); };
   }, [open, onOpenChange]);
 
-  useEffect(() => () => {
-    if (commentNoticeTimer.current) window.clearTimeout(commentNoticeTimer.current);
-  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -101,24 +72,7 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
     return () => { video.removeEventListener("timeupdate", syncProgress); video.removeEventListener("loadedmetadata", syncProgress); video.removeEventListener("play", syncPlaying); video.removeEventListener("pause", syncPlaying); video.removeEventListener("ended", syncPlaying); };
   }, [activeVideo.src, open]);
 
-  useEffect(() => {
-    if (!open || !visitorId) return;
-    const sessionKey = `ishraqa-video-viewed:${activeVideoKey}`;
-    if (sessionStorage.getItem(sessionKey)) return;
-    sessionStorage.setItem(sessionKey, "1");
-    recordVideoView.mutate({ videoKey: activeVideoKey, visitorId });
-  }, [activeVideoKey, open, recordVideoView, visitorId]);
 
-  useEffect(() => {
-    if (!commentsOpen) return;
-    const frame = window.requestAnimationFrame(() => {
-      const comments = document.getElementById(`${activeVideoKey}-comments`);
-      if (!comments) return;
-      comments.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-      comments.querySelector<HTMLTextAreaElement>("textarea")?.focus({ preventScroll: true });
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [activeVideoKey, commentsOpen]);
 
   const close = () => {
     videoRef.current?.pause();
@@ -127,11 +81,10 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
 
   const chooseRelatedVideo = (nextVideo: typeof workVideos[number]) => {
     videoRef.current?.pause();
-    setActiveVideo({ ...nextVideo, videoKey: getVideoKey(nextVideo.src) });
+    setActiveVideo({ ...nextVideo });
     setIsPlaying(false);
     setSoundOn(false);
     setProgress(0);
-    setCommentsOpen(false);
     setShareOpen(false);
   };
 
@@ -145,17 +98,6 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
     }
   };
 
-  const handleLike = () => {
-    if (!visitorId || toggleLike.isPending) return;
-    setLikePulse(true);
-    window.setTimeout(() => setLikePulse(false), 360);
-    toggleLike.mutate({ videoKey: activeVideoKey, visitorId });
-  };
-  const handleVideoCommentPublished = () => {
-    if (commentNoticeTimer.current) window.clearTimeout(commentNoticeTimer.current);
-    setCommentPublishedNotice(true);
-    commentNoticeTimer.current = window.setTimeout(() => setCommentPublishedNotice(false), 2200);
-  };
   const togglePlayback = async () => {
     const video = videoRef.current;
     if (!video) return;
@@ -184,17 +126,14 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       <div className="video-watch-head"><span className="eyebrow"><i /> أعمال الإشراقة</span><h2 id={`${activeVideoKey}-title`}>{activeVideo.title}</h2><p>{activeVideo.description}</p></div>
       <div className="video-watch-stage">
         <video ref={videoRef} muted={!soundOn} playsInline preload="metadata" disablePictureInPicture onContextMenu={(event) => event.preventDefault()} aria-label={`فيديو ${activeVideo.title}`}><source src={activeVideo.src} type="video/mp4" /></video>
-        {commentPublishedNotice && <div className="video-comment-success-notice" role="status" aria-live="polite">تم إرسال تعليقك</div>}
         <div className="video-watch-controls" aria-label={`عناصر تحكم فيديو ${activeVideo.title}`}>
           <button type="button" onClick={togglePlayback} aria-pressed={isPlaying}>{isPlaying ? "إيقاف" : "تشغيل"}</button>
           <input type="range" min="0" max="100" step="0.1" value={progress} onChange={(event) => seek(Number(event.target.value))} aria-label="التقدم في الفيديو" />
           <button type="button" onClick={toggleSound} aria-pressed={soundOn}>{soundOn ? "إيقاف الصوت" : "تشغيل الصوت"}</button>
         </div>
       </div>
-      <div className="video-watch-actions" aria-label="التفاعل مع الفيديو">
-        <button type="button" className={`video-heart${engagement.data?.liked ? " active" : ""}${likePulse ? " is-reacting" : ""}`} onClick={handleLike} disabled={!visitorId || toggleLike.isPending} aria-pressed={engagement.data?.liked ?? false}><span aria-hidden="true">♥</span> {engagement.data?.liked ? "أعجبك الفيديو" : "أعجبني"}<small>{engagement.data?.likes ?? 0}</small></button>
+      <div className="video-watch-actions" aria-label="خيارات الفيديو">
         <button type="button" className="video-share-toggle" onClick={() => setShareOpen((value) => !value)} aria-expanded={shareOpen} aria-controls={`${activeVideoKey}-share`}><Share2 size={16} aria-hidden="true" /> مشاركة</button>
-        <button type="button" className="video-comments-toggle" onClick={() => setCommentsOpen(value => !value)} aria-expanded={commentsOpen} aria-controls={`${activeVideoKey}-comments`}><MessageCircle size={16} aria-hidden="true" /> {commentsOpen ? "إخفاء التعليقات" : "اكتب تعليقًا"}<small aria-label={`${videoComments.data?.length ?? 0} تعليقًا`}>{videoComments.data?.length ?? 0}</small></button>
       </div>
       {shareOpen && <div id={`${activeVideoKey}-share`} className="video-share-menu" aria-label="خيارات مشاركة الفيديو">
         <button type="button" onClick={() => void copyShareLink()}>{copied ? <Check size={16} aria-hidden="true" /> : <Copy size={16} aria-hidden="true" />}<span>{copied ? "تم النسخ" : "نسخ الرابط"}</span></button>
@@ -203,9 +142,8 @@ export default function VideoWatchDialog({ open, onOpenChange, title, descriptio
       </div>}
       <section className="video-watch-related" aria-labelledby={`${activeVideoKey}-related`}>
         <div className="video-watch-related-heading"><span className="eyebrow"><i /> استكشف المزيد</span><h3 id={`${activeVideoKey}-related`}>فيديوهات ذات صلة</h3></div>
-        <div className="video-watch-related-list">{relatedVideos.map((relatedVideo) => <article key={relatedVideo.src}><button type="button" onClick={() => chooseRelatedVideo(relatedVideo)} aria-label={`مشاهدة فيديو مرتبط: ${relatedVideo.title}`}><span>{relatedVideo.title}</span></button><div className="video-watch-related-meta"><VideoEngagementMeta videoKey={getVideoKey(relatedVideo.src)} compact /><Link href={relatedVideo.servicePath} onClick={(event) => event.stopPropagation()}>{relatedVideo.serviceLabel} <ArrowLeft size={13} aria-hidden="true" /></Link></div></article>)}</div>
+        <div className="video-watch-related-list">{relatedVideos.map((relatedVideo) => <article key={relatedVideo.src}><button type="button" onClick={() => chooseRelatedVideo(relatedVideo)} aria-label={`مشاهدة فيديو مرتبط: ${relatedVideo.title}`}><span>{relatedVideo.title}</span></button><div className="video-watch-related-meta"><Link href={relatedVideo.servicePath} onClick={(event) => event.stopPropagation()}>{relatedVideo.serviceLabel} <ArrowLeft size={13} aria-hidden="true" /></Link></div></article>)}</div>
       </section>
-      {commentsOpen && <div id={`${activeVideoKey}-comments`} className="video-watch-comments"><ArticleComments key={activeVideoKey} pageKey={activeVideoKey} showLinkedRating sectionId={`${activeVideoKey}-comments`} showSortControls onCommentPublished={handleVideoCommentPublished} suppressSuccessToast /></div>}
     </section>
   </div>, document.body);
 }

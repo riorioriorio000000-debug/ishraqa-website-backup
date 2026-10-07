@@ -16,7 +16,7 @@ describe("صور أعمال الإشراقة", () => {
   it("يربط المعرض بصورة تنظيف الخزان الفوتوغرافية لا برسومات تجهيزات الخدمة", () => {
     expect(workPhotos).toEqual([
       expect.objectContaining({
-        src: "/ishraqa-website-backup/media/tank.jpg",
+        src: "/media/tank.jpg",
         servicePath: "/services/tank-cleaning/riyadh",
       }),
     ]);

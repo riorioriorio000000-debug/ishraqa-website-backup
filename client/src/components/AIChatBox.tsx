@@ -483,7 +483,7 @@ export function AIChatBox({
                     <Sparkles className="size-4 text-primary" />
                   </div>
                   <div className="ai-thinking flex items-center gap-2 px-1 py-2 text-sm text-muted-foreground" role="status" aria-live="polite">
-                    <img src="/manus-storage/ai-loading_4a219f05.gif" alt="" aria-hidden="true" className="size-8 object-contain" />
+                    <img src="/media/brand.png" alt="" aria-hidden="true" className="size-8 object-contain" />
                     <span>يتحقق المساعد من التفاصيل…</span>
                   </div>
                 </div>

@@ -140,14 +140,14 @@ describe("ArticleComments", () => {
 
   it("يستعيد اسم الزائر وصورته المحفوظين عند فتح نموذج تعليق جديد", async () => {
     const user = userEvent.setup();
-    localStorage.setItem("ishraqa-comment-profile", JSON.stringify({ displayName: "زائر محفوظ", avatarUrl: "/ishraqa-website-backup/media/sofa.jpg" }));
+    localStorage.setItem("ishraqa-comment-profile", JSON.stringify({ displayName: "زائر محفوظ", avatarUrl: "/media/sofa.jpg" }));
     render(<ArticleComments pageKey="article-test" />);
 
     await user.type(screen.getByRole("textbox", { name: "تعليقك" }), "تعليق لاستعادة الملف المحفوظ");
     await user.click(screen.getByRole("button", { name: /أضف تعليقًا/ }));
 
     expect((await screen.findByRole("textbox", { name: "اسم العرض" }) as HTMLInputElement).value).toBe("زائر محفوظ");
-    expect(screen.getByAltText("معاينة صورة الملف الشخصي").getAttribute("src")).toBe("/ishraqa-website-backup/media/sofa.jpg");
+    expect(screen.getByAltText("معاينة صورة الملف الشخصي").getAttribute("src")).toBe("/media/sofa.jpg");
   });
 
   it("يفتح الإبلاغ بحقل سبب مباشر ويصنفه قبل الإرسال", async () => {
