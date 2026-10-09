@@ -31,7 +31,25 @@ jobs:
       - name: بناء الموقع
         run: pnpm run build
       - name: دعم مسارات GitHub Pages
-        run: cp dist/public/index.html dist/public/404.html
+        run: |
+          cp dist/public/index.html dist/public/404.html
+          python3 - <<'PYROUTES'
+          from pathlib import Path
+          from urllib.parse import urlparse
+          import re, shutil
+          root = Path("dist/public")
+          index = root / "index.html"
+          sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
+          urls = re.findall(r"<loc>(.*?)</loc>", sitemap)
+          for url in urls:
+              path = urlparse(url).path.rstrip("/")
+              if not path or path.startswith("/media/") or "." in Path(path).name:
+                  continue
+              target = root / path.lstrip("/") / "index.html"
+              target.parent.mkdir(parents=True, exist_ok=True)
+              shutil.copy2(index, target)
+          print(f"Generated route entrypoints for {len(urls)} sitemap URLs")
+          PYROUTES
       - name: رفع الموقع
         uses: actions/upload-pages-artifact@v3
         with:
