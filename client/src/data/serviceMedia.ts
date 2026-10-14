@@ -2,16 +2,10 @@ export const serviceMedia = {
   ac: {
     image: "/media/ac.jpg",
     alt: "وحدة تكييف منزلية مع أدوات فحص وصيانة مرتبة",
-    video: "/media/ac.mp4",
-    videoTitle: "فحص وحدة تكييف من واقع العمل",
-    videoDescription: "مقطع حقيقي قصير يوضح سياق فحص وحدة تكييف منزلية وتجهيز منطقة العمل دون إظهار أشخاص.",
   },
   tank: {
     image: "/media/tank.jpg",
     alt: "خزان مياه منزلي جاهز للعناية والتنظيف",
-    video: "/media/tank.mp4",
-    videoTitle: "العناية بخزان مياه من واقع العمل",
-    videoDescription: "مقطع حقيقي قصير من تجهيز والعناية بخزان مياه منزلي دون إظهار أشخاص.",
   },
   cleaning: {
     image: "/media/cleaning-tools.png",
@@ -52,9 +46,3 @@ export function getLocalServiceMediaAlt(serviceSlug: string) {
   return undefined;
 }
 
-export function getServiceVideoPoster(src: string) {
-  if (src === serviceMedia.ac.video) return serviceMedia.ac.image;
-  if (src === serviceMedia.tank.video) return serviceMedia.tank.image;
-  if (src.includes("oven")) return serviceMedia.floorCleaning.image;
-  return serviceMedia.cleaning.image;
-}

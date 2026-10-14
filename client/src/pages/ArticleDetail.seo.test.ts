@@ -17,6 +17,17 @@ describe("مكتبة المقالات وSEO", () => {
     expect(articleEntries.filter((article) => article.category === "دليل رئيسي").every((article) => article.image && article.imageAlt)).toBe(true);
   });
 
+  it("تكرر عبارة الخدمة والمدينة داخل الأدلة المحلية ضمن سياق القراءة", () => {
+    articleEntries.filter((article) => article.category === "دليل محلي").forEach((article) => {
+      const keywordTokens = article.keywords[0].split(/\s+/).filter(Boolean);
+      const city = keywordTokens.at(-1) ?? "";
+      const servicePhrase = keywordTokens[0] ?? "";
+      const readableText = [article.title, article.intro, ...article.sections.flatMap(([heading, body]) => [heading, body])].join(" ");
+      expect((readableText.match(new RegExp(servicePhrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length).toBeGreaterThanOrEqual(3);
+      expect((readableText.match(new RegExp(city.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g")) ?? []).length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
   it("يبقي صور الأدلة المحلية ومعايناتها واضحة بلا نص عربي مضمّن", () => {
     const localArticles = articleEntries.filter((article) => article.category === "دليل محلي");
     const expectedEditorialVisuals = [

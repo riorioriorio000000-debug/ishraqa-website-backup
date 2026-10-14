@@ -30,6 +30,10 @@ describe("صفحات الخدمة والمدينة", () => {
       expect(page.title.length).toBeLessThanOrEqual(60);
       expect(page.description.length).toBeLessThanOrEqual(180);
       expect(page.image).toMatch(/^(\/manus-storage\/|https:\/\/)/);
+      expect(page.searchPhrases).toHaveLength(3);
+      expect(page.searchPhrases[0]).toContain(page.cityName);
+      expect(page.searchPhrases[1]).toContain(page.cityName);
+      expect(page.keywords).toEqual(expect.arrayContaining(page.searchPhrases.slice(0, 2)));
     }
   });
 });

@@ -9,6 +9,7 @@ export type LocalServicePage = {
   readonly title: string;
   readonly description: string;
   readonly keywords: readonly string[];
+  readonly searchPhrases: readonly string[];
   readonly neighbourhoods: readonly string[];
   readonly cityDetail: string;
   readonly serviceDetail: string;
@@ -113,6 +114,11 @@ export const localServicePages: readonly LocalServicePage[] = services.flatMap((
     title,
     description,
     keywords: [service.searchTerm, `${service.searchTerm} ${city.name}`, `شركة ${service.searchTerm} ${city.name}`, ...city.neighbourhoods.map((neighbourhood) => `${service.searchTerm} ${neighbourhood}`), "شركة الإشراقة"],
+    searchPhrases: [
+      `${service.searchTerm} ${city.name}`,
+      `شركة ${service.searchTerm} ${city.name}`,
+      `${service.name} في ${city.name}`,
+    ],
     neighbourhoods: city.neighbourhoods,
     cityDetail: city.detail,
     serviceDetail: service.detail,
